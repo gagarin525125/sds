@@ -5,35 +5,43 @@
     </head>
     <body>
         <div class="app">
-            <div class="list">
-                <ul>
-                </ul>
-            </div>
-            <div class="form">
-                <form>
-                    <div>
-                        <label>
-                            <span>Name</span>
-                            <input id="name" type="text" />
-                        </label>
-                    </div>
-                    <div>
-                        <label>
-                            <span>Short name</span>
-                            <input id="shortName" type="text" />
-                        </label>
-                    </div>
-                    <div>
-                        <label>
-                            <span>Opening date</span>
-                            <input id="openingDate" type="date" />
-                        </label>
-                    </div>
-                    <div>
-                        <button id="submit">Submit</button>
-                    </div>
-                </form>
-            </div>
+            <div class="leftColumn">
+
+                <div class="form">
+                    <form>
+                        <div>
+                            <label>
+                                <span>Name</span>
+                                <input id="name" type="text" />
+                            </label>
+                        </div>
+                        <div>
+                            <label>
+                                <span>Short name</span>
+                                <input id="shortName" type="text" />
+                            </label>
+                        </div>
+                        <div>
+                            <label>
+                                <span>Opening date</span>
+                                <input id="openingDate" type="date" />
+                            </label>
+                        </div>
+                        <div>
+                            <button id="submit">Submit</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="list">
+                    <ul>
+                    </ul>
+                </div>
+
+            </div> <!-- leftColumn end -->
+
+            <div class="map" id="theMap"></div>
+
         </div>
 
         <script src="app.js"></script>

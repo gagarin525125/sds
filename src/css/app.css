@@ -9,12 +9,25 @@ body {
 
 .app {
     display: flex;
+    flex-direction: row;
     align-items: stretch;
     position: absolute;
     left: 0px;
     right: 0px;
     top: 0;
     bottom: 0;
+}
+
+.leftColumn {
+    flex: 1;
+    flex-direction: column;
+    height: 100%;
+    padding: 3rem;
+}
+
+.map {
+    height: 100%;
+    width: 50%;
 }
 
 .list {

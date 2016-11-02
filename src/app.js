@@ -1,6 +1,7 @@
 import { getDataFromForm, registerSubmitHandler } from './form';
 import { saveOrganisationUnit, loadOrganisationUnits, deleteOrganisationUnit } from './api';
 import { populateList, registerClickHandlerForItems } from './list';
+import { loadGoogleMaps, initMap, locateOnMapTest } from './map';
 
 function loadOrganisationUnitsIntoList() {
     loadOrganisationUnits()
@@ -9,6 +10,9 @@ function loadOrganisationUnitsIntoList() {
             alert(e.message);
         });
 }
+
+// Initialization
+loadGoogleMaps(function () {initMap(); locateOnMapTest();});
 
 // Call loadOrganisationUnits once to load the initial list
 // We will call this function again later to reload the list
