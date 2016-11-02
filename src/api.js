@@ -5,7 +5,7 @@
  * `basicAuth` contains the username and password to send with the request as the basic authentication token. This is only needed when you develop locally and need CORS support (https://developer.mozilla.org/en-US/docs/Web/HTTP).
  * You obviously should not do this for your production apps.
  */
-const serverUrl = 'http://localhost:8082/api';
+const serverUrl = 'http://localhost:8082/api/';
 //const serverUrl = 'https://play.dhis2.org/demo/api/';
 //const serverUrl = 'https://play.dhis2.org/dev/api/';
 const basicAuth = `Basic ${btoa('admin:district')}`;
@@ -42,10 +42,10 @@ export function saveOrganisationUnit(organisationUnit) {
         .catch(error => console.error(error));
 }
 
-export function deleteOrganisationUnit(organisationUnit) {
+export function deleteOrganisationUnit(organisationUnitId) {
     // Send DELETE request to the server to delete the organisation unit
     return fetch(
-        `${serverUrl}/organisationUnits/${organisationUnit.id}`,
+        `${serverUrl}/organisationUnits/${organisationUnitId}`,
         {
             headers: fetchOptions.headers,
             method: 'DELETE',
