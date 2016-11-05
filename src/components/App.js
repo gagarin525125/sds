@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { saveOrganisationUnit, loadOrganisationUnits, deleteOrganisationUnit } from '../api';
 import List from './List';
 import Form from './Form';
+import { locateOnMapTest } from '../map';
 
 /**
  * ES2015 class component
@@ -76,11 +77,11 @@ export default class App extends Component {
         // We hide the form component when we are in the saving state.
         return (
             <div className="app">
+                {this.state.isSaving ? <div>Saving organisation unit</div> : <Form onSubmit={this.onSubmit} />}
                 <List
                     onItemClick={this.onItemClick}
                     items={this.state.items}
                 />
-                {this.state.isSaving ? <div>Saving organisation unit</div> : <Form onSubmit={this.onSubmit} />}
             </div>
         );
     }
