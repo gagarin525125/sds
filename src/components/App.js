@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { saveOrganisationUnit, loadOrganisationUnits, deleteOrganisationUnit } from '../api';
 import List from './List';
 import Form from './Form';
-import { locateOnMapTest } from '../map';
+import { locateOnMap } from '../map';
 
 /**
  * ES2015 class component
@@ -57,6 +57,9 @@ export default class App extends Component {
     onSubmit(formData) {
         // Set the component state to saving
         this.setState({ isSaving: true });
+
+        // Test putting a marker on the map
+        locateOnMap([{ lat: 8.5, lng: -12, title: "Testing 1 2 3" }]);
 
         // Save the organisation unit to the api
         saveOrganisationUnit(formData)

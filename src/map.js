@@ -1,4 +1,5 @@
 var map;
+var markers = [];
 
 export function initMap() {
     map = new google.maps.Map(document.getElementById('theMap'), {
@@ -7,12 +8,18 @@ export function initMap() {
     });
 }
 
-export function locateOnMapTest() {
-    new google.maps.Marker({
-            position: { lat: 8.5, lng: -12 },
-            map: map,
-            title: 'Testing 1 2 3'
-    });
+export function locateOnMap(places) {
+    // Remove old markers first
+    markers.forEach(m => m.setMap(null));
+    markers.length = 0;
+
+    markers = places.map(p =>
+        new google.maps.Marker({
+                map: map,
+                position: { lat: p.lat, lng: p.lng },
+                title: p.title
+        })
+    );
 }
 
 export function loadGoogleMaps(callback) {
