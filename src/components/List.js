@@ -9,19 +9,8 @@ export default function List({ items = [], onItemClick }) {
     // Each has a click handler for that specific item
     const listItems = items
         .map(item => {
-            var childList = "";
-            if (item.children.length > 0) {
-                const childItems = item.children.map(item => {
-                    return (
-                        <li key={item.id} onClick={() =>
-                            onItemClick(item)}>{item.displayName}</li>
-                    )
-                });
-                childList = <ul> {childItems} </ul>;
-            }
             return (
-                <li key={item.id} onClick={() =>
-                        onItemClick(item)}>{item.displayName}{childList}</li>
+                <li key={item.id} onClick={() => onItemClick(item)}>{item.displayName}</li>
             );
         });
 

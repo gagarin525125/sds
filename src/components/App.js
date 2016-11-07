@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-import { saveOrganisationUnit, loadOrganisationUnits, deleteOrganisationUnit } from '../api';
+import Search from 'react-search';
+import { saveOrganisationUnit, loadOrganisationUnits, findChildren, levelUp, fetchParent } from '../api';
 import List from './List';
 import Form from './Form';
-import { locateOnMap } from '../map';
 
 /**
  * ES2015 class component
@@ -17,15 +17,30 @@ export default class App extends Component {
             isSaving: false,
             isLoading: true,
             items: [],
+            addShow: true,
+            item: {},
+            itemsToShow: [],
+
         };
 
         // Bind the functions that are passed around to the component
         this.onItemClick = this.onItemClick.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
+        this.showChildren = this.showChildren.bind(this);
+        this.handleClickAdd = this.handleClickAdd.bind(this);
+        this.handleClickShow = this.handleClickShow.bind(this);
+        this.filterItems = this.filterItems.bind(this);
+        this.handleBackClick = this.handleBackClick.bind(this);
     }
 
     componentDidMount() {
+        console.log("componentDidMount");
         this.loadOrganisationUnits();
+
+    }
+
+    showChildren(item) {
+        this.loadOrganisationUnitsChildren(item)
     }
 
     loadOrganisationUnits() {
@@ -35,37 +50,92 @@ export default class App extends Component {
                 this.setState({
                     isLoading: false,
                     items: organisationUnits,
+                    itemsToShow: organisationUnits,
                 });
+
             });
+    }
+
+    loadOrganisationUnitsChildren(item) {
+        // Loads the organisation units from the api and sets the loading state to false and puts the items onto the component state.
+        findChildren(item)
+            .then((organisationUnits) => {
+
+                this.setState({
+                    isLoading: false,
+                    items: organisationUnits,
+                    itemsToShow: organisationUnits,
+                });
+            })
+            .then(() => {
+                console.log("this.state.item App");
+                console.log(this.state.item);
+            })
+            .catch(() => alert(`Could not find children to  organisation unit ${item.displayName}`))
+    }
+
+    loadOrganisationUnitsLevelUp(item) {
+        console.log("this.state.item level Up   App");
+        console.log(this.state.item);
+        fetchParent(item)
+            .then((parent) => {
+                levelUp(parent).then((organisationUnits) => {
+                    this.setState({
+                        isLoading: false,
+                        items: organisationUnits,
+                        itemsToShow: organisationUnits,
+                        item: parent,
+                    });
+                })
+            })
+
+        .catch(() => alert(`Level UpCould not find children to  organisation unit ${item.displayName}`))
+
     }
 
     onItemClick(item) {
         // Remove the item from the local list.
         // This will make it seem like it was deleted while we wait for the actual delete to complete.
+        /*
         this.setState({
             items: this.state.items
                 .filter(organisationUnit => item.id !== organisationUnit.id)
         });
-
+        */
         // Delete the organisationUnit from the server. If it fails show a message to the user.
-        deleteOrganisationUnit(item)
-            .catch(() => alert(`Could not delete organisation unit ${item.displayName}`))
-            // In all cases (either success or failure) after deleting reload the list.
-            .then(() => this.loadOrganisationUnits());
+        //   deleteOrganisationUnit(item)
+        //  .catch(() => alert(`Could not delete organisation unit ${item.displayName}`))
+        // In all cases (either success or failure) after deleting reload the list.
+        //   .then(() => this.loadOrganisationUnits2());
+
+        this.state.item = item;
+        console.log("this.state.item  App");
+        console.log(this.state.item);
+        console.log("addShow");
+        console.log(this.state.addShow);
+
+        this.state.addShow ? this.showChildren(item) : console.log(" do nothing");
+
     }
 
     onSubmit(formData) {
+        console.log("item-onSubmit.App");
+        console.log(this.state.item);
+        console.log("formData.App");
+        console.log(formData);
         // Set the component state to saving
-        this.setState({ isSaving: true });
-
-        // Test putting a marker on the map
-        locateOnMap([{ lat: 8.5, lng: -12, title: "Testing 1 2 3" }]);
+        this.setState({
+            isSaving: true
+        });
 
         // Save the organisation unit to the api
-        saveOrganisationUnit(formData)
+        saveOrganisationUnit(formData, this.state.item)
             .then(() => this.loadOrganisationUnits())
             .catch(() => alert(`Could save organisation unit ${item.displayName}`))
-            .then(() => this.setState({ isSaving: false })); // After either success or failure set the isSaving state to false
+            .then(() => this.setState({
+                isSaving: false,
+                item: null
+            })); // After either success or failure set the isSaving state to false
     }
 
     render() {
@@ -80,12 +150,71 @@ export default class App extends Component {
         // We hide the form component when we are in the saving state.
         return (
             <div className="app">
-                {this.state.isSaving ? <div>Saving organisation unit</div> : <Form onSubmit={this.onSubmit} />}
-                <List
-                    onItemClick={this.onItemClick}
-                    items={this.state.items}
-                />
+                <div>
+                    <div>
+                        <input type="radio" name="choice" value="A" onChange={this.handleClickAdd}/>add child<br/>
+                        <input type="radio" name="choice" value="A" onChange={this.handleClickShow}/>show children<br/>
+                        <input type="button" id="levelUp" name="levelUp"  value="levelUp" onClick={this.handleBackClick}/>
+                    </div>
+
+                    <List onItemClick={this.onItemClick} items={this.state.items}/>
+                    {this.state.isSaving ? <div>Saving organisation unit</div>: <Form onSubmit={this.onSubmit} />}
+                </div>
+                <div className="search">
+                   <input type="text" placeholder="Search" onChange={this.filterItems}/>
+                   <ListOverItems stukas = {this.state.itemsToShow}/>
+                </div>
             </div>
         );
     }
+
+    handleClickAdd(event) {
+        // event.preventDefault;
+        console.log(" click updated ");
+        this.setState({
+            addShow: false
+        });
+        console.log("addShow : " + this.state.addShow);
+    }
+
+    handleClickShow() {
+        event.preventDefault;
+        this.setState({
+            addShow: true
+        });
+        console.log("addShow : " + this.state.addShow);
+    }
+
+    filterItems(event) {
+        event.preventDefault();
+        var updatedItems = this.state.items;
+        updatedItems = updatedItems.filter(stuka =>
+            stuka.displayName.toLowerCase().search(event.target.value.toLowerCase()) !== -1);
+
+        this.setState({
+            itemsToShow: updatedItems
+        });
+        console.log("items filterItems");
+        console.log(this.state.itemsToShow);
+        console.log(this.state.items);
+
+    }
+    handleBackClick() {
+        console.log("this.state.item App button Back ");
+        console.log(this.state.item);
+        this.loadOrganisationUnitsLevelUp(this.state.item);
+
+    }
+
 }
+
+var ListOverItems = React.createClass({
+    render() {
+        return (
+            <ul>
+                {this.props.stukas.map((stuka) => {return (<li key={stuka.id}>{stuka.displayName}</li>)})  }
+            </ul>
+        );
+    }
+
+})

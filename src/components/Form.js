@@ -19,6 +19,8 @@ export default class Form extends Component {
     onSubmitClick(event) {
         event.preventDefault();
 
+        console.log("this.state");
+        console.log(this.state);
         this.props.onSubmit(this.state);
     }
 
@@ -63,8 +65,17 @@ export default class Form extends Component {
                     <div>
                         <button disabled={this.isFormValid()} id="submit" onClick={this.onSubmitClick}>Submit</button>
                     </div>
+                    <div>
+                    <input id="selection" type="button" value="back to root" onClick={this.onSubmitClick}/>
+                   </div>
                 </form>
+                
+               
+            
             </div>
+            
+            
+            
         );
     }
 }
@@ -72,3 +83,13 @@ export default class Form extends Component {
 Form.propTypes = {
     onSubmit: PropTypes.func.isRequired,
 };
+
+/*
+    <input id="selection" type="button" value="add child" onClick={this.onSubmitClick}/>
+                 <label><input type="radio" name="choice" value="A" onChange={this.handleClick}/>add child<br />
+             <input type="radio" name="choice" value="A" onChange={this.handleClick}/>back to root</label>
+ <input id="selection" type="button" id="back to root" onClick={this.onSubmitClick}/>BackToRoot
+
+
+
+*/
