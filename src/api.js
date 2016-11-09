@@ -74,7 +74,7 @@ export function deleteOrganisationUnit(organisationUnit) {
 }
 */
 export function findChildren(organisationUnit) {
-    console.log("loadorgUnits2-> del  api");
+    console.log("findChildren  api");
 
     console.log(organisationUnit);
 
@@ -162,4 +162,36 @@ export function fetchParent(item) {
         return parent
     })
 
+}
+export function fetchItem(item){
+     console.log("fetchItem api");
+    console.log(item[0].id);
+     return fetch(`${serverUrl}organisationUnits/${item[0].id}`, fetchOptions)
+        .then(onlySuccessResponses)
+        .then(response => {
+            console.log(response);
+            return response.json();
+        })
+
+    .then(({ coordinates }) => {
+        console.log("coordinates api");
+        console.log(coordinates);
+        return coordinates
+    })
+}
+export function apiFeatureType(item){
+     console.log("featureType api");
+    console.log(item);
+     return fetch(`${serverUrl}organisationUnits/${item.id}`, fetchOptions)
+        .then(onlySuccessResponses)
+        .then(response => {
+            console.log(response);
+            return response.json();
+        })
+
+    .then(({ featureType }) => {
+        console.log("then featureType api");
+        console.log(featureType);
+        return featureType
+    })
 }

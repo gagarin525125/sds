@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
 import Search from 'react-search';
-import { saveOrganisationUnit, loadOrganisationUnits, findChildren, levelUp, fetchParent } from '../api';
+import { saveOrganisationUnit, loadOrganisationUnits, findChildren, levelUp, fetchParent ,fetchItem, apiFeatureType} from '../api';
 import List from './List';
 import Form from './Form';
+import { Router, Route, IndexRout, hashHistory, browserHistory, Link } from 'react-router';
+
 
 /**
  * ES2015 class component
@@ -20,9 +22,10 @@ export default class App extends Component {
             addShow: true,
             item: {},
             itemsToShow: [],
+            coordinates:[],
 
         };
-
+       
         // Bind the functions that are passed around to the component
         this.onItemClick = this.onItemClick.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
@@ -31,6 +34,9 @@ export default class App extends Component {
         this.handleClickShow = this.handleClickShow.bind(this);
         this.filterItems = this.filterItems.bind(this);
         this.handleBackClick = this.handleBackClick.bind(this);
+        this.findElement = this.findElement.bind(this);
+        this.onPick = this.onPick.bind(this);
+        this.loadThisItem = this.loadThisItem.bind(this);
     }
 
     componentDidMount() {
@@ -55,6 +61,15 @@ export default class App extends Component {
 
             });
     }
+    
+    findFeatureType(item){
+        
+        apiFeatureType(item)
+                        .then((featureType) =>{
+                         featureType !== "NONE" ? this.loadOrganisationUnitsLevelUp(item) : this.loadOrganisationUnitsChildren(item) 
+                                              })
+                         .catch((error) => alert(`Could not find children to  organisation unit ${error}`))
+    }
 
     loadOrganisationUnitsChildren(item) {
         // Loads the organisation units from the api and sets the loading state to false and puts the items onto the component state.
@@ -71,7 +86,7 @@ export default class App extends Component {
                 console.log("this.state.item App");
                 console.log(this.state.item);
             })
-            .catch(() => alert(`Could not find children to  organisation unit ${item.displayName}`))
+            .catch((error) => alert(`Could not find children to  organisation unit ${error}`))
     }
 
     loadOrganisationUnitsLevelUp(item) {
@@ -137,6 +152,20 @@ export default class App extends Component {
                 item: null
             })); // After either success or failure set the isSaving state to false
     }
+    
+    loadThisItem(item){
+         console.log("going to find coordinates of this item " ); console.log(item);
+        fetchItem(item)
+                      .then((coordinates) => {
+                          this.setState({
+                    isLoading: false,
+                    coordinates: coordinates,
+                                       });
+                                             })
+                     .catch((error) => alert(`Could not find coordinates to  organisation unit ${error}`))
+        console.log("coordinates App");
+        console.log(this.state.coordinates);
+    }
 
     render() {
         // If the component state is set to isLoading we hide the app and show a loading message
@@ -150,6 +179,7 @@ export default class App extends Component {
         // We hide the form component when we are in the saving state.
         return (
             <div className="app">
+            
                 <div>
                     <div>
                         <input type="radio" name="choice" value="A" onChange={this.handleClickAdd}/>add child<br/>
@@ -160,14 +190,39 @@ export default class App extends Component {
                     <List onItemClick={this.onItemClick} items={this.state.items}/>
                     {this.state.isSaving ? <div>Saving organisation unit</div>: <Form onSubmit={this.onSubmit} />}
                 </div>
+            <div>
                 <div className="search">
-                   <input type="text" placeholder="Search" onChange={this.filterItems}/>
+                   <input id="t" type="text" placeholder="Search" onChange={this.filterItems}/>
+                   <input type="button"  value="find" onClick= {this.findElement}/>
                    <ListOverItems stukas = {this.state.itemsToShow}/>
-                </div>
+                 
+                 </div>
+                
+                          <div>
+                                  <h3>Coordinates</h3>
+                                  <p>{this.state.coordinates}</p>
+                          </div>
+             
+             </div>
             </div>
         );
     }
-
+    
+   onPick(item){
+       console.log("onPick");
+   }
+    
+    findElement(){
+       
+       console.log("find hit ");
+        var ill = this.state.itemsToShow;
+        console.log(ill);
+        this.loadThisItem(ill);
+       
+   
+    }
+    
+    
     handleClickAdd(event) {
         // event.preventDefault;
         console.log(" click updated ");
@@ -202,18 +257,29 @@ export default class App extends Component {
     handleBackClick() {
         console.log("this.state.item App button Back ");
         console.log(this.state.item);
-        this.loadOrganisationUnitsLevelUp(this.state.item);
+        this.findFeatureType(this.state.item);
 
     }
 
 }
+//----------------------------------------------------------------------
+
+ //  var Autocomplete = require('pui-react-autocomplete').Autocomplete;
+
+
+
+
+
+
 
 var ListOverItems = React.createClass({
     render() {
         return (
+            
             <ul>
-                {this.props.stukas.map((stuka) => {return (<li key={stuka.id}>{stuka.displayName}</li>)})  }
+                {this.props.stukas.map((stuka) => {return (<li key={stuka.id} >{stuka.displayName}</li>)})  }
             </ul>
+                        
         );
     }
 
