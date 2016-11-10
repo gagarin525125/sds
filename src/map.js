@@ -29,10 +29,21 @@ export function mapClearMarkers() {
 }
 
 /**
+ * Draw organization unit borders on the map.
+ */
+export function mapShowBorders(orgunits) {
+    mapClearPolygons();
+    for (var i = 0; i < orgunits.length; i++) {
+        var o = orgunits[i];
+        mapAddPolygon(JSON.parse(o.coordinates), o.id);
+    }
+}
+
+/**
  * Draw a polygon on the map. area is a coordinates value of type POLYGON
  * from the DHIS API.
  */
-export function mapAddPolygon(area) {
+export function mapAddPolygon(area, identifier) {
     // Convert to an array of LatLng objects
     var coords = area[0][0].map(a => ({lat: a[1], lng: a[0]}));
     var poly = new google.maps.Polygon({
@@ -45,7 +56,7 @@ export function mapAddPolygon(area) {
     });
 
     google.maps.event.addListener(poly, "click", (event) => {
-        console.log("Click in polygon:");
+        console.log("Click in polygon: " + identifier);
         console.log(poly);
     });
 
