@@ -40,6 +40,7 @@ export default class App extends Component {
         this.onPick = this.onPick.bind(this);
         this.loadThisItem = this.loadThisItem.bind(this);
         this.onAlert = this.onAlert.bind(this);
+        this.loadOrganisationUnitsChildren = this.loadOrganisationUnitsChildren.bind(this);
     }
 
     componentDidMount() {
@@ -104,27 +105,34 @@ export default class App extends Component {
 
     }
 
-
+    addCallback(items, callback) {
+        var newItems = [];
+        for (let i = 0; i < items.length; i++) {
+            let item = items[i];
+            item.callback = () => callback(item);
+            newItems.push(item);
+        }
+        return newItems;
+    }
 
     loadOrganisationUnitsChildren(item) {
         // Loads the organisation units from the api and sets the loading state to false and puts the items onto the component state.
         findChildren(item)
             .then((organisationUnits) => {
-
-            this.setState({
-            isLoading: false,
-            items: organisationUnits,
-            itemsToShow: organisationUnits,
-                         });
-
-                })
-    .then(() => {
-            console.log("this.state.items  App");
-        console.log(this.state.items);
-        mapSetItems(this.state.items);
-    })
-    .catch((error) => alert(`Error loadOrganisationUnitsChildren App${error.toLocaleString()}`)
-    )
+                this.setState({
+                    isLoading: false,
+                    items: organisationUnits,
+                    itemsToShow: organisationUnits,
+                });
+            })
+            .then(() => {
+                console.log("this.state.items  App");
+                console.log(this.state.items);
+                mapSetItems(this.addCallback(this.state.items,
+                                          this.loadOrganisationUnitsChildren));
+            })
+            .catch((error) => alert(`Error loadOrganisationUnitsChildren App${error.toLocaleString()}`)
+            )
     }
 
     loadOrganisationUnitsLevelUp(item) {

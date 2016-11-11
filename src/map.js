@@ -10,15 +10,24 @@ export function initMap() {
     });
 }
 
-/** Add markers. places is an array of { lat: n, lng: n, title: s } objects. */
+/** Add markers. places is an array of
+ * { lat: n, lng: n, title: s, callback: func } objects, the callback is
+ * optional. */
 export function mapAddMarkers(places) {
-    var newMarkers = places.map(p =>
-        new google.maps.Marker({
+    var newMarkers = places.map(p => {
+        var m = new google.maps.Marker({
             map: map,
             position: {lat: p.lat, lng: p.lng},
             title: p.title
-        })
-    );
+        });
+        if (p.callback) {
+            google.maps.event.addListener(p, "click", (event) => {
+                console.log("Click on marker: " + identifier);
+                console.log(m);
+                p.callback();
+            });
+        }
+    });
     markers.concat(newMarkers);
 }
 
@@ -32,7 +41,7 @@ export function mapClearMarkers() {
  * Draw a polygon on the map. area is a coordinates value of type POLYGON
  * from the DHIS API.
  */
-export function mapAddPolygon(area, identifier) {
+export function mapAddPolygon(area, identifier, callback) {
     // Convert to an array of LatLng objects
     var coords = area[0][0].map(a => ({lat: a[1], lng: a[0]}));
     var poly = new google.maps.Polygon({
@@ -44,10 +53,13 @@ export function mapAddPolygon(area, identifier) {
         fillOpacity: 0
     });
 
-    google.maps.event.addListener(poly, "click", (event) => {
-        console.log("Click in polygon: " + identifier);
-        console.log(poly);
-    });
+    if (callback) {
+        google.maps.event.addListener(poly, "click", (event) => {
+            console.log("Click in polygon: " + identifier);
+            console.log(poly);
+            callback();
+        });
+    }
 
     polygons.push(poly);
 }
@@ -59,8 +71,6 @@ export function mapClearPolygons() {
 }
 /** Add to the information to displayed on the map. */
 export function mapAddItems(organisationUnits) {
-    //console.log("mapSetItems:");
-    //console.log(organisationUnits);
     for(let i = 0; i < organisationUnits.length; i++) {
         let ou = organisationUnits[i];
         if (!ou.coordinates) {
@@ -72,12 +82,13 @@ export function mapAddItems(organisationUnits) {
         if (ou.featureType == "POINT") {
             mapAddMarkers([{
                 lat: coords[1], lng: coords[0],
-                title: `{ou.displayName}\n${ou.id}`
+                title: `${ou.displayName}\n${ou.id}`,
+                callback: ou.callback
             }]);
         }
         else if (ou.featureType == "POLYGON") {
             // Test border drawing, only works for featureType="POLYGON" currently.
-            mapAddPolygon(coords, ou.id);
+            mapAddPolygon(coords, ou.id, ou.callback);
         }
         else if (ou.featureType == "MULTI_POLYGON") {
             // FIXME
