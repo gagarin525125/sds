@@ -57,14 +57,10 @@ export function mapClearPolygons() {
     polygons.forEach(p => p.setMap(null));
     polygons.length = 0;
 }
-
-/** Set the information to be displayed on the map. */
-export function mapSetItems(organisationUnits) {
+/** Add to the information to displayed on the map. */
+export function mapAddItems(organisationUnits) {
     //console.log("mapSetItems:");
     //console.log(organisationUnits);
-    mapClearPolygons();
-    mapClearMarkers();
-
     for(let i = 0; i < organisationUnits.length; i++) {
         let ou = organisationUnits[i];
         if (!ou.coordinates) {
@@ -92,6 +88,13 @@ export function mapSetItems(organisationUnits) {
         }
 
     }
+}
+
+/** Set the information to be displayed on the map. */
+export function mapSetItems(organisationUnits) {
+    mapClearPolygons();
+    mapClearMarkers();
+    mapAddItems(organisationUnits);
 }
 
 /** Load the Google Maps API, call a function when it's done. */
