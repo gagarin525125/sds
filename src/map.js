@@ -29,17 +29,6 @@ export function mapClearMarkers() {
 }
 
 /**
- * Draw organization unit borders on the map.
- */
-export function mapShowBorders(orgunits) {
-    mapClearPolygons();
-    for (var i = 0; i < orgunits.length; i++) {
-        var o = orgunits[i];
-        mapAddPolygon(JSON.parse(o.coordinates), o.id);
-    }
-}
-
-/**
  * Draw a polygon on the map. area is a coordinates value of type POLYGON
  * from the DHIS API.
  */
@@ -73,6 +62,9 @@ export function mapClearPolygons() {
 export function mapSetItems(organisationUnits) {
     //console.log("mapSetItems:");
     //console.log(organisationUnits);
+    mapClearPolygons();
+    mapClearMarkers();
+
     for(let i = 0; i < organisationUnits.length; i++) {
         let ou = organisationUnits[i];
         if (!ou.coordinates) {
