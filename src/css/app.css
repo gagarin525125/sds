@@ -27,6 +27,7 @@ body {
 
 .search {
     width: 25%;
+    flex: 0 0 25%;
 }
 
 .map {

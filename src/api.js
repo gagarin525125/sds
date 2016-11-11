@@ -6,8 +6,8 @@
  * You obviously should not do this for your production apps.
  */
 //const serverUrl = 'http://localhost:8082/api/';
-const serverUrl = 'https://play.dhis2.org/demo/api/';
-//const serverUrl = 'https://play.dhis2.org/dev/api/';
+//const serverUrl = 'https://play.dhis2.org/demo/api/';
+const serverUrl = 'https://play.dhis2.org/dev/api/';
 //const serverUrl = 'https://play.dhis2.org/test/api/';
 const basicAuth = `Basic ${btoa('admin:district')}`;
 
@@ -43,6 +43,7 @@ export function saveOrganisationUnit(organisationUnit, item) {
         name: organisationUnit.name,
         shortName: organisationUnit.shortName,
         openingDate: organisationUnit.openingDate,
+        featureType: "POINT"
     };
     console.log("tosend  api ");
     console.log(JSON.stringify(toSend));
@@ -50,15 +51,14 @@ export function saveOrganisationUnit(organisationUnit, item) {
         method: 'POST',
         body: JSON.stringify(toSend)
     });
-    console.log("b   api ");
-    console.log(b);
+
 
     return fetch(`${serverUrl}/organisationUnits/`, b)
         .then(onlySuccessResponses)
         // Parse the json responsee
         .then(response => response.json())
         // Log any errors to the console. (Should probably do some better error handling);
-        .catch(error => console.error(error));
+        .catch((error) => alert(`saveOrganisationUnit api ${error}`));
 }
 /*  
 export function deleteOrganisationUnit(organisationUnit) {
@@ -78,7 +78,8 @@ export function findChildren(organisationUnit) {
 
     console.log(organisationUnit);
 
-    let a = fetch(`${serverUrl}/organisationUnits/${organisationUnit.id}?paging=false&level=1&fields=id,displayName`, fetchOptions)
+    let a = fetch(`${serverUrl}/organisationUnits/${organisationUnit.id}
+    ?paging=false&level=1&fields=id,displayName,featureType,coordinates`, fetchOptions)
 
     .then(onlySuccessResponses)
         .then(response => {
@@ -105,8 +106,8 @@ export function findChildren(organisationUnit) {
 export function loadOrganisationUnits() {
     // Load the organisation units but only the first level and the do not use paging
     // return fetch(`${serverUrl}/organisationUnits?paging=false&level=1`, fetchOptions)
-    return fetch(`${serverUrl}/organisationUnits?paging=false&level=1
-	&fields=id,displayName,children[id,displayName]`, fetchOptions)
+    return fetch(`${serverUrl}/organisationUnits?paging=false&level=2&fields=id,
+    displayName,featureType,parent,coordinates`, fetchOptions)
         .then(onlySuccessResponses)
         .then(response => {
 
@@ -127,7 +128,7 @@ export function levelUp(parent) {
 
     //-----------------------------------------------
 
-    let levelUp = fetch(`${serverUrl}organisationUnits/${parent.id}?paging=false&level=1&fields=id,displayName`, fetchOptions)
+    let levelUp = fetch(`${serverUrl}organisationUnits/${parent.id}?paging=false&level=1&fields=id,displayName,featureType`, fetchOptions)
         .then(onlySuccessResponses)
         .then(response => {
             console.log(response);
@@ -149,6 +150,8 @@ export function levelUp(parent) {
 }
 
 export function fetchParent(item) {
+    console.log("fetchparent api");
+    console.log(item);
     return fetch(`${serverUrl}organisationUnits/${item.id}`, fetchOptions)
         .then(onlySuccessResponses)
         .then(response => {
@@ -157,7 +160,7 @@ export function fetchParent(item) {
         })
 
     .then(({ parent }) => {
-        console.log("parent api");
+        console.log("fetchParent api last");
         console.log(parent);
         return parent
     })
@@ -195,3 +198,9 @@ export function apiFeatureType(item){
         return featureType
     })
 }
+
+
+
+
+ /*level=1&*/
+
