@@ -5,7 +5,7 @@ import { saveOrganisationUnit, loadOrganisationUnits, findChildren, levelUp, fet
 import List from './List';
 import Form from './Form';
 import {Router, Route, IndexRout, hashHistory, browserHistory, Link} from 'react-router';
-import {mapAddPolygon, mapClearPolygons, mapAddMarkers} from '../map';
+import {mapSetItems, mapAddPolygon, mapClearPolygons, mapAddMarkers} from '../map';
 
 
 /**
@@ -58,37 +58,12 @@ export default class App extends Component {
             isLoading: false,
             coordinates: coordinates,
         });
-
-        var coords = JSON.parse(coordinates);
-
-        if (coords.length == 2) {
-            console.log([{ lat: coords[1], lng: coords[0]}]);
-            mapAddMarkers([{ lat: coords[1], lng: coords[0], title: "Test" }])
-        }
-        else {
-            // kan vi putte f.eks. et eller annet hardkoded tre-firekant her
-            // for a se  ?
-            console.log(coords);console.log(" drawing map ");
-            // Test border drawing, only works for featureType = "POLYGON"
-          //  currently
-            mapAddPolygon(coords);
-        }
     })
     .catch((error) => alert(`${item.displayName}Can't find coord to organisation unit ${error}`))
         console.log("coordinates App");
         //console.log(this.state.coordinates);
     }
     //---------------------------------------------------------------------------------------------------------
-    drawMap(organisationUnits){
-        console.log("drawMap App");
-        console.log(organisationUnits);
-        for(let i = 0; i < organisationUnits.length;i++) {
-            let coordinates = organisationUnits[i].coordinates;
-            var coords = JSON.parse(coordinates);
-            mapAddPolygon(coords);
-        }
-    }
-    //-------------------------------------------------------------------------------------------------------
     showChildren(item) {
         apiFeatureType(item)
             .then((featureType) => {
@@ -146,7 +121,7 @@ export default class App extends Component {
     .then(() => {
             console.log("this.state.items  App");
         console.log(this.state.items);
-        this.drawMap(this.state.items);
+        mapSetItems(this.state.items);
     })
     .catch((error) => alert(`Error loadOrganisationUnitsChildren App${error.toLocaleString()}`)
     )

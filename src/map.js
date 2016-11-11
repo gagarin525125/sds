@@ -69,6 +69,39 @@ export function mapClearPolygons() {
     polygons.length = 0;
 }
 
+/** Set the information to be displayed on the map. */
+export function mapSetItems(organisationUnits) {
+    //console.log("mapSetItems:");
+    //console.log(organisationUnits);
+    for(let i = 0; i < organisationUnits.length; i++) {
+        let ou = organisationUnits[i];
+        if (!ou.coordinates) {
+            console.log(`mapSetItems: missing coordinates for ${ou.displayName} (${ou.id})`);
+            continue;
+        }
+
+        let coords = JSON.parse(ou.coordinates);
+        if (ou.featureType == "POINT") {
+            mapAddMarkers([{
+                lat: coords[1], lng: coords[0],
+                title: `{ou.displayName}\n${ou.id}`
+            }]);
+        }
+        else if (ou.featureType == "POLYGON") {
+            // Test border drawing, only works for featureType="POLYGON" currently.
+            mapAddPolygon(coords, ou.id);
+        }
+        else if (ou.featureType == "MULTI_POLYGON") {
+            // FIXME
+            console.log(`mapSetItems: MULTI_POLYGON support not implement yet [${ou.displayName} (${ou.id})]`);
+        }
+        else {
+            alert(`mapSetItems: unrecognized featureType for ${ou.displayName} (${ou.id})`);
+        }
+
+    }
+}
+
 /** Load the Google Maps API, call a function when it's done. */
 export function loadGoogleMaps(callback) {
     var script = document.createElement('script');
