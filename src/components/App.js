@@ -5,7 +5,7 @@ import { saveOrganisationUnit, loadOrganisationUnits, findChildren, levelUp, fet
 import List from './List';
 import Form from './Form';
 import {Router, Route, IndexRout, hashHistory, browserHistory, Link} from 'react-router';
-import {mapSetItems, mapAddPolygon, mapClearPolygons, mapAddMarkers} from '../map';
+import { mapSetItems } from '../map';
 
 
 /**
@@ -78,18 +78,21 @@ export default class App extends Component {
         // Loads the organisation units from the api and sets the loading state to false and puts the items onto the component state.
         loadOrganisationUnits()
             .then((organisationUnits) => {
-            this.setState({
-            isLoading: false,
-            items: organisationUnits,
-            itemsToShow: organisationUnits,
-            item: organisationUnits[0].parent
-        });
-
-
-    })
-        .then(() => {console.log("Parent id from start "); console.log(this.state.item.id);})
-    . catch((error) => alert(`Could not find children loadOrganisationUnits  App ${error}`)
-    )
+                this.setState({
+                    isLoading: false,
+                    items: organisationUnits,
+                    itemsToShow: organisationUnits,
+                    item: organisationUnits[0].parent
+                });
+            })
+            .then(() => {
+                console.log("Parent id from start ");
+                console.log(this.state.item.id);
+                mapSetItems(this.addCallback(this.state.items,
+                                          this.loadOrganisationUnitsChildren));
+            })
+            .catch((error) => alert(`Could not find children loadOrganisationUnits  App ${error}`)
+            )
     }
 
     findFeatureType(item) {

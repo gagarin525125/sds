@@ -38,12 +38,11 @@ export function mapClearMarkers() {
 }
 
 /**
- * Draw a polygon on the map. area is a coordinates value of type POLYGON
- * from the DHIS API.
+ * Draw a polygon on the map. points is an array of [lng, lat] arrays.
  */
-export function mapAddPolygon(area, identifier, callback) {
+export function mapAddPolygon(points, identifier, callback) {
     // Convert to an array of LatLng objects
-    var coords = area[0][0].map(a => ({lat: a[1], lng: a[0]}));
+    var coords = points.map(a => ({lat: a[1], lng: a[0]}));
     var poly = new google.maps.Polygon({
         map: map,
         paths: coords,
@@ -69,7 +68,8 @@ export function mapClearPolygons() {
     polygons.forEach(p => p.setMap(null));
     polygons.length = 0;
 }
-/** Add to the information to displayed on the map. */
+
+/** Add to the information displayed on the map. */
 export function mapAddItems(organisationUnits) {
     for(let i = 0; i < organisationUnits.length; i++) {
         let ou = organisationUnits[i];
@@ -78,8 +78,8 @@ export function mapAddItems(organisationUnits) {
             continue;
         }
 
-        let coords = JSON.parse(ou.coordinates);
         if (ou.featureType == "POINT") {
+            let coords = JSON.parse(ou.coordinates);
             mapAddMarkers([{
                 lat: coords[1], lng: coords[0],
                 title: `${ou.displayName}\n${ou.id}`,
@@ -87,17 +87,16 @@ export function mapAddItems(organisationUnits) {
             }]);
         }
         else if (ou.featureType == "POLYGON") {
-            // Test border drawing, only works for featureType="POLYGON" currently.
-            mapAddPolygon(coords, ou.id, ou.callback);
+            let coords = JSON.parse(ou.coordinates);
+            mapAddPolygon(coords[0][0], ou.id, ou.callback);
         }
         else if (ou.featureType == "MULTI_POLYGON") {
-            // FIXME
-            console.log(`mapSetItems: MULTI_POLYGON support not implement yet [${ou.displayName} (${ou.id})]`);
+            let matches = ou.coordinates.match(/\[\[[^[].*?\]\]/g);
+            matches.forEach(m => mapAddPolygon(JSON.parse(m), ou.id, ou.callback));
         }
         else {
             alert(`mapSetItems: unrecognized featureType for ${ou.displayName} (${ou.id})`);
         }
-
     }
 }
 
