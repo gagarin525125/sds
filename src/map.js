@@ -13,7 +13,7 @@ export function initMap() {
 /** Add markers. places is an array of
  * { lat: n, lng: n, title: s, callback: func } objects, the callback is
  * optional. */
-export function mapAddMarkers(places) {
+function mapAddMarkers(places) {
     places.forEach(p => {
         var m = new google.maps.Marker({
             map: map,
@@ -21,9 +21,8 @@ export function mapAddMarkers(places) {
             title: p.title
         });
         if (p.callback) {
-            google.maps.event.addListener(p, "click", (event) => {
-                console.log("Click on marker: " + identifier);
-                console.log(m);
+            google.maps.event.addListener(m, "click", (event) => {
+                //console.log("Click on marker: " + p.title);
                 p.callback();
             });
         }
@@ -32,17 +31,24 @@ export function mapAddMarkers(places) {
 }
 
 /** Remove all markers from the map.*/
-export function mapClearMarkers() {
+function mapClearMarkers() {
     markers.forEach(m => m.setMap(null));
     markers.length = 0;
 }
 
+function getPolygonCenter(points) {
+    let lngSum = points.reduce((acc, point) => acc + point[0], 0);
+    let latSum = points.reduce((acc, point) => acc + point[1], 0);
+    return { lat: latSum/points.length, lng: lngSum/points.length };
+}
+
 /**
- * Draw a polygon on the map. points is an array of [lng, lat] arrays.
+ * Draw a polygon on the map. points is an array of [lng, lat] arrays. callback
+ * is optional. If text is not null, a marker with that title will be added.
  */
-export function mapAddPolygon(points, identifier, callback) {
-    // Convert to an array of LatLng objects
+function mapAddPolygon(points, text, callback) {
     var coords = points.map(a => ({lat: a[1], lng: a[0]}));
+
     var poly = new google.maps.Polygon({
         map: map,
         paths: coords,
@@ -53,18 +59,25 @@ export function mapAddPolygon(points, identifier, callback) {
     });
 
     if (callback) {
-        google.maps.event.addListener(poly, "click", (event) => {
-            console.log("Click in polygon: " + identifier);
-            console.log(poly);
+        let f = (event) => {
+            //console.log("Clicked on area: " + text);
             callback();
-        });
+        };
+        google.maps.event.addListener(poly, "click", f);
+    }
+
+    if (text) {
+        let place = getPolygonCenter(points);
+        place.title = text;
+        place.callback = callback;
+        mapAddMarkers([place]);
     }
 
     polygons.push(poly);
 }
 
 /** Remove all polygons from the map. */
-export function mapClearPolygons() {
+function mapClearPolygons() {
     polygons.forEach(p => p.setMap(null));
     polygons.length = 0;
 }
@@ -90,12 +103,17 @@ export function mapAddItems(organisationUnits) {
         }
         else if (ou.featureType == "POLYGON") {
             let coords = JSON.parse(ou.coordinates);
-            mapAddPolygon(coords[0][0], ou.id, ou.callback);
+            mapAddPolygon(coords[0][0], ou.displayName, ou.callback);
         }
         else if (ou.featureType == "MULTI_POLYGON") {
             let matches = ou.coordinates.match(/\[\[[^[].*?\]\]/g);
             let polys = matches.map(m => JSON.parse(m));
-            polys.forEach(p => mapAddPolygon(p, ou.id, ou.callback));
+            polys.forEach(p => mapAddPolygon(p, null, ou.callback));
+
+            // Add a clickable, hoverable marker inside the area.
+            let center = getPolygonCenter([].concat.apply([], polys));
+            mapAddMarkers([{ lat: center.lat, lng: center.lng,
+                             title: ou.displayName, callback: ou.callback }]);
         }
         else {
             alert(`mapSetItems: unrecognized featureType for ${ou.displayName} (${ou.id})`);
