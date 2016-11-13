@@ -14,7 +14,7 @@ export function initMap() {
  * { lat: n, lng: n, title: s, callback: func } objects, the callback is
  * optional. */
 export function mapAddMarkers(places) {
-    var newMarkers = places.map(p => {
+    places.forEach(p => {
         var m = new google.maps.Marker({
             map: map,
             position: {lat: p.lat, lng: p.lng},
@@ -27,8 +27,8 @@ export function mapAddMarkers(places) {
                 p.callback();
             });
         }
+        markers.push(m);
     });
-    markers.concat(newMarkers);
 }
 
 /** Remove all markers from the map.*/
@@ -71,6 +71,8 @@ export function mapClearPolygons() {
 
 /** Add to the information displayed on the map. */
 export function mapAddItems(organisationUnits) {
+    var places = [];
+
     for(let i = 0; i < organisationUnits.length; i++) {
         let ou = organisationUnits[i];
         if (!ou.coordinates) {
@@ -80,11 +82,11 @@ export function mapAddItems(organisationUnits) {
 
         if (ou.featureType == "POINT") {
             let coords = JSON.parse(ou.coordinates);
-            mapAddMarkers([{
+            places.push({
                 lat: coords[1], lng: coords[0],
                 title: `${ou.displayName}\n${ou.id}`,
                 callback: ou.callback
-            }]);
+            });
         }
         else if (ou.featureType == "POLYGON") {
             let coords = JSON.parse(ou.coordinates);
@@ -92,11 +94,16 @@ export function mapAddItems(organisationUnits) {
         }
         else if (ou.featureType == "MULTI_POLYGON") {
             let matches = ou.coordinates.match(/\[\[[^[].*?\]\]/g);
-            matches.forEach(m => mapAddPolygon(JSON.parse(m), ou.id, ou.callback));
+            let polys = matches.map(m => JSON.parse(m));
+            polys.forEach(p => mapAddPolygon(p, ou.id, ou.callback));
         }
         else {
             alert(`mapSetItems: unrecognized featureType for ${ou.displayName} (${ou.id})`);
         }
+    }
+
+    if (places.length > 0) {
+        mapAddMarkers(places);
     }
 }
 
