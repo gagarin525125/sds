@@ -41,7 +41,6 @@ export default class App extends Component {
         this.onPick = this.onPick.bind(this);
         this.loadThisItem = this.loadThisItem.bind(this);
         this.onAlert = this.onAlert.bind(this);
-        this.loadOrganisationUnitsChildren = this.loadOrganisationUnitsChildren.bind(this);
     }
 
     componentDidMount() {
@@ -54,8 +53,7 @@ export default class App extends Component {
     componentWillUpdate(_, nextState) {
         // Keep the map in sync with the unfiltered list of org.units.
         if (!arraysEqual(nextState.items, this.state.items)) {
-            mapSetItems(addCallbackToItems(nextState.items,
-                            this.loadOrganisationUnitsChildren));
+            mapSetItems(addCallbackToItems(nextState.items, this.onItemClick));
         }
     }
 
