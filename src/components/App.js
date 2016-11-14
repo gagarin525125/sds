@@ -6,6 +6,7 @@ import List from './List';
 import Form from './Form';
 import {Router, Route, IndexRout, hashHistory, browserHistory, Link} from 'react-router';
 import { mapSetItems } from '../map';
+import { addCallbackToItems, arraysEqual } from '../util';
 
 
 /**
@@ -50,6 +51,14 @@ export default class App extends Component {
 
     }
 
+    componentDidUpdate(_, nextState) {
+        // Keep the map in sync with the unfiltered list of org.units.
+        if (!arraysEqual(nextState.items, this.state.items)) {
+            mapSetItems(addCallbackToItems(this.state.items,
+                            this.loadOrganisationUnitsChildren));
+        }
+    }
+
     loadThisItem(item) {
         console.log("going to find coordinates of this item ");
         console.log(item);
@@ -88,8 +97,6 @@ export default class App extends Component {
             .then(() => {
                 console.log("Parent id from start ");
                 console.log(this.state.item.id);
-                mapSetItems(this.addCallback(this.state.items,
-                                          this.loadOrganisationUnitsChildren));
             })
             .catch((error) => alert(`Could not find children loadOrganisationUnits  App ${error}`)
             )
@@ -108,16 +115,6 @@ export default class App extends Component {
 
     }
 
-    addCallback(items, callback) {
-        var newItems = [];
-        for (let i = 0; i < items.length; i++) {
-            let item = items[i];
-            item.callback = () => callback(item);
-            newItems.push(item);
-        }
-        return newItems;
-    }
-
     loadOrganisationUnitsChildren(item) {
         // Loads the organisation units from the api and sets the loading state to false and puts the items onto the component state.
         findChildren(item)
@@ -131,8 +128,6 @@ export default class App extends Component {
             .then(() => {
                 console.log("this.state.items  App");
                 console.log(this.state.items);
-                mapSetItems(this.addCallback(this.state.items,
-                                          this.loadOrganisationUnitsChildren));
             })
             .catch((error) => alert(`Error loadOrganisationUnitsChildren App${error.toLocaleString()}`)
             )
