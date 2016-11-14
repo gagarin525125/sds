@@ -51,10 +51,10 @@ export default class App extends Component {
 
     }
 
-    componentDidUpdate(_, nextState) {
+    componentWillUpdate(_, nextState) {
         // Keep the map in sync with the unfiltered list of org.units.
         if (!arraysEqual(nextState.items, this.state.items)) {
-            mapSetItems(addCallbackToItems(this.state.items,
+            mapSetItems(addCallbackToItems(nextState.items,
                             this.loadOrganisationUnitsChildren));
         }
     }

@@ -128,7 +128,8 @@ export function levelUp(parent) {
 
     //-----------------------------------------------
 
-    let levelUp = fetch(`${serverUrl}organisationUnits/${parent.id}?paging=false&level=1&fields=id,displayName,featureType`, fetchOptions)
+    let levelUp = fetch(`${serverUrl}organisationUnits/${parent.id}?paging=false&level=1&
+                         fields=id,displayName,featureType,coordinates`, fetchOptions)
         .then(onlySuccessResponses)
         .then(response => {
             console.log(response);
