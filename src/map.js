@@ -42,6 +42,18 @@ function getPolygonCenter(points) {
     return { lat: latSum/points.length, lng: lngSum/points.length };
 }
 
+function getBoundsForPoints(points, currentBounds) {
+    if (!currentBounds)
+        currentBounds = { south: -90, west: 180, north: 90, east: -180 };
+
+    var latArray = points.map(p => p[1]);
+    var lngArray = points.map(p => p[0]);
+    return { south: Math.max(currentBounds.south, ...latArray),
+             west:  Math.min(currentBounds.west,  ...lngArray),
+             north: Math.min(currentBounds.north, ...latArray),
+             east:  Math.max(currentBounds.east,  ...lngArray) };
+}
+
 /**
  * Draw a polygon on the map. points is an array of [lng, lat] arrays. callback
  * is optional. If text is not null, a marker with that title will be added.
@@ -85,9 +97,11 @@ function mapClearPolygons() {
 /** Add to the information displayed on the map. */
 export function mapAddItems(organisationUnits) {
     var places = [];
+    var bounds;
 
     for(let i = 0; i < organisationUnits.length; i++) {
         let ou = organisationUnits[i];
+        let newPoints = [];
         if (!ou.coordinates) {
             console.log(`mapSetItems: missing coordinates for ${ou.displayName} (${ou.id})`);
             continue;
@@ -100,29 +114,34 @@ export function mapAddItems(organisationUnits) {
                 title: `${ou.displayName}\n${ou.id}`,
                 callback: ou.callback
             });
+            newPoints = [coords];
         }
         else if (ou.featureType == "POLYGON") {
-            let coords = JSON.parse(ou.coordinates);
-            mapAddPolygon(coords[0][0], ou.displayName, ou.callback);
+            newPoints = JSON.parse(ou.coordinates)[0][0];
+            mapAddPolygon(newPoints, ou.displayName, ou.callback);
         }
         else if (ou.featureType == "MULTI_POLYGON") {
             let matches = ou.coordinates.match(/\[\[[^[].*?\]\]/g);
             let polys = matches.map(m => JSON.parse(m));
             polys.forEach(p => mapAddPolygon(p, null, ou.callback));
+            newPoints = [].concat.apply([], polys);
 
             // Add a clickable, hoverable marker inside the area.
-            let center = getPolygonCenter([].concat.apply([], polys));
+            let center = getPolygonCenter(newPoints);
             mapAddMarkers([{ lat: center.lat, lng: center.lng,
                              title: ou.displayName, callback: ou.callback }]);
         }
         else {
             alert(`mapSetItems: unrecognized featureType for ${ou.displayName} (${ou.id})`);
         }
+        bounds = getBoundsForPoints(newPoints, bounds);
     }
 
-    if (places.length > 0) {
+    if (places.length > 0)
         mapAddMarkers(places);
-    }
+
+    if (organisationUnits.length > 0)
+        map.fitBounds(bounds);
 }
 
 /** Set the information to be displayed on the map. */
