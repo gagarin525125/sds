@@ -67,6 +67,7 @@ export default class App extends Component {
             coordinates: coordinates,
         });
     })
+    //aaa
     .catch((error) => alert(`${item.displayName}Can't find coord to organisation unit ${error}`))
         console.log("coordinates App");
         //console.log(this.state.coordinates);
