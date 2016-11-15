@@ -20,12 +20,10 @@ function mapAddMarkers(places) {
             position: {lat: p.lat, lng: p.lng},
             title: p.title
         });
-        if (p.callback) {
-            google.maps.event.addListener(m, "click", (event) => {
-                //console.log("Click on marker: " + p.title);
-                p.callback();
-            });
-        }
+
+        if (p.callback)
+            google.maps.event.addListener(m, "click", event => p.callback());
+
         markers.push(m);
     });
 }
@@ -70,13 +68,8 @@ function mapAddPolygon(points, text, callback) {
         fillOpacity: 0
     });
 
-    if (callback) {
-        let f = (event) => {
-            //console.log("Clicked on area: " + text);
-            callback();
-        };
-        google.maps.event.addListener(poly, "click", f);
-    }
+    if (callback)
+        google.maps.event.addListener(poly, "click", event => callback());
 
     if (text) {
         let place = getPolygonCenter(points);
@@ -124,7 +117,7 @@ export function mapAddItems(organisationUnits) {
             let matches = ou.coordinates.match(/\[\[[^[].*?\]\]/g);
             let polys = matches.map(m => JSON.parse(m));
             polys.forEach(p => mapAddPolygon(p, null, ou.callback));
-            newPoints = [].concat.apply([], polys);
+            newPoints = [].concat(...polys);
 
             // Add a clickable, hoverable marker inside the area.
             let center = getPolygonCenter(newPoints);
@@ -134,6 +127,8 @@ export function mapAddItems(organisationUnits) {
         else {
             alert(`mapSetItems: unrecognized featureType for ${ou.displayName} (${ou.id})`);
         }
+
+        // Update bounds to include the new coordinates.
         bounds = getBoundsForPoints(newPoints, bounds);
     }
 

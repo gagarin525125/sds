@@ -1,13 +1,8 @@
 
 /** Add callback to each item. */
 export function addCallbackToItems(items, callback) {
-    var newItems = [];
-    for (let i = 0; i < items.length; i++) {
-        let item = items[i];
-        item.callback = () => callback(item);
-        newItems.push(item);
-    }
-    return newItems;
+    return items.map(item =>
+                     Object.assign(item, { callback: () => callback(item) }));
 }
 
 /** Returns true if arrays a and b have the same contents, false if not. */
