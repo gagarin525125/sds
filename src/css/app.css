@@ -26,8 +26,9 @@ body {
 }
 
 .search {
+    height: 100%;
     width: 25%;
-    flex: 0 0 25%;
+    flex: 0 0 40%;
 }
 
 .map {
@@ -38,8 +39,8 @@ body {
 
 .list {
     flex: 1;
-    height: 50%;
-    padding: 3rem;
+    height: 100%;
+    padding: 1rem;
     overflow-y: scroll;
 }
 
@@ -50,8 +51,8 @@ body {
 }
 
 .list li {
-    padding: 1rem;
-    margin: 1rem;
+    padding: 0.25rem;
+    margin: 0.5rem;
     background: #DDD;
     border-radius: .5rem;
     border: solid #CCC 1px;

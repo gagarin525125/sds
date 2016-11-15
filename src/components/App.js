@@ -212,23 +212,18 @@ export default class App extends Component {
         // We hide the form component when we are in the saving state.
         return (
             <div className="app">
-               <div>
-                    <div>
-
-                         <input type="button" id="levelUp" name="levelUp" value="levelUp" onClick={this.handleBackClick}/>
-                     </div>
-                  <List onItemClick={this.onItemClick} items={this.state.items}/>
-                  {this.state.isSaving ? <div>Saving organisation unit</div> : <Form onSubmit={this.onSubmit}/>}
-               </div>
-               <div>
-                    <div className="search">
-                         <input id="t" type="text" placeholder="Search" onChange={this.filterItems}/>
-                         <input type="button" value="find" onClick={this.findElement}/>
-                         <ListOverItems stukas={this.state.itemsToShow}/>
-                    </div>
-               </div>
+                <div className="search">
+                    <input id="t" type="text" placeholder="Search" onChange={this.filterItems}/>
+                    <input type="button" value="find" onClick={this.findElement}/>
+                    <input type="button" id="levelUp" name="levelUp" value="levelUp" onClick={this.handleBackClick}/>
+                    <List items={this.state.itemsToShow} onItemClick={this.onItemClick}/>
+                </div>
+                <div>
+                    {/*<List onItemClick={this.onItemClick} items={this.state.items}/>*/}
+                    {this.state.isSaving ? <div>Saving organisation unit</div> : <Form onSubmit={this.onSubmit}/>}
+                </div>
             </div>
-    );
+        );
     }
 
 
@@ -299,20 +294,6 @@ export default class App extends Component {
 //----------------------------------------------------------------------
 
 // var Autocomplete = require('pui-react-autocomplete').Autocomplete;
-
-
-var ListOverItems = React.createClass({
-    render() {
-        return (
-
-            <ul>
-            {this.props.stukas.map((stuka) => {return (<li key={stuka.id} >{stuka.displayName}</li>)})  }
-    </ul>
-
-    );
-    }
-
-})
 
 
 /*
