@@ -51,11 +51,11 @@ body {
 }
 
 .list li {
-    padding: 0.25rem;
-    margin: 0.5rem;
+    padding: 0.35rem;
+    /*margin: 0.5rem;*/
     background: #DDD;
-    border-radius: .5rem;
-    border: solid #CCC 1px;
+    /*border-radius: .5rem;*/
+    border: solid #CCC 3px;
     cursor: pointer;
 }
 
