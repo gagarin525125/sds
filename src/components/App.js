@@ -1,6 +1,6 @@
-import React, {Component} from 'react';
+mport React, {Component} from 'react';
 import Search from 'react-search';
-import { saveOrganisationUnit, loadOrganisationUnits, findChildren, levelUp, fetchParent, fetchItem, apiFeatureType
+import { saveOrganisationUnit, loadOrganisationUnits, findChildren, levelUp, fetchParent, organisationUnitLevels, fetchItem, itemFeatures
 } from '../api';
 import List from './List';
 import Form from './Form';
@@ -22,19 +22,16 @@ export default class App extends Component {
             isSaving: false,
             isLoading: true,
             items: [],
-            addShow: true,
             item: {},
             itemsToShow: [],
             coordinates: [],
+            levels:{},
 
         };
 
         // Bind the functions that are passed around to the component
         this.onItemClick = this.onItemClick.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
-        this.showChildren = this.showChildren.bind(this);
-        this.handleClickAdd = this.handleClickAdd.bind(this);
-        this.handleClickShow = this.handleClickShow.bind(this);
         this.filterItems = this.filterItems.bind(this);
         this.handleBackClick = this.handleBackClick.bind(this);
         this.findElement = this.findElement.bind(this);
@@ -47,6 +44,7 @@ export default class App extends Component {
         console.log("componentDidMount");
         console.log(this.state.item);
         this.loadOrganisationUnits();
+        this.loadOrganisationUnitLevels();
 
     }
 
@@ -56,33 +54,24 @@ export default class App extends Component {
             mapSetItems(addCallbackToItems(nextState.items, this.onItemClick));
         }
     }
+ //-------------------------------------  part of componentDidMount ---------------
+    loadOrganisationUnitLevels(){
 
-    loadThisItem(item) {
-        console.log("going to find coordinates of this item ");
-        console.log(item);
-        fetchItem(item)
-            .then((coordinates) => {
-            this.setState({
-            isLoading: false,
-            coordinates: coordinates,
-        });
-    })
-    //aaa
-    .catch((error) => alert(`${item.displayName}Can't find coord to organisation unit ${error}`))
-        console.log("coordinates App");
-        //console.log(this.state.coordinates);
-    }
-    //---------------------------------------------------------------------------------------------------------
-    showChildren(item) {
-        apiFeatureType(item)
-            .then((featureType) => {
-            featureType === "POINT" ? alert(`LAST level- no children `) : this.loadOrganisationUnitsChildren(item)
-                 })
-    .catch((error) => alert(`error clickOnItem => showchildren App${error}`) )
+     organisationUnitLevels()
+     .then((result) => {console.log("Levels");
+     console.log(result);
+     this.setState({
+          levels: result.pager.total,
+                   });
 
+          })
+     .then(() => console.log(this.state.levels))
+
+     .catch((error) => alert("Error loadOrganisationUnitLevels  App  ${error.message}"));
     }
 
-    loadOrganisationUnits() {
+//----------------------------------------  part of componentDidMount   --------------
+   loadOrganisationUnits() {
         // Loads the organisation units from the api and sets the loading state to false and puts the items onto the component state.
         loadOrganisationUnits()
             .then((organisationUnits) => {
@@ -90,24 +79,64 @@ export default class App extends Component {
                     isLoading: false,
                     items: organisationUnits,
                     itemsToShow: organisationUnits,
-                    item: organisationUnits[0].parent
+                    item: organisationUnits[0].parent,
+
                 });
             })
-            .then(() => {
-                console.log("Parent id from start ");
-                console.log(this.state.item.id);
+            .then(() => {this.loadItemRoot(this.state.item)
             })
-            .catch((error) => alert(`Could not find children loadOrganisationUnits  App ${error}`)
+            .catch((error) => alert(`Could not find children loadOrganisationUnits  App ${error.message}`)
             )
+
     }
+    //--------------------------------------   part of componentDidMount    -----------------
+    loadItemRoot(item){
+       itemFeatures(item)
+              .then((result) => {
+                            this.setState({item:result})
+                                  })
+       .then(() => {
+                 console.log("Parent id from start ");
+                 console.log(this.state.item);
+                })
+    }
+//----------------------------------------------------------------------------------------------
+    loadThisItem(item) {
+        console.log("going to find coordinates of this item ");
+        console.log(item);
+        fetchItem(item)
+            .then((coordinates) => {
+                                    this.setState({
+                                    isLoading: false,
+                                    coordinates: coordinates,
+                                                   });
+                    })
+        .catch((error) => alert(`${item.displayName}Cant find coord to organisation unit ${error}`))
+
+    }
+    //--------------------------------------------------------------------------------------------------------
+      onItemClick(item) {
+            console.log("this.state.item    App");
+            console.log(this.state.item);
+         let filteredItem = this.state.items;
+         // actually , this search is not necessary
+         filteredItem = filteredItem.filter(stuka => stuka.id.toLowerCase()
+                                           .search(item.id.toLowerCase()) !== -1);
+         console.log(this.state.levels);
+         console.log(filteredItem[0].level)
+         filteredItem[0].level === this.state.levels ? alert(`LAST level - no children `) :
+                                   this.loadOrganisationUnitsChildren(item)
+    }
+
+ //-----------------------------------------------------------------------------------------------------
 
     findFeatureType(item) {
         console.log("findfeaturetype App");
         console.log(item);
 
-        apiFeatureType(item)
-            .then((featureType) => {
-            featureType !== "NONE" ? this.loadOrganisationUnitsLevelUp(item) : this.loadOrganisationUnits()
+        itemFeatures(item)
+            .then((result) => {
+            result.level !== 1 ? this.loadOrganisationUnitsLevelUp(item) : this.loadOrganisationUnits()
     })
     .catch((error) => alert(`Could not find children findFeatureType ${error}`)
     )
@@ -115,6 +144,8 @@ export default class App extends Component {
     }
 
     loadOrganisationUnitsChildren(item) {
+          // save in item to be the parent of future children
+          this.setState({item: item});
         // Loads the organisation units from the api and sets the loading state to false and puts the items onto the component state.
         findChildren(item)
             .then((organisationUnits) => {
@@ -128,7 +159,7 @@ export default class App extends Component {
                 console.log("this.state.items  App");
                 console.log(this.state.items);
             })
-            .catch((error) => alert(`Error loadOrganisationUnitsChildren App${error.toLocaleString()}`)
+            .catch((error) => alert(`Error loadOrganisationUnitsChildren App${error.message}`)
             )
     }
 
@@ -152,52 +183,41 @@ export default class App extends Component {
 
     }
 
-    onItemClick(item) {
-        this.setState({item: item});
-        console.log("this.state.item  App");
-        console.log(this.state.item);
-        console.log("addShow");
-        console.log(this.state.addShow);
 
-         this.showChildren(item) ;
- // this.state.addShow ?  console.log(" do nothing")
-    }
 
     onSubmit(formData) {
-        console.log("item-onSubmit.App");
+        console.log("onSubmit this state item   App");
         console.log(this.state.item);
-        console.log("formData.App");
+        console.log("onSubmit(formData) App");
         console.log(formData);
         // Set the component state to saving
         this.setState({
             isSaving: true
         });
         //------------------------------
-        apiFeatureType(this.state.items[2])
-            .then((featureType) => {
-            featureType === "POINT" ? this.saveOrganisationUnit(formData,this.state.item) : this.rejectSaveOrganisationUnit(this.state.item)
-                  })
-            .catch((error) => alert(`Error onSubmit App ${error}`) )
+
+            this.state.items[1].level === this.state.levels ?
+                                            this.saveOrganisationUnit(formData,this.state.item)
+                                            : this.rejectSaveOrganisationUnit(this.state.item)
         //------------------------------
             }
     // item - parent to listed ogrUnits
     saveOrganisationUnit(formData,item){
-
-        saveOrganisationUnit(formData, item)
+        saveOrganisationUnit(formData, item,this.state.levels )
             .then(() => this.loadOrganisationUnitsChildren(item))
-    .catch(error => alert(`error saveOrganisationUnit App${error}`))
-    .then(() => this.setState({
-            isSaving: false,
-        }) )
+             .catch(error => alert(`error saveOrganisationUnit App${error}`))
+               .then(() => this.setState({
+                                  isSaving: false,
+                     }) )
     }
 
     rejectSaveOrganisationUnit(item){
-      //  this.onAlert();
-        this.setState({
-            isSaving: false
-        });
-
-        this.loadOrganisationUnitsChildren(item );
+        this.onAlert();
+          this.setState({
+                isSaving: false
+                        });
+        // very dangerous call !!!
+       // this.loadOrganisationUnitsChildren(item );
 
     }
     render() {
@@ -214,14 +234,19 @@ export default class App extends Component {
         return (
             <div className="app">
                 <div className="search">
+                    <li>
                     <input id="t" type="text" placeholder="Search" onChange={this.filterItems}/>
                     <input type="button" value="find" onClick={this.findElement}/>
                     <input type="button" id="levelUp" name="levelUp" value="levelUp" onClick={this.handleBackClick}/>
-                    <List items={this.state.itemsToShow} onItemClick={this.onItemClick}/>
+                     </li>
+                        <List items={this.state.itemsToShow} onItemClick={this.onItemClick}/>
                 </div>
-                <div>
+                <div className="second">
                     {/*<List onItemClick={this.onItemClick} items={this.state.items}/>*/}
                     {this.state.isSaving ? <div>Saving organisation unit</div> : <Form onSubmit={this.onSubmit}/>}
+                   <div>
+                       <h3>Here info should be listed</h3>
+                   </div>
                 </div>
             </div>
         );
@@ -255,6 +280,7 @@ export default class App extends Component {
 
     onAlert() {
         alert(`You cannot add org.unit here-not LAST level`);
+        // dangerous call
         //  this.loadOrganisationUnits(this.state.item);
     }
 
@@ -292,30 +318,3 @@ export default class App extends Component {
     }
 
 }
-//----------------------------------------------------------------------
-
-// var Autocomplete = require('pui-react-autocomplete').Autocomplete;
-
-
-/*
- // Save the organisation unit to the api
- fetchParent(this.state.item)
- .then((parent) => {
- saveOrganisationUnit(formData, this.state.item, parent)
- .then(() => this.loadOrganisationUnitsChildren())
- .catch(error => alert(`Could save organisation unit onSubmit App${error}`))
- .then(() => this.setState({
- isSaving: false,
- item: null
- })
- ); // After either success or failure set the isSaving state to false
- })
-
-
- <input type="radio" name="choiceA" value="A" onChange={this.handleClickShow}/>
- show children<br/>
-
-
- <input type="radio" name="choiceA" value="A" onChange={this.handleClickAdd}/>
- addchild<br/>
- */
