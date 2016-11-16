@@ -32,8 +32,16 @@ function onlySuccessResponses(response) {
     }
     return Promise.reject(response);
 }
+export function organisationUnitLevels(){
+return fetch(`${serverUrl}organisationUnitLevels`,fetchOptions)
+        .then(onlySuccessResponses)
+        // Parse the json responsee
+        .then(response => response.json())
+        // Log any errors to the console. (Should probably do some better error handling);
+        .catch((error) => alert(`organisationUnitLevels api ${error.toString()}`));
 
-export function saveOrganisationUnit(organisationUnit, item) {
+}
+export function saveOrganisationUnit(organisationUnit, item,levels) {
     // POST the payload to the server to save the organisationUnit
 
     let toSend = {
@@ -43,7 +51,8 @@ export function saveOrganisationUnit(organisationUnit, item) {
         name: organisationUnit.name,
         shortName: organisationUnit.shortName,
         openingDate: organisationUnit.openingDate,
-        featureType: "POINT"
+        featureType: "POINT",
+        level: levels,
     };
     console.log("tosend  api ");
     console.log(JSON.stringify(toSend));
@@ -60,7 +69,7 @@ export function saveOrganisationUnit(organisationUnit, item) {
         // Log any errors to the console. (Should probably do some better error handling);
         .catch((error) => alert(`saveOrganisationUnit api ${error}`));
 }
-/*  
+/*
 export function deleteOrganisationUnit(organisationUnit) {
     // Send DELETE request to the server to delete the organisation unit
     return fetch(
@@ -79,7 +88,7 @@ export function findChildren(organisationUnit) {
     console.log(organisationUnit);
 
     let a = fetch(`${serverUrl}/organisationUnits/${organisationUnit.id}
-    ?paging=false&level=1&fields=id,displayName,featureType,coordinates`, fetchOptions)
+    ?paging=false&level=1&fields=id,displayName,featureType,coordinates,level`, fetchOptions)
 
     .then(onlySuccessResponses)
         .then(response => {
@@ -107,15 +116,9 @@ export function loadOrganisationUnits() {
     // Load the organisation units but only the first level and the do not use paging
     // return fetch(`${serverUrl}/organisationUnits?paging=false&level=1`, fetchOptions)
     return fetch(`${serverUrl}/organisationUnits?paging=false&level=2&fields=id,
-    displayName,featureType,parent,coordinates`, fetchOptions)
+    displayName,featureType,parent,coordinates,level`, fetchOptions)
         .then(onlySuccessResponses)
-        .then(response => {
-
-            console.log(response);
-            let a = response.json();
-            console.log(a);
-            return a;
-        })
+        .then(response => response.json())
         // pick the organisationUnits property from the payload
         .then(({ organisationUnits }) => {
             console.log("organisationUnits children   api");
@@ -129,7 +132,7 @@ export function levelUp(parent) {
     //-----------------------------------------------
 
     let levelUp = fetch(`${serverUrl}organisationUnits/${parent.id}?paging=false&level=1&
-                         fields=id,displayName,featureType,coordinates`, fetchOptions)
+                         fields=id,displayName,featureType,coordinates,level`, fetchOptions)
         .then(onlySuccessResponses)
         .then(response => {
             console.log(response);
@@ -156,8 +159,7 @@ export function fetchParent(item) {
     return fetch(`${serverUrl}organisationUnits/${item.id}`, fetchOptions)
         .then(onlySuccessResponses)
         .then(response => {
-            console.log(response);
-            return response.json();
+             return response.json();
         })
 
     .then(({ parent }) => {
@@ -183,22 +185,14 @@ export function fetchItem(item){
         return coordinates
     })
 }
-export function apiFeatureType(item){
-     console.log("featureType api");
-    console.log(item);
+export function itemFeatures(item){
+
      return fetch(`${serverUrl}organisationUnits/${item.id}`, fetchOptions)
         .then(onlySuccessResponses)
-        .then(response => {
-            console.log(response);
-            return response.json();
-        })
+        .then(response => response.json())
+        .catch((error) => alert(`itemFeatures api ${error}`))
+    }
 
-    .then(({ featureType }) => {
-        console.log("then featureType api");
-        console.log(featureType);
-        return featureType
-    })
-}
 
 
 
