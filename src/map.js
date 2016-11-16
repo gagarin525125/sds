@@ -1,6 +1,7 @@
 var map;
 var markers = [];
 var polygons = [];
+var coordinatesCallback;
 
 /** Show a map of Sierra Leone. */
 export function initMap() {
@@ -8,6 +9,13 @@ export function initMap() {
         center: { lat: 8.5, lng: -12 },
         zoom: 8
     });
+    google.maps.event.addListener(map, "rightclick", event => {
+        coordinatesCallback(event.latLng.lat(), event.latLng.lng());
+    });
+}
+
+export function mapSetCoordinatesCallback(callback) {
+    coordinatesCallback = callback;
 }
 
 /** Add markers. places is an array of

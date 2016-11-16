@@ -5,7 +5,7 @@ import { saveOrganisationUnit, loadOrganisationUnits, findChildren, levelUp, fet
 import List from './List';
 import Form from './Form';
 import {Router, Route, IndexRout, hashHistory, browserHistory, Link} from 'react-router';
-import { mapSetItems } from '../map';
+import { mapSetItems, mapSetCoordinatesCallback } from '../map';
 import { addCallbackToItems, arraysEqual } from '../util';
 
 
@@ -37,6 +37,7 @@ export default class App extends Component {
         this.handleLevelUpClick = this.handleLevelUpClick.bind(this);
         this.findElement = this.findElement.bind(this);
         this.onAlert = this.onAlert.bind(this);
+        this.onCoordinatesFromMap = this.onCoordinatesFromMap.bind(this);
     }
 
     componentDidMount() {
@@ -44,7 +45,7 @@ export default class App extends Component {
         console.log(this.state.item);
         this.loadOrganisationUnits();
         this.loadOrganisationUnitLevels();
-
+        mapSetCoordinatesCallback(this.onCoordinatesFromMap);
     }
 
     componentWillUpdate(_, nextState) {
@@ -195,6 +196,10 @@ export default class App extends Component {
                .then(() => this.setState({
                                   isSaving: false,
                      }) )
+    }
+
+    onCoordinatesFromMap(lat, lng) {
+        console.log(`onCoordinatesFromMap(${lat}, ${lng})`);
     }
 //----------------------------------------------------------------------------------------------
     rejectSaveOrganisationUnit(item){
