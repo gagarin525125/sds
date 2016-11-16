@@ -1,4 +1,4 @@
-mport React, {Component} from 'react';
+import React, {Component} from 'react';
 import Search from 'react-search';
 import { saveOrganisationUnit, loadOrganisationUnits, findChildren, levelUp, fetchParent, organisationUnitLevels, fetchItem, itemFeatures
 } from '../api';
@@ -26,6 +26,7 @@ export default class App extends Component {
             itemsToShow: [],
             coordinates: [],
             levels:{},
+            toScreen: [],
 
         };
 
@@ -33,10 +34,8 @@ export default class App extends Component {
         this.onItemClick = this.onItemClick.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
         this.filterItems = this.filterItems.bind(this);
-        this.handleBackClick = this.handleBackClick.bind(this);
+        this.handleLevelUpClick = this.handleLevelUpClick.bind(this);
         this.findElement = this.findElement.bind(this);
-        this.onPick = this.onPick.bind(this);
-        this.loadThisItem = this.loadThisItem.bind(this);
         this.onAlert = this.onAlert.bind(this);
     }
 
@@ -100,20 +99,7 @@ export default class App extends Component {
                  console.log(this.state.item);
                 })
     }
-//----------------------------------------------------------------------------------------------
-    loadThisItem(item) {
-        console.log("going to find coordinates of this item ");
-        console.log(item);
-        fetchItem(item)
-            .then((coordinates) => {
-                                    this.setState({
-                                    isLoading: false,
-                                    coordinates: coordinates,
-                                                   });
-                    })
-        .catch((error) => alert(`${item.displayName}Cant find coord to organisation unit ${error}`))
 
-    }
     //--------------------------------------------------------------------------------------------------------
       onItemClick(item) {
             console.log("this.state.item    App");
@@ -125,7 +111,7 @@ export default class App extends Component {
          console.log(this.state.levels);
          console.log(filteredItem[0].level)
          filteredItem[0].level === this.state.levels ? alert(`LAST level - no children `) :
-                                   this.loadOrganisationUnitsChildren(item)
+                                       this.loadOrganisationUnitsChildren(item)
     }
 
  //-----------------------------------------------------------------------------------------------------
@@ -138,10 +124,10 @@ export default class App extends Component {
             .then((result) => {
             result.level !== 1 ? this.loadOrganisationUnitsLevelUp(item) : this.loadOrganisationUnits()
     })
-    .catch((error) => alert(`Could not find children findFeatureType ${error}`)
-    )
+    .catch((error) => alert(`Could not find children findFeatureType ${error}`))
 
     }
+    //----------------------------------------------------------------------------------------------
 
     loadOrganisationUnitsChildren(item) {
           // save in item to be the parent of future children
@@ -162,7 +148,7 @@ export default class App extends Component {
             .catch((error) => alert(`Error loadOrganisationUnitsChildren App${error.message}`)
             )
     }
-
+//----------------------------------------------------------------------------------------------
     loadOrganisationUnitsLevelUp(item) {
         console.log("this.state.item level Up   App");
         console.log(this.state.item);
@@ -178,13 +164,12 @@ export default class App extends Component {
     })
     })
 
-    .catch((error) => alert(`Level UpCould not find children loadOrganisationUntisLevelUp${error}`)
-    )
+    .catch((error) => alert(`Level UpCould not find children loadOrganisationUntisLevelUp${error}`))
 
     }
 
 
-
+//----------------------------------------------------------------------------------------------
     onSubmit(formData) {
         console.log("onSubmit this state item   App");
         console.log(this.state.item);
@@ -201,6 +186,7 @@ export default class App extends Component {
                                             : this.rejectSaveOrganisationUnit(this.state.item)
         //------------------------------
             }
+ //----------------------------------------------------------------------------------------------
     // item - parent to listed ogrUnits
     saveOrganisationUnit(formData,item){
         saveOrganisationUnit(formData, item,this.state.levels )
@@ -210,7 +196,7 @@ export default class App extends Component {
                                   isSaving: false,
                      }) )
     }
-
+//----------------------------------------------------------------------------------------------
     rejectSaveOrganisationUnit(item){
         this.onAlert();
           this.setState({
@@ -220,6 +206,7 @@ export default class App extends Component {
        // this.loadOrganisationUnitsChildren(item );
 
     }
+    //----------------------------------------------------------------------------------------------
     render() {
         // If the component state is set to isLoading we hide the app and show a loading message
         if (this.state.isLoading) {
@@ -237,7 +224,7 @@ export default class App extends Component {
                     <li>
                     <input id="t" type="text" placeholder="Search" onChange={this.filterItems}/>
                     <input type="button" value="find" onClick={this.findElement}/>
-                    <input type="button" id="levelUp" name="levelUp" value="levelUp" onClick={this.handleBackClick}/>
+                    <input type="button" id="levelUp" name="levelUp" value="levelUp" onClick={this.handleLevelUpClick}/>
                      </li>
                         <List items={this.state.itemsToShow} onItemClick={this.onItemClick}/>
                 </div>
@@ -246,75 +233,63 @@ export default class App extends Component {
                     {this.state.isSaving ? <div>Saving organisation unit</div> : <Form onSubmit={this.onSubmit}/>}
                    <div>
                        <h3>Here info should be listed</h3>
+                       <li>{this.state.toScreen}</li>
                    </div>
                 </div>
             </div>
         );
     }
 
+//
 
-    onPick(item) {
-        console.log("onPick");
-    }
 
+//----------------------------------------------------------------------------------------------
     findElement() {
 
-        console.log("find hit ");
+        console.log(" hit - find ");
         var ill = this.state.itemsToShow;
         console.log(ill);
-        this.loadThisItem(ill);
-
+        let info = ill[0].displayName;
+        this.setState({
+                       toScreen : info,
+                      })
 
     }
 
-
-    handleClickAdd(event) {
-        // event.preventDefault;
-        this.state.items[0].featureType !== "POINT" ? this.onAlert() :
-            this.setState({
-                addShow: false
-            });
-        console.log("addShow ");
-        console.log(this.state.addShow);
-    }
-
+//----------------------------------------------------------------------------------------------
     onAlert() {
         alert(`You cannot add org.unit here-not LAST level`);
         // dangerous call
         //  this.loadOrganisationUnits(this.state.item);
     }
 
-    handleClickShow() {
-        //  event.preventDefault;
-        this.setState({
-            addShow: true
-        });
-        console.log("addShow : ");
-        console.log(this.state.addShow);
-    }
-
+//----------------------------------------------------------------------------------------------
     filterItems(event) {
         event.preventDefault();
         var updatedItems = this.state.items;
         updatedItems = updatedItems.filter(stuka =>
-            stuka.displayName.toLowerCase().search(event.target.value.toLowerCase()) !== -1
-    )
-        ;
+            stuka.displayName.toLowerCase().search(event.target.value.toLowerCase()) !== -1);
 
         this.setState({
             itemsToShow: updatedItems
-        });
+                      });
         console.log("items filterItems");
         console.log(this.state.itemsToShow);
         console.log(this.state.items);
 
     }
-
-    handleBackClick() {
-        console.log("this.state.item App button Back ");
-        console.log(this.state.item);
-        this.findFeatureType(this.state.item);
+//----------------------------------------------------------------------------------------------
+    handleLevelUpClick() {
+        console.log("this.state.item  handleLevelUp  App  ");
+        console.log(this.state.item.level);
+       itemFeatures(this.state.item)
+                   .then((result) => {
+                      result.level !== 1 ? this.loadOrganisationUnitsLevelUp(this.state.item) :
+                                                this.loadOrganisationUnits()
+            })
+           .catch((error) => alert(`Error handleLevelUpClick ${error.message}`))
 
     }
 
 }
+//----------------------------------------------------------------------------------------------
