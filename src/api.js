@@ -41,18 +41,18 @@ return fetch(`${serverUrl}organisationUnitLevels`,fetchOptions)
         .catch((error) => alert(`organisationUnitLevels api ${error.toString()}`));
 
 }
-export function saveOrganisationUnit(organisationUnit, item,levels) {
+export function saveOrganisationUnit(organisationUnit, parentOf,levels) {
     // POST the payload to the server to save the organisationUnit
-
+      console.log("levels  " + levels);
     let toSend = {
         parent: {
-            id: item.id
+            id: parentOf.id
         },
         name: organisationUnit.name,
         shortName: organisationUnit.shortName,
         openingDate: organisationUnit.openingDate,
         featureType: "POINT",
-        level: levels,
+       level: levels,
     };
     console.log("tosend  api ");
     console.log(JSON.stringify(toSend));
@@ -88,7 +88,8 @@ export function findChildren(organisationUnit) {
     console.log(organisationUnit);
 
     let a = fetch(`${serverUrl}/organisationUnits/${organisationUnit.id}
-    ?paging=false&level=1&fields=id,displayName,featureType,coordinates,level`, fetchOptions)
+    ?paging=false&level=1&fields=id,displayName,featureType,coordinates,level,ancestors[id,displayName],
+                parent[id,displayName,ancestors]`, fetchOptions)
 
     .then(onlySuccessResponses)
         .then(response => {
@@ -98,14 +99,14 @@ export function findChildren(organisationUnit) {
 
             }
             console.log("findchildren api response");
-            console.log(response);
+          //  console.log(response);
             let a = response.json();
-            console.log(a);
+          //  console.log(a);
             return a;
         })
         .then(({ organisationUnits }) => {
-            console.log("children");
-            console.log(organisationUnits);
+         //   console.log("children");
+        //    console.log(organisationUnits);
             return organisationUnits;
         })
 
@@ -116,7 +117,8 @@ export function loadOrganisationUnits() {
     // Load the organisation units but only the first level and the do not use paging
     // return fetch(`${serverUrl}/organisationUnits?paging=false&level=1`, fetchOptions)
     return fetch(`${serverUrl}/organisationUnits?paging=false&level=2&fields=id,
-    displayName,featureType,parent,coordinates,level`, fetchOptions)
+    displayName,featureType,coordinates,level,ancestors[id,displayName],
+                parent[id,displayName,ancestors],`, fetchOptions)
         .then(onlySuccessResponses)
         .then(response => response.json())
         // pick the organisationUnits property from the payload
@@ -127,64 +129,8 @@ export function loadOrganisationUnits() {
         })
 }
 
-export function levelUp(parent) {
 
-    //-----------------------------------------------
 
-    let levelUp = fetch(`${serverUrl}organisationUnits/${parent.id}?paging=false&level=1&
-                         fields=id,displayName,featureType,coordinates,level`, fetchOptions)
-        .then(onlySuccessResponses)
-        .then(response => {
-            console.log(response);
-            let a = response.json();
-            console.log(a);
-            return a;
-        })
-
-    .then(({ organisationUnits }) => {
-        console.log("children api level up");
-        console.log(organisationUnits);
-        return organisationUnits;
-    })
-
-    console.log("done");
-    //-----------------------------------------------
-    return levelUp;
-
-}
-
-export function fetchParent(item) {
-    console.log("fetchparent api");
-    console.log(item);
-    return fetch(`${serverUrl}organisationUnits/${item.id}`, fetchOptions)
-        .then(onlySuccessResponses)
-        .then(response => {
-             return response.json();
-        })
-
-    .then(({ parent }) => {
-        console.log("fetchParent api last");
-        console.log(parent);
-        return parent
-    })
-
-}
-export function fetchItem(item){
-     console.log("fetchItem api");
-    console.log(item[0].id);
-     return fetch(`${serverUrl}organisationUnits/${item[0].id}`, fetchOptions)
-        .then(onlySuccessResponses)
-        .then(response => {
-            console.log(response);
-            return response.json();
-        })
-
-    .then(({ coordinates }) => {
-        console.log("coordinates api");
-        console.log(coordinates);
-        return coordinates
-    })
-}
 export function itemFeatures(item){
 
      return fetch(`${serverUrl}organisationUnits/${item.id}`, fetchOptions)
