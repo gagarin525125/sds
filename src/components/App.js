@@ -24,6 +24,7 @@ export default class App extends Component {
             itemsToShow: [],
             levels:{},
             toScreen: [],
+            itemTo: {},
 
         };
 
@@ -85,23 +86,30 @@ export default class App extends Component {
 
     //--------------------------------------------------------------------------------------------------------
       onItemClick(item) {
-           let filteredItem = this.state.items;
+
+         let filteredItem = this.state.items;
          // actually , this search is not necessary
          filteredItem = filteredItem.filter(stuka => stuka.id.toLowerCase()
                                            .search(item.id.toLowerCase()) !== -1);
          console.log(this.state.levels);
-         console.log(filteredItem[0].level)
-         filteredItem[0].level === this.state.levels ? alert(`LAST level - no children `) :
+         console.log(filteredItem[0].level);
+         filteredItem[0].level === this.state.levels ? this.setState({itemTo: item}) :
                                        this.loadOrganisationUnitsChildren(item)
     }
+//---------------------------------------------------------------------------------
+    showItemClick(item) {
+        // alert(`LAST level - no children `);
+        console.log(item);
 
 
+        console.log(this.state.itemTo);
+
+    }
     //----------------------------------------------------------------------------------------------
 
     loadOrganisationUnitsChildren(item) {
           // save in item to be the parent of future children
-          console.log("XXXXXXXXXXXXXXXXXXXXX");
-       // Loads the organisation units from the api and sets the loading state to false and puts the items onto the component state.
+        // Loads the organisation units from the api and sets the loading state to false and puts the items onto the component state.
         findChildren(item)
             .then((organisationUnits) => {
                 this.setState({
@@ -181,7 +189,8 @@ export default class App extends Component {
                 <div className="second">
                     {/*<List onItemClick={this.onItemClick} items={this.state.items}/>*/}
                     {/*this.state.isSaving ? <div>Saving organisation unit</div> : <Form onSubmit={this.onSubmit}/>*/}
-                    {this.state.items[0].level === this.state.levels ?  <Form onSubmit={this.onSubmit} /> :  console.log()}
+                    {this.state.items[0].level === this.state.levels ?  <Form onSubmit={this.onSubmit}
+                          item={this.state.itemTo}   /> :  console.log()}
                    <div>
                        <h3>Here info should be listed</h3>
                        <li>{this.state.toScreen}</li>
