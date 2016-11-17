@@ -1,8 +1,8 @@
 import React, { Component, PropTypes } from 'react';
 
 export default class Form extends Component {
-    constructor(...args) {
-        super(...args);
+    constructor(props) {
+        super(props);
 
         this.state = {
             name: '',
@@ -62,6 +62,10 @@ export default class Form extends Component {
                             <input type="date" value={this.state.openingDate} onChange={this.setOpeningDate} />
                         </label>
                     </div>
+                    <label>
+                        <span>Location</span>
+                        <input type="date" value={this.props.coordinates} disabled />
+                    </label>
                     <div>
                         <button disabled={this.isFormValid()} id="submit" onClick={this.onSubmitClick}>Submit</button>
                     </div>
