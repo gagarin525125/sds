@@ -88,8 +88,8 @@ export function findChildren(organisationUnit) {
     console.log(organisationUnit);
 
     let a = fetch(`${serverUrl}/organisationUnits/${organisationUnit.id}
-    ?paging=false&level=1&fields=id,displayName,featureType,coordinates,level,ancestors[id,displayName],
-                parent[id,displayName,ancestors]`, fetchOptions)
+    ?paging=false&level=1&fields=id,displayName,featureType,coordinates,level,openingDate,ancestors[id,displayName],
+            shortName,parent[id,displayName,ancestors]`, fetchOptions)
 
     .then(onlySuccessResponses)
         .then(response => {
@@ -117,8 +117,8 @@ export function loadOrganisationUnits() {
     // Load the organisation units but only the first level and the do not use paging
     // return fetch(`${serverUrl}/organisationUnits?paging=false&level=1`, fetchOptions)
     return fetch(`${serverUrl}/organisationUnits?paging=false&level=2&fields=id,
-    displayName,featureType,coordinates,level,ancestors[id,displayName],
-                parent[id,displayName,ancestors],`, fetchOptions)
+    displayName,featureType,coordinates,level,openingDate,ancestors[id,displayName],
+              shortName,parent[id,displayName,ancestors],`, fetchOptions)
         .then(onlySuccessResponses)
         .then(response => response.json())
         // pick the organisationUnits property from the payload
