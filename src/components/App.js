@@ -34,10 +34,11 @@ export default class App extends Component {
         this.handleLevelUpClick = this.handleLevelUpClick.bind(this);
         this.findElement = this.findElement.bind(this);
         this.onAlert = this.onAlert.bind(this);
+        this.handleBackToRootClick = this.handleBackToRootClick.bind(this);
     }
 
     componentDidMount() {
-
+         console.log("componentDisMount");
         this.loadOrganisationUnits();
         this.loadOrganisationUnitLevels();
 
@@ -167,12 +168,15 @@ export default class App extends Component {
                     <input id="t" type="text" placeholder="Search" onChange={this.filterItems}/>
                     <input type="button" value="find" onClick={this.findElement}/>
                     <input type="button" id="levelUp" name="levelUp" value="levelUp" onClick={this.handleLevelUpClick}/>
+
+                    <input type="button" id="backToRoot" name="backToRoot" value="backToRoot" onClick={this.handleBackToRootClick}/>
                      </li>
                         <List items={this.state.itemsToShow} onItemClick={this.onItemClick}/>
                 </div>
                 <div className="second">
                     {/*<List onItemClick={this.onItemClick} items={this.state.items}/>*/}
-                    {this.state.isSaving ? <div>Saving organisation unit</div> : <Form onSubmit={this.onSubmit}/>}
+                    {/*this.state.isSaving ? <div>Saving organisation unit</div> : <Form onSubmit={this.onSubmit}/>*/}
+                    {this.state.items[0].level === this.state.levels ?  <Form onSubmit={this.onSubmit} /> :  console.log()}
                    <div>
                        <h3>Here info should be listed</h3>
                        <li>{this.state.toScreen}</li>
@@ -182,7 +186,10 @@ export default class App extends Component {
         );
     }
 
-//
+//---------------------------------------------------------------------------------------------
+    handleBackToRootClick(){
+        this.loadOrganisationUnits();
+    }
 
 
 //----------------------------------------------------------------------------------------------
@@ -191,7 +198,10 @@ export default class App extends Component {
         console.log(" hit - find ");
         var ill = this.state.itemsToShow;
         console.log(ill);
-        let info = ill[0].displayName;
+        let info = [];
+            info[0] = ill[0].displayName;
+            info[1] = "  - PARENT -  ";
+            info[2] = ill[0].parent.displayName;
         this.setState({
                        toScreen : info,
                       })
