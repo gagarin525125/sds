@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import Search from 'react-search';
-import { saveOrganisationUnit, loadOrganisationUnits, findChildren, levelUp, fetchParent, organisationUnitLevels, fetchItem, itemFeatures
-} from '../api';
+import { saveOrganisationUnit, loadOrganisationUnits, findChildren,  organisationUnitLevels, itemFeatures } from '../api';
 import List from './List';
 import Form from './Form';
 import {Router, Route, IndexRout, hashHistory, browserHistory, Link} from 'react-router';
@@ -22,9 +21,7 @@ export default class App extends Component {
             isSaving: false,
             isLoading: true,
             items: [],
-            item: {},
             itemsToShow: [],
-            coordinates: [],
             levels:{},
             toScreen: [],
 
@@ -38,11 +35,11 @@ export default class App extends Component {
         this.findElement = this.findElement.bind(this);
         this.onAlert = this.onAlert.bind(this);
         this.onCoordinatesFromMap = this.onCoordinatesFromMap.bind(this);
+        this.handleBackToRootClick = this.handleBackToRootClick.bind(this);
     }
 
     componentDidMount() {
-        console.log("componentDidMount");
-        console.log(this.state.item);
+         console.log("componentDisMount");
         this.loadOrganisationUnits();
         this.loadOrganisationUnitLevels();
         mapSetCoordinatesCallback(this.onCoordinatesFromMap);
@@ -58,16 +55,16 @@ export default class App extends Component {
     loadOrganisationUnitLevels(){
 
      organisationUnitLevels()
-     .then((result) => {console.log("Levels");
-     console.log(result);
-     this.setState({
-          levels: result.pager.total,
-                   });
+            .then((result) => {console.log("Levels");
+                               console.log(result);
+                                this.setState({
+                                            levels: result.pager.total,
+                                              });
 
-          })
-     .then(() => console.log(this.state.levels))
+                      })
+              .then(() => console.log(this.state.levels))
 
-     .catch((error) => alert("Error loadOrganisationUnitLevels  App  ${error.message}"));
+              .catch((error) => alert("Error loadOrganisationUnitLevels  App  ${error.message}"));
     }
 
 //----------------------------------------  part of componentDidMount   --------------
@@ -79,33 +76,16 @@ export default class App extends Component {
                     isLoading: false,
                     items: organisationUnits,
                     itemsToShow: organisationUnits,
-                    item: organisationUnits[0].parent,
-
-                });
-            })
-            .then(() => {this.loadItemRoot(this.state.item)
+                                  });
             })
             .catch((error) => alert(`Could not find children loadOrganisationUnits  App ${error.message}`)
             )
 
     }
-    //--------------------------------------   part of componentDidMount    -----------------
-    loadItemRoot(item){
-       itemFeatures(item)
-              .then((result) => {
-                            this.setState({item:result})
-                                  })
-       .then(() => {
-                 console.log("Parent id from start ");
-                 console.log(this.state.item);
-                })
-    }
 
     //--------------------------------------------------------------------------------------------------------
       onItemClick(item) {
-            console.log("this.state.item    App");
-            console.log(this.state.item);
-         let filteredItem = this.state.items;
+           let filteredItem = this.state.items;
          // actually , this search is not necessary
          filteredItem = filteredItem.filter(stuka => stuka.id.toLowerCase()
                                            .search(item.id.toLowerCase()) !== -1);
@@ -115,25 +95,13 @@ export default class App extends Component {
                                        this.loadOrganisationUnitsChildren(item)
     }
 
- //-----------------------------------------------------------------------------------------------------
 
-    findFeatureType(item) {
-        console.log("findfeaturetype App");
-        console.log(item);
-
-        itemFeatures(item)
-            .then((result) => {
-            result.level !== 1 ? this.loadOrganisationUnitsLevelUp(item) : this.loadOrganisationUnits()
-    })
-    .catch((error) => alert(`Could not find children findFeatureType ${error}`))
-
-    }
     //----------------------------------------------------------------------------------------------
 
     loadOrganisationUnitsChildren(item) {
           // save in item to be the parent of future children
-          this.setState({item: item});
-        // Loads the organisation units from the api and sets the loading state to false and puts the items onto the component state.
+          console.log("XXXXXXXXXXXXXXXXXXXXX");
+       // Loads the organisation units from the api and sets the loading state to false and puts the items onto the component state.
         findChildren(item)
             .then((organisationUnits) => {
                 this.setState({
@@ -143,56 +111,34 @@ export default class App extends Component {
                 });
             })
             .then(() => {
-                console.log("this.state.items  App");
+                console.log("this.state.items load org child   App");
                 console.log(this.state.items);
             })
             .catch((error) => alert(`Error loadOrganisationUnitsChildren App${error.message}`)
             )
     }
 //----------------------------------------------------------------------------------------------
-    loadOrganisationUnitsLevelUp(item) {
-        console.log("this.state.item level Up   App");
-        console.log(this.state.item);
-        fetchParent(item)
-            .then((parent) => {
-            levelUp(parent).then((organisationUnits) => {
-            this.setState({
-            isLoading: false,
-            items: organisationUnits,
-            itemsToShow: organisationUnits,
-            item: parent,
-        });
-    })
-    })
-
-    .catch((error) => alert(`Level UpCould not find children loadOrganisationUntisLevelUp${error}`))
-
-    }
-
-
-//----------------------------------------------------------------------------------------------
     onSubmit(formData) {
         console.log("onSubmit this state item   App");
-        console.log(this.state.item);
-        console.log("onSubmit(formData) App");
-        console.log(formData);
+         console.log(this.state.items[0]);
+         let parent = this.state.items[0].parent;
         // Set the component state to saving
         this.setState({
             isSaving: true
         });
         //------------------------------
 
-            this.state.items[1].level === this.state.levels ?
-                                            this.saveOrganisationUnit(formData,this.state.item)
-                                            : this.rejectSaveOrganisationUnit(this.state.item)
+            this.state.items[0].level === this.state.levels ?
+                                            this.saveOrganisationUnit(formData,parent)
+                                            : this.rejectSaveOrganisationUnit(parent)
         //------------------------------
             }
  //----------------------------------------------------------------------------------------------
     // item - parent to listed ogrUnits
-    saveOrganisationUnit(formData,item){
-        saveOrganisationUnit(formData, item,this.state.levels )
-            .then(() => this.loadOrganisationUnitsChildren(item))
-             .catch(error => alert(`error saveOrganisationUnit App${error}`))
+    saveOrganisationUnit(formData,parent){
+        saveOrganisationUnit(formData, parent,this.state.levels )
+            .then(() => this.loadOrganisationUnitsChildren(parent))
+             .catch(error => alert(`error saveOrganisationUnit App${error.message}`))
                .then(() => this.setState({
                                   isSaving: false,
                      }) )
@@ -207,10 +153,7 @@ export default class App extends Component {
           this.setState({
                 isSaving: false
                         });
-        // very dangerous call !!!
-       // this.loadOrganisationUnitsChildren(item );
-
-    }
+          }
     //----------------------------------------------------------------------------------------------
     render() {
         // If the component state is set to isLoading we hide the app and show a loading message
@@ -230,12 +173,15 @@ export default class App extends Component {
                     <input id="t" type="text" placeholder="Search" onChange={this.filterItems}/>
                     <input type="button" value="find" onClick={this.findElement}/>
                     <input type="button" id="levelUp" name="levelUp" value="levelUp" onClick={this.handleLevelUpClick}/>
+
+                    <input type="button" id="backToRoot" name="backToRoot" value="backToRoot" onClick={this.handleBackToRootClick}/>
                      </li>
                         <List items={this.state.itemsToShow} onItemClick={this.onItemClick}/>
                 </div>
                 <div className="second">
                     {/*<List onItemClick={this.onItemClick} items={this.state.items}/>*/}
-                    {this.state.isSaving ? <div>Saving organisation unit</div> : <Form onSubmit={this.onSubmit}/>}
+                    {/*this.state.isSaving ? <div>Saving organisation unit</div> : <Form onSubmit={this.onSubmit}/>*/}
+                    {this.state.items[0].level === this.state.levels ?  <Form onSubmit={this.onSubmit} /> :  console.log()}
                    <div>
                        <h3>Here info should be listed</h3>
                        <li>{this.state.toScreen}</li>
@@ -245,7 +191,10 @@ export default class App extends Component {
         );
     }
 
-//
+//---------------------------------------------------------------------------------------------
+    handleBackToRootClick(){
+        this.loadOrganisationUnits();
+    }
 
 
 //----------------------------------------------------------------------------------------------
@@ -254,7 +203,10 @@ export default class App extends Component {
         console.log(" hit - find ");
         var ill = this.state.itemsToShow;
         console.log(ill);
-        let info = ill[0].displayName;
+        let info = [];
+            info[0] = ill[0].displayName;
+            info[1] = "  - PARENT -  ";
+            info[2] = ill[0].parent.displayName;
         this.setState({
                        toScreen : info,
                       })
@@ -264,9 +216,7 @@ export default class App extends Component {
 //----------------------------------------------------------------------------------------------
     onAlert() {
         alert(`You cannot add org.unit here-not LAST level`);
-        // dangerous call
-        //  this.loadOrganisationUnits(this.state.item);
-    }
+            }
 
 //----------------------------------------------------------------------------------------------
     filterItems(event) {
@@ -286,15 +236,11 @@ export default class App extends Component {
 //----------------------------------------------------------------------------------------------
     handleLevelUpClick() {
         console.log("this.state.item  handleLevelUp  App  ");
-        console.log(this.state.item.level);
-       itemFeatures(this.state.item)
-                   .then((result) => {
-                      result.level !== 1 ? this.loadOrganisationUnitsLevelUp(this.state.item) :
-                                                this.loadOrganisationUnits()
-            })
-           .catch((error) => alert(`Error handleLevelUpClick ${error.message}`))
+         let ancestors = this.state.items[0].ancestors;
+                   let i = ancestors.length;
+                  i === 1 ? alert(`You are on HIGHEST level`) ://this.loadOrganisationUnits() :
+                                       this.loadOrganisationUnitsChildren(ancestors[i - 2])
+     }
 
-    }
-
-}
-//----------------------------------------------------------------------------------------------
+     //----------------------- end class ---------------------------------
+  }
