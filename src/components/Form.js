@@ -8,14 +8,45 @@ export default class Form extends Component {
             name: '',
             shortName: '',
             openingDate: '',
+            item: {} ,
+            coordinates: '',
         };
+
+
 
         this.onSubmitClick = this.onSubmitClick.bind(this);
         this.setName = this.setName.bind(this);
         this.setShortName = this.setShortName.bind(this);
         this.setOpeningDate = this.setOpeningDate.bind(this);
     }
+    componentWillReceiveProps(){
+        console.log("will mount");
 
+        this.setCoordinates(this.props.item);
+        console.log(this.state.item)
+    }
+
+    setCoordinates(item){
+        if (item.coordinates) {
+            this.setState({
+                name: item.displayName,
+                shortName: item.shortName,
+               openingDate: this.convertDate(item.openingDate),
+                coordinates: item.coordinates,
+
+
+            })
+        } else {
+            this.setState({
+                name: item.displayName,
+                shortName: item.shortName,
+               openingDate: this.convertDate(item.openingDate),
+                coordinates: "No coordinates",
+
+
+            })
+        }
+    }
     onSubmitClick(event) {
         event.preventDefault();
 
@@ -38,6 +69,13 @@ export default class Form extends Component {
 
     isFormValid() {
         return !(this.state.name && this.state.shortName && this.state.openingDate);
+    }
+    convertDate(dateForm){
+        let d = new Date(dateForm);
+
+       let newD =  `${d.getFullYear()}-${d.getMonth() + 1 }-${d.getDate()}` ;
+       console.log(newD);
+       return newD;
     }
 
     render() {
@@ -62,9 +100,10 @@ export default class Form extends Component {
                             <input type="date" value={this.state.openingDate} onChange={this.setOpeningDate} />
                         </label>
                     </div>
+
                     <label>
                         <span>Location</span>
-                        <input type="date" value={this.props.coordinates} disabled />
+                        <input type="text"  value={this.state.coordinates} placeholder="[ latitude , longitude ]"  required="true"/>
                     </label>
                     <div>
                         <button disabled={this.isFormValid()} id="submit" onClick={this.onSubmitClick}>Submit</button>
@@ -83,7 +122,8 @@ export default class Form extends Component {
 }
 
 Form.propTypes = {
-    onSubmit: PropTypes.func.isRequired,
+    onSubmit: PropTypes.func,
+    coordinates: PropTypes.object,
 };
 
 /*
