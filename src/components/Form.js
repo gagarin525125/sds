@@ -65,9 +65,7 @@ export default class Form extends Component {
                     <div>
                         <button disabled={this.isFormValid()} id="submit" onClick={this.onSubmitClick}>Submit</button>
                     </div>
-                    <div>
-                    <input id="selection" type="button" value="back to root" onClick={this.onSubmitClick}/>
-                   </div>
+
                 </form>
                 
                
