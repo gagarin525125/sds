@@ -1,6 +1,7 @@
 var map;
 var markers = [];
 var polygons = [];
+var coordinatesCallback;
 
 /** Show a map of Sierra Leone. */
 export function initMap() {
@@ -8,6 +9,13 @@ export function initMap() {
         center: { lat: 8.5, lng: -12 },
         zoom: 8
     });
+    google.maps.event.addListener(map, "rightclick", event => {
+        coordinatesCallback(event.latLng.lat(), event.latLng.lng());
+    });
+}
+
+export function mapSetCoordinatesCallback(callback) {
+    coordinatesCallback = callback;
 }
 
 /** Add markers. places is an array of
@@ -20,12 +28,10 @@ function mapAddMarkers(places) {
             position: {lat: p.lat, lng: p.lng},
             title: p.title
         });
-        if (p.callback) {
-            google.maps.event.addListener(m, "click", (event) => {
-                //console.log("Click on marker: " + p.title);
-                p.callback();
-            });
-        }
+
+        if (p.callback)
+            google.maps.event.addListener(m, "click", event => p.callback());
+
         markers.push(m);
     });
 }
@@ -40,6 +46,18 @@ function getPolygonCenter(points) {
     let lngSum = points.reduce((acc, point) => acc + point[0], 0);
     let latSum = points.reduce((acc, point) => acc + point[1], 0);
     return { lat: latSum/points.length, lng: lngSum/points.length };
+}
+
+function getBoundsForPoints(points, currentBounds) {
+    if (!currentBounds)
+        currentBounds = { south: -90, west: 180, north: 90, east: -180 };
+
+    var latArray = points.map(p => p[1]);
+    var lngArray = points.map(p => p[0]);
+    return { south: Math.max(currentBounds.south, ...latArray),
+             west:  Math.min(currentBounds.west,  ...lngArray),
+             north: Math.min(currentBounds.north, ...latArray),
+             east:  Math.max(currentBounds.east,  ...lngArray) };
 }
 
 /**
@@ -58,13 +76,8 @@ function mapAddPolygon(points, text, callback) {
         fillOpacity: 0
     });
 
-    if (callback) {
-        let f = (event) => {
-            //console.log("Clicked on area: " + text);
-            callback();
-        };
-        google.maps.event.addListener(poly, "click", f);
-    }
+    if (callback)
+        google.maps.event.addListener(poly, "click", event => callback());
 
     if (text) {
         let place = getPolygonCenter(points);
@@ -85,9 +98,11 @@ function mapClearPolygons() {
 /** Add to the information displayed on the map. */
 export function mapAddItems(organisationUnits) {
     var places = [];
+    var bounds;
 
     for(let i = 0; i < organisationUnits.length; i++) {
         let ou = organisationUnits[i];
+        let newPoints = [];
         if (!ou.coordinates) {
             console.log(`mapSetItems: missing coordinates for ${ou.displayName} (${ou.id})`);
             continue;
@@ -100,29 +115,36 @@ export function mapAddItems(organisationUnits) {
                 title: `${ou.displayName}\n${ou.id}`,
                 callback: ou.callback
             });
+            newPoints = [coords];
         }
         else if (ou.featureType == "POLYGON") {
-            let coords = JSON.parse(ou.coordinates);
-            mapAddPolygon(coords[0][0], ou.displayName, ou.callback);
+            newPoints = JSON.parse(ou.coordinates)[0][0];
+            mapAddPolygon(newPoints, ou.displayName, ou.callback);
         }
         else if (ou.featureType == "MULTI_POLYGON") {
             let matches = ou.coordinates.match(/\[\[[^[].*?\]\]/g);
             let polys = matches.map(m => JSON.parse(m));
             polys.forEach(p => mapAddPolygon(p, null, ou.callback));
+            newPoints = [].concat(...polys);
 
             // Add a clickable, hoverable marker inside the area.
-            let center = getPolygonCenter([].concat.apply([], polys));
+            let center = getPolygonCenter(newPoints);
             mapAddMarkers([{ lat: center.lat, lng: center.lng,
                              title: ou.displayName, callback: ou.callback }]);
         }
         else {
             alert(`mapSetItems: unrecognized featureType for ${ou.displayName} (${ou.id})`);
         }
+
+        // Update bounds to include the new coordinates.
+        bounds = getBoundsForPoints(newPoints, bounds);
     }
 
-    if (places.length > 0) {
+    if (places.length > 0)
         mapAddMarkers(places);
-    }
+
+    if (organisationUnits.length > 0)
+        map.fitBounds(bounds);
 }
 
 /** Set the information to be displayed on the map. */

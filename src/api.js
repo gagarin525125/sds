@@ -6,8 +6,8 @@
  * You obviously should not do this for your production apps.
  */
 //const serverUrl = 'http://localhost:8082/api/';
-//const serverUrl = 'https://play.dhis2.org/demo/api/';
-const serverUrl = 'https://play.dhis2.org/dev/api/';
+const serverUrl = 'https://play.dhis2.org/demo/api/';
+//const serverUrl = 'https://play.dhis2.org/dev/api/';
 //const serverUrl = 'https://play.dhis2.org/test/api/';
 const basicAuth = `Basic ${btoa('admin:district')}`;
 
@@ -130,7 +130,7 @@ export function loadOrganisationUnits() {
 }
 
 
-
+/*
 export function itemFeatures(item){
 
      return fetch(`${serverUrl}organisationUnits/${item.id}`, fetchOptions)
@@ -139,7 +139,7 @@ export function itemFeatures(item){
         .catch((error) => alert(`itemFeatures api ${error}`))
     }
 
-
+*/
 
 
 

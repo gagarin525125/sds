@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import Search from 'react-search';
-import { saveOrganisationUnit, loadOrganisationUnits, findChildren,  organisationUnitLevels, itemFeatures } from '../api';
+import { saveOrganisationUnit, loadOrganisationUnits, findChildren,  organisationUnitLevels} from '../api';
 import List from './List';
 import Form from './Form';
 import {Router, Route, IndexRout, hashHistory, browserHistory, Link} from 'react-router';
