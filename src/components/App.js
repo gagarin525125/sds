@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import Search from 'react-search';
-import { saveOrganisationUnit, loadOrganisationUnits, findChildren,  organisationUnitLevels} from '../api';
+import { saveOrganisationUnit, loadOrganisationUnits, findChildren,  organisationUnitLevels,liveSearch} from '../api';
 import List from './List';
 import Form from './Form';
 import {Router, Route, IndexRout, hashHistory, browserHistory, Link} from 'react-router';
@@ -37,6 +37,7 @@ export default class App extends Component {
         this.onItemClick = this.onItemClick.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
         this.filterItems = this.filterItems.bind(this);
+        this.filterItems2 = this.filterItems2.bind(this);
         this.handleLevelUpClick = this.handleLevelUpClick.bind(this);
         this.findElement = this.findElement.bind(this);
         this.onAlert = this.onAlert.bind(this);
@@ -132,8 +133,7 @@ export default class App extends Component {
                 console.log("this.state.items load org child   App");
                 console.log(this.state.items);
             })
-            .catch((error) => alert(`Error loadOrganisationUnitsChildren App${error.message}`)
-            )
+            .catch((error) => alert(`Error loadOrganisationUnitsChildren App${error.message}`))
     }
 //----------------------------------------------------------------------------------------------
     onSubmit(formData) {
@@ -188,8 +188,10 @@ export default class App extends Component {
             <div className="app">
                 <div className="search">
                     <li>
-                    <input id="t" type="text" placeholder="Search" onChange={this.filterItems}/>
+                    <input id="search" type="text" placeholder="Search" onChange={this.filterItems}/>
                     <input type="button" value="find" onClick={this.findElement}/>
+                        <input id="live" type="text" placeholder="LiveSearch" onChange={this.filterItems2}/>
+                        <input type="button" value="find" onClick={this.findElement}/>
                     <input type="button" id="levelUp" name="levelUp" value="levelUp" onClick={this.handleLevelUpClick}/>
 
                     <input type="button" id="backToRoot" name="backToRoot" value="backToRoot" onClick={this.handleBackToRootClick}/>
@@ -234,6 +236,7 @@ export default class App extends Component {
 //----------------------------------------------------------------------------------------------
     onAlert() {
         alert(`You cannot add org.unit here-not LAST level`);
+        event.preventDefault();
             }
 
 //----------------------------------------------------------------------------------------------
@@ -249,6 +252,20 @@ export default class App extends Component {
         console.log("items filterItems");
         console.log(this.state.itemsToShow);
         console.log(this.state.items);
+
+    }
+    //-----------------------------------------------------------------------------------------
+    filterItems2(event){
+        event.preventDefault();
+        liveSearch(event.target.value.toLowerCase())
+            .then(result => {
+                console.log(result);
+                this.setState({
+                    itemsToShow: result.organisationUnits
+                })
+            })
+
+            .catch((error) => alert(`Error filterItems2 App  ${error.message}`))
 
     }
 //----------------------------------------------------------------------------------------------
