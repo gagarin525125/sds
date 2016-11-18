@@ -255,6 +255,7 @@ export default class App extends Component {
 
     }
     //-----------------------------------------------------------------------------------------
+    // not ready
     filterItems2(event){
         event.preventDefault();
         liveSearch(event.target.value.toLowerCase())
