@@ -110,6 +110,7 @@ export function findChildren(organisationUnit) {
         //    console.log(organisationUnits);
             return organisationUnits;
         })
+        .catch((error) => alert(`findChildren api ${error}`));
 
     return a;
 }
@@ -128,8 +129,17 @@ export function loadOrganisationUnits() {
             console.log(organisationUnits);
             return organisationUnits;
         })
+        .catch((error) => alert(`loadOrganisationUnits api ${error}`));
 }
 
+export function liveSearch(searchString) {
+
+    return fetch(`${serverUrl}/organisationUnits?filter=name:like:${searchString}`,fetchOptions)
+        .then(onlySuccessResponses)
+        .then(response => response.json())
+        .catch((error) => alert(`liveSearch api ${error}`));
+
+}
 
 /*
 export function itemFeatures(item){
