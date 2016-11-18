@@ -8,8 +8,7 @@ export default class Form extends Component {
             name: '',
             shortName: '',
             openingDate: '',
-            item: {} ,
-            coordinates: '',
+            coordinates: '[   ,  ]',
         };
 
 
@@ -18,15 +17,16 @@ export default class Form extends Component {
         this.setName = this.setName.bind(this);
         this.setShortName = this.setShortName.bind(this);
         this.setOpeningDate = this.setOpeningDate.bind(this);
-    }
-    componentWillReceiveProps(){
-        console.log("will mount");
+        this.setNewCoordinates = this.setNewCoordinates.bind(this);
 
-        this.setCoordinates(this.props.item);
-        console.log(this.state.item)
     }
+    componentWillReceiveProps(nextProps) {
+            if(nextProps.item != this.props.item)
+            this.loadData(nextProps.item);
+    }
+    loadData(item){
+   //new one
 
-    setCoordinates(item){
         if (item.coordinates) {
             this.setState({
                 name: item.displayName,
@@ -53,6 +53,13 @@ export default class Form extends Component {
         console.log("this.state");
         console.log(this.state);
         this.props.onSubmit(this.state);
+        this.setState({
+            name: '',
+            shortName: '',
+            openingDate: '',
+            coordinates: '[   ,  ]',
+
+        })
     }
 
     setName(event) {
@@ -68,14 +75,11 @@ export default class Form extends Component {
     }
 
     isFormValid() {
-        return !(this.state.name && this.state.shortName && this.state.openingDate);
+        return !(this.state.name && this.state.shortName && this.state.openingDate && this.state.coordinates);
     }
-    convertDate(dateForm){
-        let d = new Date(dateForm);
 
-       let newD =  `${d.getFullYear()}-${d.getMonth() + 1 }-${d.getDate()}` ;
-       console.log(newD);
-       return newD;
+    setNewCoordinates(event){
+    this.setState({ coordinates: event.target.value });
     }
 
     render() {
@@ -100,11 +104,13 @@ export default class Form extends Component {
                             <input type="date" value={this.state.openingDate} onChange={this.setOpeningDate} />
                         </label>
                     </div>
-
-                    <label>
-                        <span>Location</span>
-                        <input type="text"  value={this.state.coordinates} placeholder="[ latitude , longitude ]"  required="true"/>
-                    </label>
+                    <div>
+                         <label>
+                             <span>Location</span>
+                             <input type="text"  value={this.state.coordinates}  placeholder="latitude , longitude ]"
+                                onChange={this.setNewCoordinates}/>
+                         </label>
+                    </div>
                     <div>
                         <button disabled={this.isFormValid()} id="submit" onClick={this.onSubmitClick}>Submit</button>
                     </div>
@@ -118,6 +124,17 @@ export default class Form extends Component {
             
             
         );
+    }
+
+    convertDate(dateForm){
+        let d = new Date(dateForm);
+        let m = d.getMonth() + 1;
+        if(m < 10) m = '0' + m;
+        let day = d.getDate();
+        if(day < 10) day = '0' + day;
+
+        let newD =  `${d.getFullYear()}-${m}-${day}` ;
+        return newD.toString();
     }
 }
 
