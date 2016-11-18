@@ -52,6 +52,7 @@ export function saveOrganisationUnit(organisationUnit, parentOf,levels) {
         shortName: organisationUnit.shortName,
         openingDate: organisationUnit.openingDate,
         featureType: "POINT",
+        coordinates: organisationUnit.coordinates,
        level: levels,
     };
     console.log("tosend  api ");
