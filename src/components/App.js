@@ -24,7 +24,12 @@ export default class App extends Component {
             itemsToShow: [],
             levels:{},
             toScreen: [],
-            itemTo: {},
+            itemTo: {
+                displayName: 'empty',
+                shortName: 'empty',
+                openingDate: '1111-11-11',
+                coordinates: 'empty',
+            },
 
         };
 
@@ -87,24 +92,29 @@ export default class App extends Component {
     //--------------------------------------------------------------------------------------------------------
       onItemClick(item) {
 
-         let filteredItem = this.state.items;
-         // actually , this search is not necessary
-         filteredItem = filteredItem.filter(stuka => stuka.id.toLowerCase()
-                                           .search(item.id.toLowerCase()) !== -1);
-         console.log(this.state.levels);
-         console.log(filteredItem[0].level);
-         filteredItem[0].level === this.state.levels ? this.setState({itemTo: item}) :
-                                       this.loadOrganisationUnitsChildren(item)
-    }
-//---------------------------------------------------------------------------------
-    showItemClick(item) {
-        // alert(`LAST level - no children `);
-        console.log(item);
+          console.log("this state before itemTo");
+          console.log(this.state.itemTo);
 
 
-        console.log(this.state.itemTo);
+          let filteredItem = this.state.items;
+          // actually , this search is not necessary
+          filteredItem = filteredItem.filter(stuka => stuka.id.toLowerCase()
+              .search(item.id.toLowerCase()) !== -1);
+          console.log(this.state.levels);
+          console.log(filteredItem[0].level);
+          if (filteredItem[0].level < this.state.levels) {
+               item.coordinates = "not listed";
+              this.setState({itemTo: item});
+              this.loadOrganisationUnitsChildren(item);
+          } else {
+              this.setState({itemTo: item});
+              console.log("this state after itemTo");
+              console.log(this.state.itemTo)
 
-    }
+          }
+      }
+
+
     //----------------------------------------------------------------------------------------------
 
     loadOrganisationUnitsChildren(item) {
@@ -138,7 +148,7 @@ export default class App extends Component {
 
             this.state.items[0].level === this.state.levels ?
                                             this.saveOrganisationUnit(formData,parent)
-                                            : this.rejectSaveOrganisationUnit(parent)
+                                            : this.rejectSaveOrganisationUnit(parent);
         //------------------------------
             }
  //----------------------------------------------------------------------------------------------
@@ -184,13 +194,12 @@ export default class App extends Component {
 
                     <input type="button" id="backToRoot" name="backToRoot" value="backToRoot" onClick={this.handleBackToRootClick}/>
                      </li>
-                        <List items={this.state.itemsToShow} onItemClick={this.onItemClick}/>
+                        <List items={this.state.itemsToShow} onItemClick={this.onItemClick} />
                 </div>
                 <div className="second">
                     {/*<List onItemClick={this.onItemClick} items={this.state.items}/>*/}
                     {/*this.state.isSaving ? <div>Saving organisation unit</div> : <Form onSubmit={this.onSubmit}/>*/}
-                    {this.state.items[0].level === this.state.levels ?  <Form onSubmit={this.onSubmit}
-                          item={this.state.itemTo}   /> :  console.log()}
+                    {<Form onSubmit={this.onSubmit}   item={this.state.itemTo}   /> }
                    <div>
                        <h3>Here info should be listed</h3>
                        <li>{this.state.toScreen}</li>
@@ -253,3 +262,7 @@ export default class App extends Component {
 
      //----------------------- end class ---------------------------------
   }
+/*
+ {this.state.items[0].level === this.state.levels ?  <Form onSubmit={this.onSubmit}
+ item={this.state.itemTo}   /> :  console.log()}
+ */
