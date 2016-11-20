@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import Search from 'react-search';
-import { saveOrganisationUnit, loadOrganisationUnits, findChildren,  organisationUnitLevels,liveSearch} from '../api';
+import { saveOrganisationUnit, loadOrganisationUnits, findChildren,  organisationUnitLevels,liveSearch,updateOrganisationUnit} from '../api';
 import List from './List';
 import Form from './Form';
 import {Router, Route, IndexRout, hashHistory, browserHistory, Link} from 'react-router';
@@ -25,11 +25,13 @@ export default class App extends Component {
             levels:{},
             toScreen: [],
             itemTo: {
+                id: "0",
                 displayName: 'empty',
                 shortName: 'empty',
                 openingDate: '1111-11-11',
                 coordinates: 'empty',
             },
+            wantToChange: false,
 
         };
 
@@ -43,6 +45,7 @@ export default class App extends Component {
         this.onAlert = this.onAlert.bind(this);
         this.onCoordinatesFromMap = this.onCoordinatesFromMap.bind(this);
         this.handleBackToRootClick = this.handleBackToRootClick.bind(this);
+        this.resetItemToClick = this.resetItemToClick.bind(this);
     }
 
     componentDidMount() {
@@ -91,32 +94,6 @@ export default class App extends Component {
     }
 
     //--------------------------------------------------------------------------------------------------------
-      onItemClick(item) {
-
-          console.log("this state before itemTo");
-          console.log(this.state.itemTo);
-
-
-          let filteredItem = this.state.items;
-          // actually , this search is not necessary
-          filteredItem = filteredItem.filter(stuka => stuka.id.toLowerCase()
-              .search(item.id.toLowerCase()) !== -1);
-          console.log(this.state.levels);
-          console.log(filteredItem[0].level);
-          if (filteredItem[0].level < this.state.levels) {
-               item.coordinates = "not listed";
-              this.setState({itemTo: item});
-              this.loadOrganisationUnitsChildren(item);
-          } else {
-              this.setState({itemTo: item});
-              console.log("this state after itemTo");
-              console.log(this.state.itemTo)
-
-          }
-      }
-
-
-    //----------------------------------------------------------------------------------------------
 
     loadOrganisationUnitsChildren(item) {
           // save in item to be the parent of future children
@@ -133,29 +110,70 @@ export default class App extends Component {
                 console.log("this.state.items load org child   App");
                 console.log(this.state.items);
             })
-            .catch((error) => alert(`Error loadOrganisationUnitsChildren App${error.message}`))
+            .catch((error) => alert(`Error loadOrganisationUnitsChildren App  ${error.message}`))
     }
-//----------------------------------------------------------------------------------------------
-    onSubmit(formData) {
-        console.log("onSubmit this state item   App");
-         console.log(this.state.items[0]);
-         let parent = this.state.items[0].parent;
-        // Set the component state to saving
+//---------------------------------------------------------------------------------------------
+onItemClick(item) {
+    if(item.level < this.state.levels){
+        item.coordinates = "not listed";
         this.setState({
-            isSaving: true
-        });
-        //------------------------------
+            itemTo: item,
 
-            this.state.items[0].level === this.state.levels ?
-                                            this.saveOrganisationUnit(formData,parent)
-                                            : this.rejectSaveOrganisationUnit(parent);
-        //------------------------------
+        });
+        this.loadOrganisationUnitsChildren(item);
+    } else {
+        this.setState({
+            itemTo: item,
+            wantToChange : true
+        });
             }
+}
+
+
+    //----------------------------------------------------------------------------------------------
+
+    onSubmit(formData) {
+        if (this.state.wantToChange) {
+            let res = prompt(`want to change existing orgUnit? Y/no`, "no");
+            if (res == null) {  // cancel
+                console.log("hit - cancel");// something to add ?
+            } else if (res.toLowerCase() === "no") {
+                console.log("hit - no "); // something to add ?
+
+            }
+            else if (res.toLowerCase() === "") {
+                console.log("hit - empty"); // something to add ?
+            }
+            else if (res.toLowerCase() === "y") {
+                console.log("hit - yes ");
+                this.setState({
+                    isSaving: true,
+
+                });
+                this.updateOrganisationUnit(formData, this.state.itemTo);
+                this.resetItemToClick();
+            }
+        } else {
+            this.resetItemToClick();
+            this.saveOrganisationUnit(formData,this.state.items[0].parent);
+
+        }
+    }
  //----------------------------------------------------------------------------------------------
+    updateOrganisationUnit(formData,itemTo){
+        updateOrganisationUnit(formData,itemTo )
+            .then(() => this.loadOrganisationUnitsChildren(itemTo.parent))// update state with new born lazaret
+            .catch(error => alert(`error updateOrganisationUnit App${error.message}`))
+            .then(() => this.setState({
+                isSaving: false,
+            }) )
+    }
+
+    //--------------------------------------------------------------------------------------------
     // item - parent to listed ogrUnits
     saveOrganisationUnit(formData,parent){
         saveOrganisationUnit(formData, parent,this.state.levels )
-            .then(() => this.loadOrganisationUnitsChildren(parent))
+            .then(() => this.loadOrganisationUnitsChildren(parent))// update state with new born lazaret
              .catch(error => alert(`error saveOrganisationUnit App${error.message}`))
                .then(() => this.setState({
                                   isSaving: false,
@@ -166,12 +184,12 @@ export default class App extends Component {
         console.log(`onCoordinatesFromMap(${lat}, ${lng})`);
     }
 //----------------------------------------------------------------------------------------------
-    rejectSaveOrganisationUnit(item){
+   /* rejectSaveOrganisationUnit(item){
         this.onAlert();
           this.setState({
                 isSaving: false
                         });
-          }
+          }*/
     //----------------------------------------------------------------------------------------------
     render() {
         // If the component state is set to isLoading we hide the app and show a loading message
@@ -187,33 +205,32 @@ export default class App extends Component {
         return (
             <div className="app">
                 <div className="search">
-                    <li>
-                    <input id="search" type="text" placeholder="Search" onChange={this.filterItems}/>
-                    <input type="button" value="find" onClick={this.findElement}/>
-                        <input id="live" type="text" placeholder="LiveSearch" onChange={this.filterItems2}/>
-                        <input type="button" value="find" onClick={this.findElement}/>
-                    <input type="button" id="levelUp" name="levelUp" value="levelUp" onClick={this.handleLevelUpClick}/>
 
-                    <input type="button" id="backToRoot" name="backToRoot" value="backToRoot" onClick={this.handleBackToRootClick}/>
-                     </li>
-                        <List items={this.state.itemsToShow} onItemClick={this.onItemClick} />
+
+                    <input type="button" id="levelUp" name="levelUp" value="levelUp" onClick={this.handleLevelUpClick}/>
+                    <input type="button" id="backToRoot" name="backToRoot" value="backToRoot"
+                           onClick={this.handleBackToRootClick}/>
+
+                    <input id="live" type="text" placeholder="livesearch" onChange={this.filterItems2}/>
+                    < List items={this.state.items/*ToShow*/} onItemClick={this.onItemClick}/>
                 </div>
                 <div className="second">
                     {/*<List onItemClick={this.onItemClick} items={this.state.items}/>*/}
                     {/*this.state.isSaving ? <div>Saving organisation unit</div> : <Form onSubmit={this.onSubmit}/>*/}
-                    {<Form onSubmit={this.onSubmit}   item={this.state.itemTo}   /> }
-                   <div>
-                       <h3>Here info should be listed</h3>
-                       <li>{this.state.toScreen}</li>
-                   </div>
+                    {<Form onSubmit={this.onSubmit} item={this.state.itemTo} resetItemToClick={this.resetItemToClick}/> }
+                    <div>
+                        <h3>Here info should be listed</h3>
+                        <li>{this.state.toScreen}</li>
+                    </div>
                 </div>
             </div>
         );
     }
 
 //---------------------------------------------------------------------------------------------
-    handleBackToRootClick(){
-        this.loadOrganisationUnits();
+    handleBackToRootClick(event){
+        event.preventDefault();
+        this.loadOrganisationUnits() ;
     }
 
 
@@ -221,7 +238,7 @@ export default class App extends Component {
     findElement() {
 
         console.log(" hit - find ");
-        var ill = this.state.itemsToShow;
+        let ill = this.state.itemsToShow;
         console.log(ill);
         let info = [];
             info[0] = ill[0].displayName;
@@ -242,7 +259,7 @@ export default class App extends Component {
 //----------------------------------------------------------------------------------------------
     filterItems(event) {
         event.preventDefault();
-        var updatedItems = this.state.items;
+        let updatedItems = this.state.items;
         updatedItems = updatedItems.filter(stuka =>
             stuka.displayName.toLowerCase().search(event.target.value.toLowerCase()) !== -1);
 
@@ -257,12 +274,24 @@ export default class App extends Component {
     //-----------------------------------------------------------------------------------------
     // not ready
     filterItems2(event){
+        this.resetItemToClick();
         event.preventDefault();
+        if(event.target.value === ''){
+
+                this.setState({
+                    items/*ToShow*/: this.state.items
+                });
+                return;
+        }
+
+
         liveSearch(event.target.value.toLowerCase())
+
             .then(result => {
                 console.log(result);
+
                 this.setState({
-                    itemsToShow: result.organisationUnits
+                    items/*ToShow*/: result.organisationUnits
                 })
             })
 
@@ -278,9 +307,54 @@ export default class App extends Component {
                                        this.loadOrganisationUnitsChildren(ancestors[i - 2])
      }
 
+     //----------------------------------------------------------------------------------------
+    resetItemToClick() {
+        this.setState({
+            itemTo: {
+                id: "0",
+                displayName: '',
+                shortName: '',
+                openingDate: '',
+                coordinates: '[   ,   ]',
+            },
+            wantToChange : false
+        })
+    }
+
      //----------------------- end class ---------------------------------
   }
 /*
  {this.state.items[0].level === this.state.levels ?  <Form onSubmit={this.onSubmit}
  item={this.state.itemTo}   /> :  console.log()}
+
+ <input id="search" type="text" placeholder="Search" onChange={this.filterItems}/>
+ <input type="button" value="find" onClick={this.findElement}/>
+ <input type="button" value="find" onClick={this.findElement}/>
+
+
+ this.state.items[0].level === this.state.levels ?
+ this.saveOrganisationUnit(formData,parent)
+ : this.rejectSaveOrganisationUnit(parent);
+
+
+
+ //  console.log("onItemClick  levels App");
+ // console.log(this.state.itemTo);
+ /*
+
+
+ let filteredItem = this.state.items;
+ // actually , this search is not necessary
+ filteredItem = filteredItem.filter(stuka => stuka.id.toLowerCase()
+ .search(item.id.toLowerCase()) !== -1);
+ console.log(this.state.levels);
+ console.log(filteredItem[0].level);
+
+
+
+ //  if (filteredItem[0].level < this.state.levels) {
+
+ <button id="reset"  onClick={this.resetItemToClick}>reset</button>
  */
+
+
