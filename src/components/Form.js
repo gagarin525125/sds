@@ -9,7 +9,7 @@ export default class Form extends Component {
             shortName: '',
             openingDate: '',
             coordinates: '[   ,   ]',
-            allowance : false,
+            allowance : false,//not in use
         };
 
 
