@@ -42,6 +42,19 @@ return fetch(`${serverUrl}organisationUnitLevels`,fetchOptions)
 
 }
 export function saveOrganisationUnit(organisationUnit, parentOf,levels) {
+    //-----------------------------------------------------------
+    /*
+    let check = fetch(`${serverUrl}/organisationUnits/${organisationUnit.id}`,fetchOptions)
+                .then(response => {
+                                    if (response.status === 200) {
+                                                                 alert(`this unit exists,want to replace ?`);
+                                                                 }
+                    let a = response.json();
+                     return a;
+                  })
+        .catch((error) => alert(`saveOrgUnits check api ${error}`));
+    */
+    //-----------------------------------------------------------
     // POST the payload to the server to save the organisationUnit
       console.log("levels  " + levels);
     let toSend = {
@@ -57,19 +70,50 @@ export function saveOrganisationUnit(organisationUnit, parentOf,levels) {
     };
     console.log("tosend  api ");
     console.log(JSON.stringify(toSend));
-    let b = Object.assign({}, fetchOptions, {
+    let options = Object.assign({}, fetchOptions, {
         method: 'POST',
         body: JSON.stringify(toSend)
     });
 
 
-    return fetch(`${serverUrl}/organisationUnits/`, b)
+    return fetch(`${serverUrl}/organisationUnits/`, options)
         .then(onlySuccessResponses)
         // Parse the json responsee
         .then(response => response.json())
         // Log any errors to the console. (Should probably do some better error handling);
         .catch((error) => alert(`saveOrganisationUnit api ${error}`));
 }
+//------------------------------------------------------------------------------------------------------
+
+export function updateOrganisationUnit(formData,itemTo){
+    if(!itemTo.id)
+        alert("something wrong with  Id ,updateOrgUnit   api  ");
+      else if(!itemTo.parent)
+          alert("something wrong with  Parent , updateOrgUnit   api");
+    let toSend = {
+        parent: {
+            id: itemTo.parent.id
+        },
+        name: formData.name,
+        shortName: formData.shortName,
+        openingDate: formData.openingDate,
+        coordinates: formData.coordinates,
+        featureType: "POINT",
+      //  featureType: itemTo.featureType,
+        level: itemTo.level,
+    };
+    let options = Object.assign({}, fetchOptions, {
+        method: 'PUT',
+        body: JSON.stringify(toSend)
+          });
+        return fetch(`${serverUrl}organisationUnits/${itemTo.id}?mergeMode=REPLACE`, options)
+        .then(onlySuccessResponses)
+        // Parse the json responsee
+        .then(response => response.json())
+        .catch((error) => alert(`updateOrganisationUnit api ${error}`));
+
+}
+
 /*
 export function deleteOrganisationUnit(organisationUnit) {
     // Send DELETE request to the server to delete the organisation unit
@@ -133,8 +177,15 @@ export function loadOrganisationUnits() {
 }
 
 export function liveSearch(searchString) {
+    console.log("searchString api");
+    console.log(searchString);
+    let ar = [];
+    if(searchString === '') return null;
 
-    return fetch(`${serverUrl}/organisationUnits?filter=name:like:${searchString}`,fetchOptions)
+                                                 // paging=false
+    return fetch(`${serverUrl}/organisationUnits?paging=true&fields=id,displayName,
+    featureType,coordinates,level,openingDate,ancestors[id,displayName],shortName,
+    parent[id,displayName,ancestors]&filter=name:like:${searchString}`,fetchOptions)
         .then(onlySuccessResponses)
         .then(response => response.json())
         .catch((error) => alert(`liveSearch api ${error}`));
