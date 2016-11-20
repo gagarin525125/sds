@@ -8,7 +8,8 @@ export default class Form extends Component {
             name: '',
             shortName: '',
             openingDate: '',
-            coordinates: '[   ,  ]',
+            coordinates: '[   ,   ]',
+            allowance : false,
         };
 
 
@@ -18,6 +19,8 @@ export default class Form extends Component {
         this.setShortName = this.setShortName.bind(this);
         this.setOpeningDate = this.setOpeningDate.bind(this);
         this.setNewCoordinates = this.setNewCoordinates.bind(this);
+        this.resetFormClick = this.resetFormClick.bind(this);
+        this.checkPermition = this.checkPermition.bind(this);
 
     }
     componentWillReceiveProps(nextProps) {
@@ -50,20 +53,40 @@ export default class Form extends Component {
     onSubmitClick(event) {
         event.preventDefault();
 
-        console.log("this.state");
+        console.log("this.state Form ");
         console.log(this.state);
         this.props.onSubmit(this.state);
         this.setState({
             name: '',
             shortName: '',
             openingDate: '',
-            coordinates: '[   ,  ]',
+            coordinates: '[   ,   ]',
+            allowance: false
 
         })
     }
 
+    resetFormClick(event){
+        event.preventDefault();
+        this.setState({
+            name: '',
+            shortName: '',
+            openingDate: '',
+            coordinates: '[   ,   ]',
+
+        });
+      this.props.resetItemToClick();
+    }
+
     setName(event) {
-        this.setState({ name: event.target.value });
+
+
+
+
+                this.setState({name: event.target.value});
+
+
+
     }
 
     setShortName(event) {
@@ -107,16 +130,17 @@ export default class Form extends Component {
                     <div>
                          <label>
                              <span>Location</span>
-                             <input type="text"  value={this.state.coordinates}  placeholder="latitude , longitude ]"
+                             <input type="text"  value={this.state.coordinates}  placeholder="[ latitude , longitude ]"
                                 onChange={this.setNewCoordinates}/>
                          </label>
                     </div>
                     <div>
                         <button disabled={this.isFormValid()} id="submit" onClick={this.onSubmitClick}>Submit</button>
+                        <button id="empty_fields" onClick={this.resetFormClick}>empty fields/reset</button>
                     </div>
 
                 </form>
-                
+
                
             
             </div>
@@ -136,11 +160,36 @@ export default class Form extends Component {
         let newD =  `${d.getFullYear()}-${m}-${day}` ;
         return newD.toString();
     }
+    // not in use
+    checkPermition(){
+        let res = prompt(`want to change existing orgUnit? Y/no`, "no");
+        if (res == null) {  // cancel
+            console.log("hit - cancel");// something to add ?
+        } else if (res.toLowerCase() === "no") {
+            console.log("hit - no "); // something to add ?
+
+        }
+        else if (res.toLowerCase() === "") {
+            console.log("hit - empty"); // something to add ?
+        }
+        else if (res.toLowerCase() === "y") {
+            console.log("hit - yes ");
+
+            this.setState({
+                allowance : true
+
+            });
+            return true;
+         //   this.updateOrganisationUnit(formData, this.state.itemTo);
+         //   this.resetItemToClick();
+        }
+    }
+    //-----------------   end class  ---------------
 }
 
 Form.propTypes = {
-    onSubmit: PropTypes.func,
-    coordinates: PropTypes.object,
+    onSubmit: PropTypes.func.isRequired,
+    item: PropTypes.object,
 };
 
 /*
