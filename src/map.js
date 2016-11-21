@@ -133,17 +133,19 @@ export function mapAddItems(organisationUnits) {
                              title: ou.displayName, callback: ou.callback }]);
         }
         else {
-            alert(`mapSetItems: unrecognized featureType for ${ou.displayName} (${ou.id})`);
+            console.log(`mapSetItems: unrecognized featureType ${ou.featureType} for
+                         ${ou.displayName} (${ou.id})`);
         }
 
         // Update bounds to include the new coordinates.
-        bounds = getBoundsForPoints(newPoints, bounds);
+        if (newPoints.length > 0)
+            bounds = getBoundsForPoints(newPoints, bounds);
     }
 
     if (places.length > 0)
         mapAddMarkers(places);
 
-    if (organisationUnits.length > 0)
+    if (bounds)
         map.fitBounds(bounds);
 }
 
