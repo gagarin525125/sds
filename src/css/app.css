@@ -12,23 +12,26 @@ body {
     flex-direction: row;
     align-items: stretch;
     position: absolute;
-    left: 0px;
-    right: 0px;
+    left: 0;
+    right: 0;
     top: 0;
     bottom: 0;
+    background: #A3CCFF;
 }
 
 .app {
+    flex: 1;
     display: flex;
     flex-direction: row;
-    height: 100%;
+    justify-content: flex-end;
+    margin: 1em;
+    /*height: 100%;*/
     /*padding: 1rem;*/
 }
 
 .search {
+    flex: 0 1 25% ;
     height: 100%;
-    width: 25%;
-    flex: 0 0 40%;
 }
 
 .search input {
@@ -45,15 +48,16 @@ body {
 }
 
 .map {
-    height: 100%;
-    width: 50%;
+    flex: 1;
+    /*height: 100%;
+    width: 50%;*/
     /*padding: 1rem;*/
 }
 
 .list {
-    flex: 1;
+    flex: 0 0;
     height: 100%;
-    padding: 1rem;
+    padding-top: 1rem;
     overflow-y: auto;
 }
 
@@ -76,12 +80,16 @@ body {
     background: #BBB;
 }
 
+.info {
+    flex: 0 auto;
+    margin-left: 1em;
+}
+
 .form {
     background-color: lightblue;
-    flex: 1;
+    /*flex: 1;*/
     padding: 1rem;
-    margin: 1em;
-    border: solid 2px;
+    border: solid 1px;
     border-radius: 0.3em;
 }
 
@@ -111,7 +119,7 @@ body {
 
 .form button {
     width: 100%;
-    border: solid black 2px;
+    border: solid black 1px;
     border-radius: 0.5em;
     color: black;
     padding: 1rem;

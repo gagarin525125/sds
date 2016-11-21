@@ -205,16 +205,15 @@ onItemClick(item) {
         return (
             <div className="app">
                 <div className="search">
-
-
-                    <input type="button" id="levelUp" name="levelUp" value="levelUp" onClick={this.handleLevelUpClick}/>
-                    <input type="button" id="backToRoot" name="backToRoot" value="backToRoot"
-                           onClick={this.handleBackToRootClick}/>
-
                     <input id="live" type="text" placeholder="livesearch" onChange={this.filterItems2}/>
-                    < List items={this.state.items/*ToShow*/} onItemClick={this.onItemClick}/>
+
+                    <input type="button" id="backToRoot" name="backToRoot" value="Root level"
+                           onClick={this.handleBackToRootClick}/>
+                    <input type="button" id="levelUp" name="levelUp" value="Higher level" onClick={this.handleLevelUpClick}/>
+
+                    <List items={this.state.items/*ToShow*/} onItemClick={this.onItemClick}/>
                 </div>
-                <div className="second">
+                <div className="info">
                     {/*<List onItemClick={this.onItemClick} items={this.state.items}/>*/}
                     {/*this.state.isSaving ? <div>Saving organisation unit</div> : <Form onSubmit={this.onSubmit}/>*/}
                     {<Form onSubmit={this.onSubmit} item={this.state.itemTo} resetItemToClick={this.resetItemToClick}/> }
