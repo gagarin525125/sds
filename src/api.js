@@ -11,6 +11,11 @@ const serverUrl = 'https://play.dhis2.org/demo/api/';
 //const serverUrl = 'https://play.dhis2.org/test/api/';
 const basicAuth = `Basic ${btoa('admin:district')}`;
 
+/* For app deployment */
+/*$.getJSON( "manifest.webapp", function( json ) {
+    var serverUrl = json.activities.dhis.href + "/api/";
+} );*/
+
 /**
  * Default options object to send along with each request
  */
@@ -185,7 +190,7 @@ export function liveSearch(searchString) {
                                                  // paging=false
     return fetch(`${serverUrl}/organisationUnits?paging=true&fields=id,displayName,
     featureType,coordinates,level,openingDate,ancestors[id,displayName],shortName,
-    parent[id,displayName,ancestors]&filter=name:like:${searchString}`,fetchOptions)
+    parent[id,displayName,ancestors]&filter=name:ilike:${searchString}`,fetchOptions)
         .then(onlySuccessResponses)
         .then(response => response.json())
         .catch((error) => alert(`liveSearch api ${error}`));

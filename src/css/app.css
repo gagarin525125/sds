@@ -31,6 +31,19 @@ body {
     flex: 0 0 40%;
 }
 
+.search input {
+    border-radius: 0.3em;
+    border: solid 1px black;
+}
+
+.search #levelUp {
+    background-color: lightgreen;
+}
+
+.search #backToRoot {
+    background-color: orange;
+}
+
 .map {
     height: 100%;
     width: 50%;
@@ -41,7 +54,7 @@ body {
     flex: 1;
     height: 100%;
     padding: 1rem;
-    overflow-y: scroll;
+    overflow-y: auto;
 }
 
 .list ul {
@@ -53,9 +66,9 @@ body {
 .list li {
     padding: 0.35rem;
     /*margin: 0.5rem;*/
-    background: #DDD;
-    /*border-radius: .5rem;*/
-    border: solid #CCC 3px;
+    background: lightblue;
+    border-radius: 0.2rem;
+    border: solid black 1px;
     cursor: pointer;
 }
 
@@ -64,9 +77,12 @@ body {
 }
 
 .form {
-    background-color: #DDD;
+    background-color: lightblue;
     flex: 1;
-    padding: 3rem;
+    padding: 1rem;
+    margin: 1em;
+    border: solid 2px;
+    border-radius: 0.3em;
 }
 
 .form div {
@@ -88,13 +104,23 @@ body {
 .form input {
     flex: 2;
     padding: 1rem;
-    border: 0;
     font-size: 1rem;
+    border: solid 1px;
+    border-radius: 0.5em;
 }
 
 .form button {
     width: 100%;
-    background-color: orange;
-    border: 0;
+    border: solid black 2px;
+    border-radius: 0.5em;
+    color: black;
     padding: 1rem;
+}
+
+.form #submit {
+    background-color: lightgreen;
+}
+
+.form #empty_fields {
+    background-color: orange;
 }
