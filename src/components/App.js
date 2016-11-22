@@ -21,7 +21,8 @@ export default class App extends Component {
             items: [],
             itemsToShow: [],
             levels:{},
-            toScreen: [],
+            toScreenP: [],
+            toScreenO: [],
             itemTo: {
                 id: "0",
                 displayName: 'empty',
@@ -59,7 +60,7 @@ export default class App extends Component {
     componentWillUpdate(_, nextState) {
         // Keep the map in sync with the unfiltered list of org.units.
         if (!arraysEqual(nextState.items, this.state.items)) {
-            mapSetItems(addCallbackToItems(nextState.items, this.onItemClick));
+            mapSetItems(addCallbackToItems(nextState.items, this.onLevelDownClick));
         }
     }
  //-------------------------------------  part of componentDidMount ---------------
@@ -75,7 +76,7 @@ export default class App extends Component {
                       })
               .then(() => console.log(this.state.levels))
 
-              .catch((error) => alert("Error loadOrganisationUnitLevels  App  ${error.message}"));
+              .catch((error) => alert("Error loadOrgUnitLevels  App  ${error.message}"));
     }
 
 //----------------------------------------  part of componentDidMount   --------------
@@ -116,25 +117,9 @@ export default class App extends Component {
 //---------------------------------------------------------------------------------------------
     onLevelDownClick(item){    // drill down
         if(item.level < this.state.levels){
-/*
-            item.coordinates = "not listed";
-            this.setState({
-                itemTo: item,
-                rigid: true
-
-            });
-            this.findElement(item);*/
             this.resetItemToClick();
             this.loadOrganisationUnitsChildren(item);
         } else {
-/*
-            this.setState({
-                itemTo: item,
-                wantToChange : true,
-                rigid: false
-            });*/
-            //this.findElement(item);
-          //  this.resetItemToClick();
             alert(`Lowest Level`);
         }
 
@@ -214,11 +199,14 @@ onItemClick(item) {  // show info
     }
 
     onCoordinatesFromMap(lat, lng) {
-        console.log(`onCoordinatesFromMap(${lat}, ${lng})`);
-       /* this.setState({
-            itemTo{
-                    coordinates: `${lat}, ${lng}`}
-        })*/
+
+        let longitude = lng.toFixed(4);
+        let latitude = lat.toFixed(4);
+        this.setState({
+            itemTo: {
+                coordinates: `[ ${longitude}, ${latitude} ]`
+            }
+        })
     }
 //----------------------------------------------------------------------------------------------
    /* rejectSaveOrganisationUnit(item){
@@ -259,9 +247,10 @@ onItemClick(item) {  // show info
                            resetItemToClick={this.resetItemToClick}/> }
                     <div>
 
-                            <h3>Here info should be listed</h3>
 
-                        {<Info toScreen={this.state.toScreen}/>}
+                        {<InfoP toScreenP={this.state.toScreenP}/>}
+
+                        {<InfoO toScreenO={this.state.toScreenO}/>}
 
                     </div>
 
@@ -283,17 +272,27 @@ onItemClick(item) {  // show info
 
         console.log(" hit - find ");
         let elem = item;
-        let info = [];
-        for(let i = 0; i < item.ancestors.length;i++){
-            info.push({
+        let infoP = [];
+
+        infoP[0] = {name : <h4>Parents : </h4>};
+
+            for(let i = 0; i < item.ancestors.length;i++){
+            infoP.push({
          name:    item.ancestors[i].displayName
             });
         }
         //--------------------------
         console.log("item.orgUnGroups");
-        let groupId = elem.organisationUnitGroups[0].id;
-        console.log(groupId);
-        findOrganisationUnitGroups(groupId)
+       let groups = item.organisationUnitGroups;
+       let infoO = [];
+        console.log(groups);
+        infoO[0] = {name : <h4>Organisation Groups : : </h4>};
+        for(let i = 0; i < groups.length;i++){
+            infoO.push({
+                name: groups[i].name
+            });
+        }
+     /*   findOrganisationUnitGroups(groupId)
             .then((result) => {
                 console.log("groupId result ");
                 console.log(result);
@@ -302,17 +301,15 @@ onItemClick(item) {  // show info
                 info.push({name : grName});
                 this.setState({
                     isLoading: false,
-
-
-                });
+                              });
             })
-
-            .catch((error) => alert(`Error findElement App  ${error.message}`));
+          .catch((error) => alert(`Error findElement App  ${error.message}`)); */
 
 
         //--------------------------
         this.setState({
-            toScreen : info,
+            toScreenP : infoP,
+            toScreenO : infoO,
         })
 
     }
@@ -389,6 +386,8 @@ onItemClick(item) {  // show info
                 openingDate: '',
                 coordinates: '[   ,   ]',
             },
+            toScreenO : [],
+            toScreenP: [],
             wantToChange : false,
             rigid: true,
         })
@@ -397,33 +396,30 @@ onItemClick(item) {  // show info
      //----------------------- end class ---------------------------------
   }
 
-  class Info extends  React.Component{
-    /*render(){
+class InfoP extends React.Component {
 
-        let lines = [];
-        this.props.toScreen.forEach((stuka) => {
-            lines.push(stuka.name)
+    render() {
+
+        let list = this.props.toScreenP.map(function (name, i) {
+            return <li key={i} style={{marginLeft: i + 'em'}}> {name.name} </li>;
 
         });
-        console.log("lines Info");
-        console.log(lines);
-        return(
-            <table>
-                <tbody>
-                <ul>{lines}</ul>
-                </tbody>
-            </table>
-        );
-    }*/
-    render () {
-
-                let list = this.props.toScreen.map(function(name,i)  {
-                return <li key={i} style={{marginLeft: i + 'em'}}> {name.name} </li>;
-
-                            });
         return <ul>{list}</ul>
     }
-  }
+}
+//-------------------------------------------------------
+class InfoO extends React.Component {
+
+    render() {
+
+        let list = this.props.toScreenO.map(function (stuka, i) {
+            return  <li key={i} style={{marginLeft: i + 'em'}}> {stuka.name} </li>;
+
+        });
+        return <ul>{list}</ul>
+    }
+}
+  //--------------------------------------------------------
 /*
  {this.state.items[0].level === this.state.levels ?  <Form onSubmit={this.onSubmit}
  item={this.state.itemTo}   /> :  console.log()}
