@@ -10,7 +10,7 @@
   "keywords": [
     "DHIS2",
     "App"
-],
+  ],
   "author": "Sibir & Dovre Software",
   "license": "",
   "devDependencies": {
@@ -25,6 +25,7 @@
     "pui-react-autocomplete": "^7.0.2",
     "react": "^15.3.2",
     "react-dom": "^15.3.2",
+    "react-popup": "^0.4.2",
     "react-router": "^3.0.0",
     "react-search": "^2.0.4"
   }

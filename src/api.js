@@ -5,10 +5,10 @@
  * `basicAuth` contains the username and password to send with the request as the basic authentication token. This is only needed when you develop locally and need CORS support (https://developer.mozilla.org/en-US/docs/Web/HTTP).
  * You obviously should not do this for your production apps.
  */
-const serverUrl = 'http://localhost:8082/api/';
+//const serverUrl = 'http://localhost:8082/api/';
 //const serverUrl = 'https://play.dhis2.org/demo/api/';
 //const serverUrl = 'https://play.dhis2.org/dev/api/';
-//const serverUrl = 'https://play.dhis2.org/test/api/';
+const serverUrl = 'https://play.dhis2.org/test/api/';
 const basicAuth = `Basic ${btoa('admin:district')}`;
 
 /* For app deployment */
@@ -138,8 +138,10 @@ export function findChildren(organisationUnit) {
     console.log(organisationUnit);
 
     let a = fetch(`${serverUrl}/organisationUnits/${organisationUnit.id}
-    ?paging=false&level=1&fields=id,displayName,featureType,coordinates,level,openingDate,ancestors[id,displayName],
-            shortName,parent[id,displayName,ancestors]`, fetchOptions)
+    ?paging=false&level=1&fields= 
+    id,displayName,featureType,coordinates,level,
+    openingDate,ancestors[id,displayName],shortName,parent[id,displayName,level,ancestors],
+    organisationUnitGroups`, fetchOptions)
 
     .then(onlySuccessResponses)
         .then(response => {
@@ -167,13 +169,14 @@ export function findChildren(organisationUnit) {
 export function loadOrganisationUnits() {
     // Load the organisation units but only the first level and the do not use paging
     // return fetch(`${serverUrl}/organisationUnits?paging=false&level=1`, fetchOptions)
-    return fetch(`${serverUrl}/organisationUnits?paging=false&level=2&fields=id,
-    displayName,featureType,coordinates,level,openingDate,ancestors[id,displayName],
-              shortName,parent[id,displayName,ancestors],`, fetchOptions)
+    return fetch(`${serverUrl}/organisationUnits?paging=false&level=2&fields=
+    id,displayName,featureType,coordinates,level,
+    openingDate,ancestors[id,displayName],shortName,parent[id,displayName,level,ancestors],
+    organisationUnitGroups`, fetchOptions)
         .then(onlySuccessResponses)
         .then(response => response.json())
         // pick the organisationUnits property from the payload
-        .then(({ organisationUnits }) => {
+        .then(({organisationUnits}) => {
             console.log("organisationUnits children   api");
             console.log(organisationUnits);
             return organisationUnits;
@@ -184,16 +187,26 @@ export function loadOrganisationUnits() {
 export function liveSearch(searchString) {
     console.log("searchString api");
     console.log(searchString);
-    let ar = [];
-    if(searchString === '') return null;
+     if (searchString === '') return null;
 
-                                                 // paging=false
-    return fetch(`${serverUrl}/organisationUnits?paging=true&fields=id,displayName,
-    featureType,coordinates,level,openingDate,ancestors[id,displayName],shortName,
-    parent[id,displayName,ancestors]&filter=name:ilike:${searchString}`,fetchOptions)
+    // paging=false
+    return fetch(`${serverUrl}/organisationUnits?paging=true&fields=
+    id,displayName,featureType,coordinates,level,
+    openingDate,ancestors[id,displayName],shortName,parent[id,displayName,level,ancestors],
+    organisationUnitGroups
+    &filter=name:ilike:${searchString}`, fetchOptions)
         .then(onlySuccessResponses)
         .then(response => response.json())
         .catch((error) => alert(`liveSearch api ${error}`));
+
+}
+
+export function  findOrganisationUnitGroups(groupId) {
+
+    return fetch(`${serverUrl}/organisationUnitGroups/${groupId}`, fetchOptions)
+        .then(onlySuccessResponses)
+        .then(response => response.json())
+        .catch((error) => alert(`findOrgUnitGroups api ${error}`));
 
 }
 
