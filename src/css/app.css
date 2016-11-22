@@ -51,9 +51,8 @@ body {
 }
 
 .list {
-    flex: 0 0;
     height: 100%;
-    padding-top: 1rem;
+    /*padding-top: 1rem;*/
     overflow-y: auto;
 }
 
@@ -71,8 +70,11 @@ body {
     cursor: pointer;
 }
 
-.list li li {
-    background: #BBB;
+.list li button {
+    float: right;
+    background: none;
+    border: solid 1px;
+    margin: 0;
 }
 
 .info {
