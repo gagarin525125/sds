@@ -1,4 +1,4 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component, PropTypes} from 'react';
 
 export default class Form extends Component {
     constructor(props) {
@@ -72,21 +72,14 @@ export default class Form extends Component {
             name: '',
             shortName: '',
             openingDate: '',
-            coordinates: '[   ,   ]',
+            coordinates: ``,//'[   ,   ]',
 
         });
       this.props.resetItemToClick();
     }
 
     setName(event) {
-
-
-
-
                 this.setState({name: event.target.value});
-
-
-
     }
 
     setShortName(event) {
@@ -135,7 +128,7 @@ export default class Form extends Component {
                          </label>
                     </div>
                     <div>
-                        <button disabled={this.isFormValid()} id="submit" onClick={this.onSubmitClick}>Submit</button>
+                        <button style={{color: `red`}}  disabled={this.isFormValid()}    id="submit" onClick={this.onSubmitClick}>Submit</button>
                         <button id="empty_fields" onClick={this.resetFormClick}>empty fields/reset</button>
                     </div>
 
