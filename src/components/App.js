@@ -418,10 +418,10 @@ onItemClick(item) {  // show info
     render () {
 
                 let list = this.props.toScreen.map(function(name,i)  {
-                return <li key={i} style={{marginRight: i + 'em'}}> {name.name} </li>;
+                return <li key={i} style={{marginLeft: i + 'em'}}> {name.name} </li>;
 
                             });
-        return <ol>{list}</ol>
+        return <ul>{list}</ul>
     }
   }
 /*
