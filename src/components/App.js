@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import { saveOrganisationUnit, loadOrganisationUnits, findChildren,  organisationUnitLevels,liveSearch,updateOrganisationUnit} from '../api';
+import { saveOrganisationUnit, loadOrganisationUnits, findChildren, findOrganisationUnitGroups,  organisationUnitLevels,liveSearch,updateOrganisationUnit} from '../api';
 import List from './List';
 import Form from './Form';
 import { mapSetItems, mapSetCoordinatesCallback } from '../map';
@@ -156,7 +156,7 @@ onItemClick(item) {  // show info
             wantToChange : true,
             rigid: false
         });
-        this.findElement(item);
+       this.findElement(item);
             }
 }
 
@@ -215,6 +215,10 @@ onItemClick(item) {  // show info
 
     onCoordinatesFromMap(lat, lng) {
         console.log(`onCoordinatesFromMap(${lat}, ${lng})`);
+       /* this.setState({
+            itemTo{
+                    coordinates: `${lat}, ${lng}`}
+        })*/
     }
 //----------------------------------------------------------------------------------------------
    /* rejectSaveOrganisationUnit(item){
@@ -259,6 +263,7 @@ onItemClick(item) {  // show info
 
                             <h3>Here info should be listed</h3>
 
+                        {<Info toScreen={this.state.toScreen}/>}
 
                     </div>
 
@@ -267,7 +272,7 @@ onItemClick(item) {  // show info
 
         );
     }
-
+  //
 //---------------------------------------------------------------------------------------------
     handleBackToRootClick(event){
         event.preventDefault();
@@ -279,19 +284,35 @@ onItemClick(item) {  // show info
     findElement(item) {
 
         console.log(" hit - find ");
-        let ill = item;
-        console.log(ill);
+        let elem = item;
         let info = [];
-        for(let i = 0; i < ill.ancestors.length;i++){
+        for(let i = 0; i < item.ancestors.length;i++){
             info.push({
-         name:    ill.ancestors[i].displayName
+         name:    item.ancestors[i].displayName
             });
         }
+        //--------------------------
+        console.log("item.orgUnGroups");
+        let groupId = elem.organisationUnitGroups[0].id;
+        console.log(groupId);
+        findOrganisationUnitGroups(groupId)
+            .then((result) => {
+                console.log("groupId result ");
+                console.log(result);
+                let grName = result.displayName;
+                console.log(grName);
+                info.push({name : grName});
+                this.setState({
+                    isLoading: false,
 
-/*      //{this.state.toScreen}
-        this.setState({
-                       toScreen : [],
-                      });*/
+
+                });
+            })
+
+            .catch((error) => alert(`Error findElement App  ${error.message}`));
+
+
+        //--------------------------
         this.setState({
             toScreen : info,
         })
@@ -376,6 +397,34 @@ onItemClick(item) {  // show info
     }
 
      //----------------------- end class ---------------------------------
+  }
+
+  class Info extends  React.Component{
+    /*render(){
+
+        let lines = [];
+        this.props.toScreen.forEach((stuka) => {
+            lines.push(stuka.name)
+
+        });
+        console.log("lines Info");
+        console.log(lines);
+        return(
+            <table>
+                <tbody>
+                <ul>{lines}</ul>
+                </tbody>
+            </table>
+        );
+    }*/
+    render () {
+
+                let list = this.props.toScreen.map(function(name,i)  {
+                return <li key={i} style={{marginRight: i + 'em'}}> {name.name} </li>;
+
+                            });
+        return <ol>{list}</ol>
+    }
   }
 /*
  {this.state.items[0].level === this.state.levels ?  <Form onSubmit={this.onSubmit}
