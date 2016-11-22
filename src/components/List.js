@@ -4,13 +4,24 @@ import React, { PropTypes } from 'react';
  * A stateless function component
  * https://facebook.github.io/react/docs/reusable-components.html#stateless-functions
  */
-export default function List({ items = [], onItemClick }) {
+export default function List({ items = [], onItemClick,onLevelDownClick }) {
     // Create a list of li elements that make up the list of organisation units units
     // Each has a click handler for that specific item
     const listItems = items
         .map(item => {
             return (
-                <li key={item.id} onClick={() => onItemClick(item)}>{item.displayName}</li>
+
+                     <li key={item.id} >
+                         {item.displayName}
+                         <button onClick={() => onItemClick(item)}> info </button>
+                         <button onClick={() => onLevelDownClick(item)}> drill down </button>
+                     </li>
+
+
+
+
+
+
             );
         });
 
@@ -27,5 +38,15 @@ export default function List({ items = [], onItemClick }) {
 List.propTypes = {
     items: PropTypes.array,
     onItemClick: PropTypes.func.isRequired,
+    onLevelDownClick: PropTypes.func.isRequired,
 
 };
+
+/*
+*
+*
+ <li  onClick={() => onLevelDownClick(item)}>Level Down
+ </li>
+*
+*
+* */
