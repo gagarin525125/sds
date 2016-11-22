@@ -1,9 +1,7 @@
 import React, {Component} from 'react';
-import Search from 'react-search';
 import { saveOrganisationUnit, loadOrganisationUnits, findChildren,  organisationUnitLevels,liveSearch,updateOrganisationUnit} from '../api';
 import List from './List';
 import Form from './Form';
-import {Router, Route, IndexRout, hashHistory, browserHistory, Link} from 'react-router';
 import { mapSetItems, mapSetCoordinatesCallback } from '../map';
 import { addCallbackToItems, arraysEqual } from '../util';
 
@@ -30,13 +28,16 @@ export default class App extends Component {
                 shortName: 'empty',
                 openingDate: '1111-11-11',
                 coordinates: 'empty',
+                level: '0',
             },
             wantToChange: false,
+            rigid: true,
 
         };
 
         // Bind the functions that are passed around to the component
         this.onItemClick = this.onItemClick.bind(this);
+        this.onLevelDownClick = this.onLevelDownClick.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
         this.filterItems = this.filterItems.bind(this);
         this.filterItems2 = this.filterItems2.bind(this);
@@ -113,19 +114,49 @@ export default class App extends Component {
             .catch((error) => alert(`Error loadOrganisationUnitsChildren App  ${error.message}`))
     }
 //---------------------------------------------------------------------------------------------
-onItemClick(item) {
+    onLevelDownClick(item){    // drill down
+        if(item.level < this.state.levels){
+/*
+            item.coordinates = "not listed";
+            this.setState({
+                itemTo: item,
+                rigid: true
+
+            });
+            this.findElement(item);*/
+            this.resetItemToClick();
+            this.loadOrganisationUnitsChildren(item);
+        } else {
+/*
+            this.setState({
+                itemTo: item,
+                wantToChange : true,
+                rigid: false
+            });*/
+            //this.findElement(item);
+          //  this.resetItemToClick();
+            alert(`Lowest Level`);
+        }
+
+    }
+onItemClick(item) {  // show info
     if(item.level < this.state.levels){
+
         item.coordinates = "not listed";
         this.setState({
             itemTo: item,
+            rigid: true
 
         });
-        this.loadOrganisationUnitsChildren(item);
+        this.findElement(item);
     } else {
+
         this.setState({
             itemTo: item,
-            wantToChange : true
+            wantToChange : true,
+            rigid: false
         });
+        this.findElement(item);
             }
 }
 
@@ -133,6 +164,7 @@ onItemClick(item) {
     //----------------------------------------------------------------------------------------------
 
     onSubmit(formData) {
+      //  if(!this.state.rigid){
         if (this.state.wantToChange) {
             let res = prompt(`want to change existing orgUnit? Y/no`, "no");
             if (res == null) {  // cancel
@@ -158,6 +190,7 @@ onItemClick(item) {
             this.saveOrganisationUnit(formData,this.state.items[0].parent);
 
         }
+        //}else{ alert(' cannot be changed ')}
     }
  //----------------------------------------------------------------------------------------------
     updateOrganisationUnit(formData,itemTo){
@@ -192,6 +225,8 @@ onItemClick(item) {
           }*/
     //----------------------------------------------------------------------------------------------
     render() {
+
+
         // If the component state is set to isLoading we hide the app and show a loading message
         if (this.state.isLoading) {
             return (
@@ -212,18 +247,24 @@ onItemClick(item) {
                            onClick={this.handleBackToRootClick}/>
 
                     <input id="live" type="text" placeholder="livesearch" onChange={this.filterItems2}/>
-                    < List items={this.state.items/*ToShow*/} onItemClick={this.onItemClick}/>
+                    < List items={this.state.items/*ToShow*/} onItemClick={this.onItemClick}
+                                                              onLevelDownClick={this.onLevelDownClick}/>
                 </div>
                 <div className="second">
                     {/*<List onItemClick={this.onItemClick} items={this.state.items}/>*/}
                     {/*this.state.isSaving ? <div>Saving organisation unit</div> : <Form onSubmit={this.onSubmit}/>*/}
-                    {<Form onSubmit={this.onSubmit} item={this.state.itemTo} resetItemToClick={this.resetItemToClick}/> }
+                    {<Form onSubmit={this.onSubmit} item={this.state.itemTo}
+                           resetItemToClick={this.resetItemToClick}/> }
                     <div>
-                        <h3>Here info should be listed</h3>
-                        <li>{this.state.toScreen}</li>
+
+                            <h3>Here info should be listed</h3>
+
+
                     </div>
+
                 </div>
             </div>
+
         );
     }
 
@@ -235,18 +276,25 @@ onItemClick(item) {
 
 
 //----------------------------------------------------------------------------------------------
-    findElement() {
+    findElement(item) {
 
         console.log(" hit - find ");
-        let ill = this.state.itemsToShow;
+        let ill = item;
         console.log(ill);
         let info = [];
-            info[0] = ill[0].displayName;
-            info[1] = "  - PARENT -  ";
-            info[2] = ill[0].parent.displayName;
+        for(let i = 0; i < ill.ancestors.length;i++){
+            info.push({
+         name:    ill.ancestors[i].displayName
+            });
+        }
+
+/*      //{this.state.toScreen}
         this.setState({
-                       toScreen : info,
-                      })
+                       toScreen : [],
+                      });*/
+        this.setState({
+            toScreen : info,
+        })
 
     }
 
@@ -301,11 +349,16 @@ onItemClick(item) {
 //----------------------------------------------------------------------------------------------
     handleLevelUpClick() {
         console.log("this.state.item  handleLevelUp  App  ");
-         let ancestors = this.state.items[0].ancestors;
-                   let i = ancestors.length;
-                  i === 1 ? alert(`You are on HIGHEST level`) ://this.loadOrganisationUnits() :
-                                       this.loadOrganisationUnitsChildren(ancestors[i - 2])
-     }
+        let ancestors = this.state.items[0].ancestors;
+        let i = ancestors.length;
+       if( i === 1) {alert(`You are on HIGHEST level`); this.resetItemToClick(); }//this.loadOrganisationUnits() :
+                  else {
+           this.loadOrganisationUnitsChildren(ancestors[i - 2]);
+           this.resetItemToClick();
+       }
+    }
+     //---------------------------------------------------------------------------------------
+
 
      //----------------------------------------------------------------------------------------
     resetItemToClick() {
@@ -317,7 +370,8 @@ onItemClick(item) {
                 openingDate: '',
                 coordinates: '[   ,   ]',
             },
-            wantToChange : false
+            wantToChange : false,
+            rigid: true,
         })
     }
 
