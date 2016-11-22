@@ -7,8 +7,8 @@
  */
 //const serverUrl = 'http://localhost:8082/api/';
 //const serverUrl = 'https://play.dhis2.org/demo/api/';
-//const serverUrl = 'https://play.dhis2.org/dev/api/';
-const serverUrl = 'https://play.dhis2.org/test/api/';
+const serverUrl = 'https://play.dhis2.org/dev/api/';
+//const serverUrl = 'https://play.dhis2.org/test/api/';
 const basicAuth = `Basic ${btoa('admin:district')}`;
 
 /* For app deployment */
@@ -141,7 +141,7 @@ export function findChildren(organisationUnit) {
     ?paging=false&level=1&fields= 
     id,displayName,featureType,coordinates,level,
     openingDate,ancestors[id,displayName],shortName,parent[id,displayName,level,ancestors],
-    organisationUnitGroups`, fetchOptions)
+    organisationUnitGroups[id,name]`, fetchOptions)
 
     .then(onlySuccessResponses)
         .then(response => {
@@ -172,7 +172,7 @@ export function loadOrganisationUnits() {
     return fetch(`${serverUrl}/organisationUnits?paging=false&level=2&fields=
     id,displayName,featureType,coordinates,level,
     openingDate,ancestors[id,displayName],shortName,parent[id,displayName,level,ancestors],
-    organisationUnitGroups`, fetchOptions)
+    organisationUnitGroups[id,name]`, fetchOptions)
         .then(onlySuccessResponses)
         .then(response => response.json())
         // pick the organisationUnits property from the payload
@@ -193,7 +193,7 @@ export function liveSearch(searchString) {
     return fetch(`${serverUrl}/organisationUnits?paging=true&fields=
     id,displayName,featureType,coordinates,level,
     openingDate,ancestors[id,displayName],shortName,parent[id,displayName,level,ancestors],
-    organisationUnitGroups
+    organisationUnitGroups[id,name]
     &filter=name:ilike:${searchString}`, fetchOptions)
         .then(onlySuccessResponses)
         .then(response => response.json())
