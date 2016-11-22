@@ -7,7 +7,10 @@ var coordinatesCallback;
 export function initMap() {
     map = new google.maps.Map(document.getElementById('theMap'), {
         center: { lat: 8.5, lng: -12 },
-        zoom: 8
+        zoom: 8,
+        mapTypeControlOptions: {
+            position: google.maps.ControlPosition.BOTTOM_RIGHT,
+        },
     });
     google.maps.event.addListener(map, "rightclick", event => {
         coordinatesCallback(event.latLng.lat(), event.latLng.lng());
