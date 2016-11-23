@@ -13,8 +13,15 @@ const basicAuth = `Basic ${btoa('admin:district')}`;
 
 /* For app deployment */
 /*$.getJSON( "manifest.webapp", function( json ) {
-    var serverUrl = json.activities.dhis.href + "/api/";
+    var serverUrl = json.activities.dhis.href + "/api";
 } );*/
+
+/*fetch("index.html")
+    .then(response => response.text())
+    .then(s => {
+        console.log("testFetch:");
+        console.log(s);
+    });*/
 
 /**
  * Default options object to send along with each request

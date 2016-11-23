@@ -35,11 +35,13 @@ body {
 }
 
 .search #levelUp {
-    background-color: lightgreen;
+    background-color: #6DA161;
+    color: ghostwhite;
 }
 
 .search #backToRoot {
-    background-color: orange;
+    background-color: #BB8B71;
+    color: ghostwhite;
 }
 
 .map {
@@ -51,8 +53,11 @@ body {
 }
 
 .list {
-    height: 100%;
-    /*padding-top: 1rem;*/
+    background: #b4eea7;
+    opacity: 0.925;
+    border: none;
+    border-radius: 0.7em;
+    margin-top: 1em;
     overflow-y: auto;
 }
 
@@ -64,17 +69,25 @@ body {
 
 .list li {
     padding: 0.35rem;
-    background: lightblue;
-    border-radius: 0.2rem;
-    border: solid black 1px;
+    /*border-radius: 0.2rem;*/
+    /*border:*/
+    border-bottom: solid black 1px;
     cursor: pointer;
+}
+
+.list li:last-of-type {
+    border: none;
 }
 
 .list li button {
     float: right;
-    background: none;
+    background: #EDF7A1;
     border: solid 1px;
     margin: 0;
+}
+
+.list li button.info_button {
+    background: #eea0ff;
 }
 
 .info {
@@ -84,10 +97,11 @@ body {
 }
 
 .form {
-    background-color: lightblue;
-    padding: 1rem;
-    border: solid 1px;
-    border-radius: 0.3em;
+    background-color: #b4eea7;
+    opacity: 0.925;
+    padding: 0.5em;
+    border: none;
+    border-radius: 0.7em;
 }
 
 .form div {
@@ -98,7 +112,7 @@ body {
     display: flex;
     flex-direction: row;
     width: 100%;
-    margin-bottom: 1rem;
+    margin-bottom: 0rem;
     align-items: center;
 }
 
@@ -108,7 +122,7 @@ body {
 
 .form input {
     flex: 2;
-    padding: 1rem;
+    padding: 0.5rem;
     font-size: 1rem;
     border: solid 1px;
     border-radius: 0.5em;
@@ -119,13 +133,19 @@ body {
     border: solid black 1px;
     border-radius: 0.5em;
     color: black;
-    padding: 1rem;
+    padding: 0.5rem;
 }
 
 .form #submit {
-    background-color: lightgreen;
+    background-color: #6DA161;
+    color: ghostwhite
 }
 
 .form #empty_fields {
-    background-color: orange;
+    background-color: #BB8B71;
+    color: ghostwhite;
 }
+
+/*.form #submit:disabled {
+    background-color: red;
+}*/

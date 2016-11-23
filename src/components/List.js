@@ -22,7 +22,7 @@ export default function List({ items = [], onItemClick,onLevelDownClick ,onShowM
 
                     <li key={item.id} >
                         {item.displayName}
-                        <button onClick={() => onItemClick(item)}> info </button>
+                        <button className="info_button" onClick={() => onItemClick(item)}> info </button>
                         < button onClick={() => onLevelDownClick(item)}> drill down </button>
                     </li>
 
