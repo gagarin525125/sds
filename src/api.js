@@ -53,22 +53,11 @@ return fetch(`${serverUrl}organisationUnitLevels`,fetchOptions)
         .catch((error) => alert(`organisationUnitLevels api ${error.toString()}`));
 
 }
-export function saveOrganisationUnit(organisationUnit, parentOf,levels) {
+export function saveOrganisationUnit(organisationUnit, parentOf, levels) {
     //-----------------------------------------------------------
-    /*
-    let check = fetch(`${serverUrl}/organisationUnits/${organisationUnit.id}`,fetchOptions)
-                .then(response => {
-                                    if (response.status === 200) {
-                                                                 alert(`this unit exists,want to replace ?`);
-                                                                 }
-                    let a = response.json();
-                     return a;
-                  })
-        .catch((error) => alert(`saveOrgUnits check api ${error}`));
-    */
-    //-----------------------------------------------------------
+    alert(`levels : ${levels}`);
     // POST the payload to the server to save the organisationUnit
-      console.log("levels  " + levels);
+    console.log("levels  " + levels);
     let toSend = {
         parent: {
             id: parentOf.id
@@ -78,7 +67,7 @@ export function saveOrganisationUnit(organisationUnit, parentOf,levels) {
         openingDate: organisationUnit.openingDate,
         featureType: "POINT",
         coordinates: organisationUnit.coordinates,
-       level: levels,
+        level: levels,
     };
     console.log("tosend  api ");
     console.log(JSON.stringify(toSend));
@@ -232,3 +221,15 @@ export function itemFeatures(item){
 
  /*level=1&*/
 
+/*
+ let check = fetch(`${serverUrl}/organisationUnits/${organisationUnit.id}`,fetchOptions)
+ .then(response => {
+ if (response.status === 200) {
+ alert(`this unit exists,want to replace ?`);
+ }
+ let a = response.json();
+ return a;
+ })
+ .catch((error) => alert(`saveOrgUnits check api ${error}`));
+ */
+//-----------------------------------------------------------
