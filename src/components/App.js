@@ -48,10 +48,11 @@ export default class App extends Component {
         this.onCoordinatesFromMap = this.onCoordinatesFromMap.bind(this);
         this.handleBackToRootClick = this.handleBackToRootClick.bind(this);
         this.resetItemToClick = this.resetItemToClick.bind(this);
+        this.onShowMapClick = this.onShowMapClick.bind(this);
     }
 
     componentDidMount() {
-         console.log("componentDisMount");
+        console.log("componentDisMount");
         this.loadOrganisationUnits();
         this.loadOrganisationUnitLevels();
         mapSetCoordinatesCallback(this.onCoordinatesFromMap);
@@ -115,6 +116,12 @@ export default class App extends Component {
             .catch((error) => alert(`Error loadOrganisationUnitsChildren App  ${error.message}`))
     }
 //---------------------------------------------------------------------------------------------
+    onShowMapClick(item){
+        console.log("on show map click ");
+        console.log(item);
+
+    }
+    //------------------------------------------------------------------------------------------
     onLevelDownClick(item){    // drill down
         if(item.level < this.state.levels){
             this.resetItemToClick();
@@ -133,7 +140,7 @@ onItemClick(item) {  // show info
             rigid: true
 
         });
-        this.findElement(item);
+        this.findElement(item);// show Parents and Groups
     } else {
 
         this.setState({
@@ -238,7 +245,8 @@ onItemClick(item) {  // show info
 
                     <input id="live" type="text" placeholder="livesearch" onChange={this.filterItems2}/>
                     < List items={this.state.items/*ToShow*/} onItemClick={this.onItemClick}
-                                                              onLevelDownClick={this.onLevelDownClick}/>
+                           onLevelDownClick={this.onLevelDownClick}
+                           onShowMapClick={this.onShowMapClick} levels={this.state.levels}/>
                 </div>
                 <div className="info">
                     {/*<List onItemClick={this.onItemClick} items={this.state.items}/>*/}
@@ -283,29 +291,19 @@ onItemClick(item) {  // show info
         }
         //--------------------------
         console.log("item.orgUnGroups");
-       let groups = item.organisationUnitGroups;
+
+
        let infoO = [];
-        console.log(groups);
-        infoO[0] = {name : <h4>Organisation Groups : : </h4>};
-        for(let i = 0; i < groups.length;i++){
-            infoO.push({
-                name: groups[i].name
-            });
-        }
-     /*   findOrganisationUnitGroups(groupId)
-            .then((result) => {
-                console.log("groupId result ");
-                console.log(result);
-                let grName = result.displayName;
-                console.log(grName);
-                info.push({name : grName});
-                this.setState({
-                    isLoading: false,
-                              });
-            })
-          .catch((error) => alert(`Error findElement App  ${error.message}`)); */
-
-
+      // if(item.organisationUnitGroups) { // to add ?
+           let groups = item.organisationUnitGroups;
+           console.log(groups);
+           infoO[0] = {name: <h4>Organisation Groups : : </h4>};
+           for (let i = 0; i < groups.length; i++) {
+               infoO.push({
+                   name: groups[i].name
+               });
+           }
+       //}
         //--------------------------
         this.setState({
             toScreenP : infoP,
@@ -455,3 +453,15 @@ class InfoO extends React.Component {
  */
 
 
+/*   findOrganisationUnitGroups(groupId)
+ .then((result) => {
+ console.log("groupId result ");
+ console.log(result);
+ let grName = result.displayName;
+ console.log(grName);
+ info.push({name : grName});
+ this.setState({
+ isLoading: false,
+ });
+ })
+ .catch((error) => alert(`Error findElement App  ${error.message}`)); */
