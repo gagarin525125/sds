@@ -143,7 +143,7 @@ export default class Form extends Component {
         );
     }
 
-    convertDate(dateForm){
+   static convertDate(dateForm){
         let d = new Date(dateForm);
         let m = d.getMonth() + 1;
         if(m < 10) m = '0' + m;
@@ -154,7 +154,7 @@ export default class Form extends Component {
         return newD.toString();
     }
     // not in use
-    checkPermition(){
+    checkPermission(){
         let res = prompt(`want to change existing orgUnit? Y/no`, "no");
         if (res == null) {  // cancel
             console.log("hit - cancel");// something to add ?

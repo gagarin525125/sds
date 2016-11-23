@@ -7,8 +7,8 @@
  */
 //const serverUrl = 'http://localhost:8082/api/';
 //const serverUrl = 'https://play.dhis2.org/demo/api/';
-const serverUrl = 'https://play.dhis2.org/dev/api/';
-//const serverUrl = 'https://play.dhis2.org/test/api/';
+//const serverUrl = 'https://play.dhis2.org/dev/api/';
+const serverUrl = 'https://play.dhis2.org/test/api/';
 const basicAuth = `Basic ${btoa('admin:district')}`;
 
 /* For app deployment */

@@ -40,15 +40,15 @@ export default class App extends Component {
         this.onItemClick = this.onItemClick.bind(this);
         this.onLevelDownClick = this.onLevelDownClick.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
-        this.filterItems = this.filterItems.bind(this);
-        this.filterItems2 = this.filterItems2.bind(this);
+       // this.filterItems = this.filterItems.bind(this);
+       // this.filterItems2 = this.filterItems2.bind(this);
         this.handleLevelUpClick = this.handleLevelUpClick.bind(this);
         this.findElement = this.findElement.bind(this);
         this.onAlert = this.onAlert.bind(this);
         this.onCoordinatesFromMap = this.onCoordinatesFromMap.bind(this);
         this.handleBackToRootClick = this.handleBackToRootClick.bind(this);
         this.resetItemToClick = this.resetItemToClick.bind(this);
-        this.onShowMapClick = this.onShowMapClick.bind(this);
+      //  this.onShowMapClick = this.onShowMapClick.bind(this);
     }
 
     componentDidMount() {
@@ -209,11 +209,16 @@ onItemClick(item) {  // show info
 
         let longitude = lng.toFixed(4);
         let latitude = lat.toFixed(4);
-        this.setState({
+     /*   this.setState({
             itemTo: {
                 coordinates: `[ ${longitude}, ${latitude} ]`
             }
-        })
+        })*/
+        //------------------
+        this.setState(prevState =>({
+            coordinates : [...prevState.coordinates,`[ ${longitude}, ${latitude} ]`]
+        }));
+        //------------------
     }
 //----------------------------------------------------------------------------------------------
    /* rejectSaveOrganisationUnit(item){
