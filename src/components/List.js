@@ -10,7 +10,7 @@ export default function List({ items = [], onItemClick,onLevelDownClick ,onShowM
 
     const listItems = items
         .map(item => {
-            if(item.level === levels-1 ){
+            if(item.level === levels ){
                 return(
                     <li key={item.id} >
                         {item.displayName}
