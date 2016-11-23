@@ -25,10 +25,10 @@ export default class App extends Component {
             toScreenO: [],
             itemTo: {
                 id: "0",
-                displayName: 'empty',
-                shortName: 'empty',
+                displayName: '',
+                shortName: '',
                 openingDate: '1111-11-11',
-                coordinates: 'empty',
+                coordinates: ``,//'empty',
                 level: '0',
             },
             wantToChange: false,
@@ -44,7 +44,7 @@ export default class App extends Component {
        // this.filterItems2 = this.filterItems2.bind(this);
         this.handleLevelUpClick = this.handleLevelUpClick.bind(this);
         this.findElement = this.findElement.bind(this);
-        this.onAlert = this.onAlert.bind(this);
+       // this.onAlert = this.onAlert.bind(this);
         this.onCoordinatesFromMap = this.onCoordinatesFromMap.bind(this);
         this.handleBackToRootClick = this.handleBackToRootClick.bind(this);
         this.resetItemToClick = this.resetItemToClick.bind(this);
@@ -91,7 +91,7 @@ export default class App extends Component {
                     itemsToShow: organisationUnits,
                                   });
             })
-            .catch((error) => alert(`Could not find children loadOrganisationUnits  App ${error.message}`)
+            .catch((error) => alert(`loadOrgUnits  App ${error.message}`)
             )
 
     }
@@ -113,7 +113,7 @@ export default class App extends Component {
                 console.log("this.state.items load org child   App");
                 console.log(this.state.items);
             })
-            .catch((error) => alert(`Error loadOrganisationUnitsChildren App  ${error.message}`))
+            .catch((error) => alert(`Error loadOrgUnitsChildren App  ${error.stack}`))
     }
 //---------------------------------------------------------------------------------------------
     onShowMapClick(item){
@@ -127,7 +127,7 @@ export default class App extends Component {
             this.resetItemToClick();
             this.loadOrganisationUnitsChildren(item);
         } else {
-            alert(`Lowest Level`);
+            alert(`Lowest Level`);// additional check ,maybe not necessary
         }
 
     }
@@ -137,6 +137,7 @@ onItemClick(item) {  // show info
         item.coordinates = "not listed";
         this.setState({
             itemTo: item,
+            wantedToChange: false,
             rigid: true
 
         });
@@ -197,37 +198,30 @@ onItemClick(item) {  // show info
     //--------------------------------------------------------------------------------------------
     // item - parent to listed ogrUnits
     saveOrganisationUnit(formData,parent){
-        saveOrganisationUnit(formData, parent,this.state.levels )
+        console.log("saveogun App levels");
+        console.log(this.state.levels);
+        saveOrganisationUnit(formData, parent, this.state.levels)
             .then(() => this.loadOrganisationUnitsChildren(parent))// update state with new born lazaret
-             .catch(error => alert(`error saveOrganisationUnit App${error.message}`))
-               .then(() => this.setState({
-                                  isSaving: false,
-                     }) )
+            .catch(error => alert(`error saveOrganisationUnit App${error.message}`))
+            .then(() => this.setState({
+                isSaving: false,
+            }))
     }
 
+//---------------------------------------------------------------------------------------
     onCoordinatesFromMap(lat, lng) {
 
         let longitude = lng.toFixed(4);
         let latitude = lat.toFixed(4);
-     /*   this.setState({
-            itemTo: {
-                coordinates: `[ ${longitude}, ${latitude} ]`
-            }
-        })*/
-        //------------------
-        this.setState(prevState =>({
-            coordinates : [...prevState.coordinates,`[ ${longitude}, ${latitude} ]`]
-        }));
-        //------------------
+        const nova = this.state.itemTo;
+        nova.coordinates = `[ ${longitude}, ${latitude} ]`;
+        this.setState({
+            itemTo: nova,
+            wantedToChange: false,
+        });
     }
+
 //----------------------------------------------------------------------------------------------
-   /* rejectSaveOrganisationUnit(item){
-        this.onAlert();
-          this.setState({
-                isSaving: false
-                        });
-          }*/
-    //----------------------------------------------------------------------------------------------
     render() {
 
 
@@ -278,8 +272,6 @@ onItemClick(item) {  // show info
         event.preventDefault();
         this.loadOrganisationUnits() ;
     }
-
-
 //----------------------------------------------------------------------------------------------
     findElement(item) {
 
@@ -297,9 +289,8 @@ onItemClick(item) {  // show info
         //--------------------------
         console.log("item.orgUnGroups");
 
-
        let infoO = [];
-      // if(item.organisationUnitGroups) { // to add ?
+       if(item.organisationUnitGroups.length !== 0) { // to add ?
            let groups = item.organisationUnitGroups;
            console.log(groups);
            infoO[0] = {name: <h4>Organisation Groups : : </h4>};
@@ -308,7 +299,7 @@ onItemClick(item) {  // show info
                    name: groups[i].name
                });
            }
-       //}
+       }
         //--------------------------
         this.setState({
             toScreenP : infoP,
@@ -318,26 +309,10 @@ onItemClick(item) {  // show info
     }
 
 //----------------------------------------------------------------------------------------------
-    onAlert() {
-        alert(`You cannot add org.unit here-not LAST level`);
-        event.preventDefault();
-            }
+
 
 //----------------------------------------------------------------------------------------------
-    filterItems(event) {
-        event.preventDefault();
-        let updatedItems = this.state.items;
-        updatedItems = updatedItems.filter(stuka =>
-            stuka.displayName.toLowerCase().search(event.target.value.toLowerCase()) !== -1);
 
-        this.setState({
-            itemsToShow: updatedItems
-                      });
-        console.log("items filterItems");
-        console.log(this.state.itemsToShow);
-        console.log(this.state.items);
-
-    }
     //-----------------------------------------------------------------------------------------
     // not ready
     filterItems2(event){
@@ -387,7 +362,7 @@ onItemClick(item) {  // show info
                 displayName: '',
                 shortName: '',
                 openingDate: '',
-                coordinates: '[   ,   ]',
+                coordinates: ``,//'[   ,   ]',
             },
             toScreenO : [],
             toScreenP: [],
@@ -469,4 +444,41 @@ class InfoO extends React.Component {
  isLoading: false,
  });
  })
- .catch((error) => alert(`Error findElement App  ${error.message}`)); */
+ .catch((error) => alert(`Error findElement App  ${error.message}`));
+
+
+
+ /* rejectSaveOrganisationUnit(item){
+ this.onAlert();
+ this.setState({
+ isSaving: false
+ });
+ }*/
+//----------------------------------------------------------------------------------------------
+
+
+/*
+ onAlert() {
+ alert(`You cannot add org.unit here-not LAST level`);
+ event.preventDefault();
+ }
+ */
+
+/*
+ filterItems(event) {
+ event.preventDefault();
+ let updatedItems = this.state.items;
+ updatedItems = updatedItems.filter(stuka =>
+ stuka.displayName.toLowerCase().search(event.target.value.toLowerCase()) !== -1);
+
+ this.setState({
+ itemsToShow: updatedItems
+ });
+ console.log("items filterItems");
+ console.log(this.state.itemsToShow);
+ console.log(this.state.items);
+
+ }
+ */
+
+
