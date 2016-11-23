@@ -8,8 +8,8 @@ export default class Form extends Component {
             name: '',
             shortName: '',
             openingDate: '',
-            coordinates: '[   ,   ]',
-            allowance : false,//not in use
+            coordinates: ``,//'[   ,   ]',
+           // allowance : false,//not in use
         };
 
 
@@ -20,13 +20,29 @@ export default class Form extends Component {
         this.setOpeningDate = this.setOpeningDate.bind(this);
         this.setNewCoordinates = this.setNewCoordinates.bind(this);
         this.resetFormClick = this.resetFormClick.bind(this);
-        this.checkPermition = this.checkPermition.bind(this);
+      //  this.checkPermission = this.checkPermission.bind(this);
 
     }
     componentWillReceiveProps(nextProps) {
-            if(nextProps.item != this.props.item)
+            console.log("this props");
+            console.log(this.props.item);
+            console.log("next props");
+            console.log(nextProps.item);
+
+            if(nextProps.item.coordinates !== this.state.coordinates){
             this.loadData(nextProps.item);
-    }
+            }/*
+      else  if(nextProps.item === this.props.item){
+            let a = this.state;
+            //   a.coordinates = nextProps.coordinates;
+            console.log("equal");
+            console.log(a.coordinates);
+            this.setState({
+                name : a.name,
+                coordinates : a.coordinates,// nextProps.coordinates,
+            })
+        }*/
+           }
     loadData(item){
    //new one
 
@@ -36,17 +52,13 @@ export default class Form extends Component {
                 shortName: item.shortName,
                openingDate: this.convertDate(item.openingDate),
                 coordinates: item.coordinates,
-
-
             })
         } else {
             this.setState({
                 name: item.displayName,
                 shortName: item.shortName,
                openingDate: this.convertDate(item.openingDate),
-                coordinates: "No coordinates",
-
-
+                coordinates: `qqq`,//"No coordinates",
             })
         }
     }
@@ -56,18 +68,18 @@ export default class Form extends Component {
         console.log("this.state Form ");
         console.log(this.state);
         this.props.onSubmit(this.state);
-        this.setState({
+       /* this.setState({
             name: '',
             shortName: '',
             openingDate: '',
-            coordinates: '[   ,   ]',
+           // coordinates: '[   ,   ]',
             allowance: false
-
-        })
+        })*/
+       this.resetFormClick();
     }
 
     resetFormClick(event){
-        event.preventDefault();
+      //  event.preventDefault();
         this.setState({
             name: '',
             shortName: '',
@@ -80,6 +92,7 @@ export default class Form extends Component {
 
     setName(event) {
                 this.setState({name: event.target.value});
+        //this.props.item.name = this.state.name
     }
 
     setShortName(event) {
@@ -143,7 +156,7 @@ export default class Form extends Component {
         );
     }
 
-   static convertDate(dateForm){
+   convertDate(dateForm){
         let d = new Date(dateForm);
         let m = d.getMonth() + 1;
         if(m < 10) m = '0' + m;
