@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import { saveOrganisationUnit, loadOrganisationUnits, findChildren, deleteOrganisationUnit, organisationUnitLevels,liveSearch,updateOrganisationUnit} from '../api';
 import List from './List';
 import Form from './Form';
-import { mapSetItems, mapAddItems, mapSetCoordinatesCallback } from '../map';
+import { mapSetItems, mapAddItems, mapClearAll, mapSetCoordinatesCallback } from '../map';
 import { addCallbackToItems, arraysEqual } from '../util';
 
 
@@ -59,7 +59,10 @@ export default class App extends Component {
 
     componentWillUpdate(_, nextState) {
         // Keep the map in sync with the unfiltered list of org.units.
-        if (!arraysEqual(nextState.items, this.state.items)) {
+        if (nextState.items.length == 0) {
+            mapClearAll();
+        }
+        else if (!arraysEqual(nextState.items, this.state.items)) {
             let atFacilityLevel = nextState.items[0].level ==
                                                 this.state.maxLevels;
             let callback = atFacilityLevel ? this.onItemClick :
