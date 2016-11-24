@@ -160,6 +160,12 @@ export function mapSetItems(organisationUnits) {
     mapAddItems(organisationUnits);
 }
 
+/** Clear all info on the map. */
+export function mapClearAll() {
+    mapClearPolygons();
+    mapClearMarkers();
+}
+
 /** Load the Google Maps API, call a function when it's done. */
 export function loadGoogleMaps(callback) {
     var script = document.createElement('script');
