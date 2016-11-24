@@ -66,21 +66,20 @@ input[type="button"] {
     border: solid 1px black;
 }
 
-.list {
+ul {
     background: #b4eea7;
     opacity: 0.9;
     border: none;
     border-radius: 0.7em;
-    margin-top: 1em;
     overflow-y: auto;
 }
 
-.list ul {
-    margin: 0;
-    padding: 0;
+.list ul{
     list-style: none;
+    padding: 0;
+    margin: 0;
+    margin-top: 1em;
 }
-
 .list li {
     padding: 0.35rem;
     border-bottom: solid black 1px;
@@ -156,7 +155,3 @@ input[type="button"] {
 .form #empty_fields {
     background-color: #BB8B71;
 }
-
-/*.form #submit:disabled {
-    background-color: red;
-}*/
