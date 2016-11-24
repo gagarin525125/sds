@@ -144,6 +144,11 @@ input[type="button"] {
     margin: 0.2em;
 }
 
+.form button:disabled {
+    opacity: 0.3;
+    cursor: default;
+}
+
 .form #submit {
     background-color: #6DA161;
 }
