@@ -63,8 +63,15 @@ export default class App extends Component {
         // Keep the map in sync with the unfiltered list of org.units.
         if (!arraysEqual(nextState.items, this.state.items)) {
             mapSetItems(addCallbackToItems(nextState.items, this.onLevelDownClick));
+
+            // When displaying facilities, draw boundaries for the parent org.unit.
             if (nextState.items.length > 0 && nextState.items[0].level == this.state.levels) {
-                mapAddItems([this.state.parentItem]);
+                let parentItem = this.state.parentItem;
+                let name = parentItem.displayName;
+                // This prevents the center marker from being added.
+                parentItem.displayName = null;
+                mapAddItems([parentItem]);
+                parentItem.displayName = name;
             }
         }
     }
