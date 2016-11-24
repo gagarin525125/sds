@@ -5,11 +5,13 @@ export default class Form extends Component {
         super(props);
 
         this.state = {
+            id: `0`,
             name: '',
             shortName: '',
-            openingDate: '',
-            coordinates: ``,//'[   ,   ]',
-           // allowance : false,//not in use
+            openingDate: `1111-11-11`,
+            coordinates: ``,
+            isChanged: false,
+            level: ``,
         };
 
 
@@ -20,47 +22,61 @@ export default class Form extends Component {
         this.setOpeningDate = this.setOpeningDate.bind(this);
         this.setNewCoordinates = this.setNewCoordinates.bind(this);
         this.resetFormClick = this.resetFormClick.bind(this);
-      //  this.checkPermission = this.checkPermission.bind(this);
+
 
     }
     componentWillReceiveProps(nextProps) {
             console.log("this props");
             console.log(this.props.item);
-            console.log("next props");
-            console.log(nextProps.item);
 
-            if(nextProps.item.coordinates !== this.state.coordinates){
+
+            if(nextProps.item !== this.state){
+                this.setState({
+                    isChanged : false,
+                })
+
             this.loadData(nextProps.item);
-            }/*
-      else  if(nextProps.item === this.props.item){
-            let a = this.state;
-            //   a.coordinates = nextProps.coordinates;
-            console.log("equal");
-            console.log(a.coordinates);
-            this.setState({
-                name : a.name,
-                coordinates : a.coordinates,// nextProps.coordinates,
-            })
-        }*/
+            }else{
+                this.setState({
+                    isChanged : true,
+                })
+
+            }
            }
     loadData(item){
    //new one
 
-        if (item.coordinates) {
-            this.setState({
-                name: item.displayName,
-                shortName: item.shortName,
-               openingDate: this.convertDate(item.openingDate),
-                coordinates: item.coordinates,
-            })
-        } else {
-            this.setState({
-                name: item.displayName,
-                shortName: item.shortName,
-               openingDate: this.convertDate(item.openingDate),
-                coordinates: `qqq`,//"No coordinates",
-            })
-        }
+
+        console.log("next props");
+        console.log(item);
+       if(!this.state.isChanged) {
+           if (item.coordinates) {
+               this.setState({
+                   name: item.displayName,
+                   shortName: item.shortName,
+                   openingDate: this.convertDate(item.openingDate),
+                   coordinates: item.coordinates,
+
+               })
+           } else {
+               this.setState({
+                   name: item.displayName,
+                   shortName: item.shortName,
+                   openingDate: this.convertDate(item.openingDate),
+                   coordinates: ``,
+               })
+           }
+       }else{
+           let a = this.state;
+           this.setState({
+               name: a.name,
+               shortName: a.shortName,
+               openingDate: a.openingDate,
+               coordinates: item.coordinates,
+
+           })
+       }
+
     }
     onSubmitClick(event) {
         event.preventDefault();
@@ -68,47 +84,67 @@ export default class Form extends Component {
         console.log("this.state Form ");
         console.log(this.state);
         this.props.onSubmit(this.state);
-       /* this.setState({
-            name: '',
-            shortName: '',
-            openingDate: '',
-           // coordinates: '[   ,   ]',
-            allowance: false
-        })*/
-       this.resetFormClick();
+        this.resetFormClick();
     }
 
-    resetFormClick(event){
-      //  event.preventDefault();
-        this.setState({
+    resetFormClick(){
+           this.setState({
             name: '',
             shortName: '',
             openingDate: '',
-            coordinates: ``,//'[   ,   ]',
+            coordinates: ``,
+            isChanged: false,
 
         });
-      this.props.resetItemToClick();
+     // this.props.resetItemToClick();
     }
 
     setName(event) {
-                this.setState({name: event.target.value});
-        //this.props.item.name = this.state.name
+        if (this.props.item.level !== this.props.maxLevels){
+            alert(`cannot change`);return;
     }
+                this.setState({
+                    name: event.target.value,
+                    isChanged: true,
+                           });
+            }
 
     setShortName(event) {
-        this.setState({ shortName: event.target.value });
+        if (this.props.item.level !== this.props.maxLevels){
+            alert(`cannot change`);return;
+        }
+        this.setState({
+            shortName: event.target.value,
+            isChanged: true,
+        });
     }
 
     setOpeningDate(event) {
-        this.setState({ openingDate: event.target.value });
+        if (this.props.item.level !== this.props.maxLevels){
+            alert(`cannot change`);return;
+        }
+        this.setState({
+            openingDate: event.target.value ,
+            isChanged: true,
+        });
     }
 
     isFormValid() {
-        return !(this.state.name && this.state.shortName && this.state.openingDate && this.state.coordinates);
+        return !(this.state.name && this.state.shortName && this.state.openingDate
+        && this.areCoordinatesValid()  );
     }
-
+    areCoordinatesValid(){
+        let a = this.state.coordinates;
+        return a.includes("[", 0) && a.includes(",") && a.includes("]");
+    }
     setNewCoordinates(event){
-    this.setState({ coordinates: event.target.value });
+        if (this.props.item.level !== this.props.maxLevels){
+            alert(`cannot change`);return;
+        }
+    this.setState({
+        coordinates: event.target.value,
+        isChanged: true,
+    });
     }
 
     render() {
@@ -166,30 +202,7 @@ export default class Form extends Component {
         let newD =  `${d.getFullYear()}-${m}-${day}` ;
         return newD.toString();
     }
-    // not in use
-    checkPermission(){
-        let res = prompt(`want to change existing orgUnit? Y/no`, "no");
-        if (res == null) {  // cancel
-            console.log("hit - cancel");// something to add ?
-        } else if (res.toLowerCase() === "no") {
-            console.log("hit - no "); // something to add ?
 
-        }
-        else if (res.toLowerCase() === "") {
-            console.log("hit - empty"); // something to add ?
-        }
-        else if (res.toLowerCase() === "y") {
-            console.log("hit - yes ");
-
-            this.setState({
-                allowance : true
-
-            });
-            return true;
-         //   this.updateOrganisationUnit(formData, this.state.itemTo);
-         //   this.resetItemToClick();
-        }
-    }
     //-----------------   end class  ---------------
 }
 
@@ -207,3 +220,27 @@ Form.propTypes = {
 
 
 */
+/*
+ checkPermission(){
+ let res = prompt(`want to change existing orgUnit? Y/no`, "no");
+ if (res == null) {  // cancel
+ console.log("hit - cancel");// something to add ?
+ } else if (res.toLowerCase() === "no") {
+ console.log("hit - no "); // something to add ?
+
+ }
+ else if (res.toLowerCase() === "") {
+ console.log("hit - empty"); // something to add ?
+ }
+ else if (res.toLowerCase() === "y") {
+ console.log("hit - yes ");
+
+ this.setState({
+ allowance : true
+
+ });
+ return true;
+ //   this.updateOrganisationUnit(formData, this.state.itemTo);
+ //   this.resetItemToClick();
+ }
+ }*/
