@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import { saveOrganisationUnit, loadOrganisationUnits, findChildren, findOrganisationUnitGroups,  organisationUnitLevels,liveSearch,updateOrganisationUnit} from '../api';
 import List from './List';
 import Form from './Form';
-import { mapSetItems, mapSetCoordinatesCallback } from '../map';
+import { mapSetItems, mapAddItems, mapSetCoordinatesCallback } from '../map';
 import { addCallbackToItems, arraysEqual } from '../util';
 
 
@@ -20,6 +20,7 @@ export default class App extends Component {
             isLoading: true,
             items: [],
             itemsToShow: [],
+            parentItem: {},
             levels:{},
             toScreenP: [],
             toScreenO: [],
@@ -62,6 +63,10 @@ export default class App extends Component {
         // Keep the map in sync with the unfiltered list of org.units.
         if (!arraysEqual(nextState.items, this.state.items)) {
             mapSetItems(addCallbackToItems(nextState.items, this.onLevelDownClick));
+            if (nextState.items.length > 0 && nextState.items[0].featureType == "POINT") {
+                //console.log(`Adding parent item ${this.state.parentItem.displayName}`);
+                mapAddItems([this.state.parentItem]);
+            }
         }
     }
  //-------------------------------------  part of componentDidMount ---------------
@@ -124,6 +129,7 @@ export default class App extends Component {
     //------------------------------------------------------------------------------------------
     onLevelDownClick(item){    // drill down
         if(item.level < this.state.levels){
+            this.setState({ parentItem: item });
             this.resetItemToClick();
             this.loadOrganisationUnitsChildren(item);
         } else {
@@ -240,7 +246,7 @@ onItemClick(item) {  // show info
                 <div className="search">
                     <input type="button" id="backToRoot" name="backToRoot" value="Root level"
                            onClick={this.handleBackToRootClick}/>
-                    <input type="button" id="levelUp" name="levelUp" value="Higher level" onClick={this.handleLevelUpClick}/>
+                    <input type="button" id="levelUp" name="levelUp" value="One level up" onClick={this.handleLevelUpClick}/>
 
                     <input id="live" type="text" placeholder="livesearch" onChange={this.filterItems2}/>
                     < List items={this.state.items/*ToShow*/} onItemClick={this.onItemClick}
