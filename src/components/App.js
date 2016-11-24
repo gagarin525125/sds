@@ -280,7 +280,7 @@ onItemClick(item) {  // show info
         return (
             <div className="app">
                 <div className="search">
-                    <input type="button" id="backToRoot" name="backToRoot" value="Root level"
+                    <input type="button" id="backToRoot" name="backToRoot" value="Top level"
                            onClick={this.handleBackToRootClick}/>
                     <input type="button" id="levelUp" name="levelUp" value="One level up" onClick={this.handleLevelUpClick}/>
 
@@ -298,8 +298,8 @@ onItemClick(item) {  // show info
                            resetItemToClick={this.resetItemToClick}
                            maxLevels={this.state.maxLevels}/> }
                     <div>
-                        {<InfoP toScreenP={this.state.toScreenP}/>}
-                        {<InfoG toScreenG={this.state.toScreenG}/>}
+                        {this.state.toScreenP.length && <InfoP toScreenP={this.state.toScreenP}/>}
+                        {this.state.toScreenG.length && <InfoG toScreenG={this.state.toScreenG}/>}
                     </div>
 
                 </div>
@@ -320,11 +320,11 @@ onItemClick(item) {  // show info
         let elem = item;
         let infoP = [];
 
-        infoP[0] = {name : <h4>Parents : </h4>};
+        infoP[0] = {name: "Parents"};
 
-            for(let i = 0; i < item.ancestors.length;i++){
+        for (let i = 0; i < item.ancestors.length; i++) {
             infoP.push({
-         name:    item.ancestors[i].displayName
+                name: item.ancestors[i].displayName
             });
         }
         //--------------------------
@@ -334,7 +334,7 @@ onItemClick(item) {  // show info
        if(item.organisationUnitGroups.length !== 0) { // to add ?
            let groups = item.organisationUnitGroups;
            console.log(groups);
-           infoG[0] = {name: <h4>Organisation Groups : : </h4>};
+           infoG[0] = {name: "Organisation Groups"};
            for (let i = 0; i < groups.length; i++) {
                infoG.push({
                    name: groups[i].name
@@ -425,7 +425,7 @@ class InfoP extends React.Component {
             return <li key={i} style={{marginLeft: i + 'em'}}> {name.name} </li>;
 
         });
-        return <ul>{list}</ul>
+        return <ul className="list_with_header">{list}</ul>
     }
 }
 //-------------------------------------------------------
@@ -437,7 +437,7 @@ class InfoG extends React.Component {
             return  <li key={i} style={{marginLeft: i + 'em'}}> {stuka.name} </li>;
 
         });
-        return <ul>{list}</ul>
+        return <ul className="list_with_header">{list}</ul>
     }
 }
   //--------------------------------------------------------

@@ -178,7 +178,7 @@ export default class Form extends Component {
                     </div>
                     <div>
                         <button disabled={this.isFormValid()}    id="submit" onClick={this.onSubmitClick}>Submit</button>
-                        <button id="empty_fields" onClick={this.resetFormClick}>empty fields/reset</button>
+                        <button id="empty_fields" onClick={this.resetFormClick}>Clear</button>
                     </div>
 
                 </form>

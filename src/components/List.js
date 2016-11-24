@@ -14,7 +14,7 @@ export default function List({ items = [], onItemClick,onLevelDownClick ,onDelet
                 return(
                     <li key={item.id} onClick={() => onItemClick(item)}>
                         {item.displayName}
-                        <button className="info_button" onClick={() => onDeleteClick(item)}> del </button>
+                        <button className="delete_button" onClick={() => onDeleteClick(item)}>Delete</button>
 
                     </li>
                 ) } else {
@@ -22,8 +22,8 @@ export default function List({ items = [], onItemClick,onLevelDownClick ,onDelet
 
                     <li key={item.id} >
                         {item.displayName}
-                        <button className="info_button" onClick={() => onItemClick(item)}> info </button>
-                        < button onClick={() => onLevelDownClick(item)}> drill down </button>
+                        <button className="info_button" onClick={() => onItemClick(item)}>Info</button>
+                        <button onClick={() => onLevelDownClick(item)}>Drill down</button>
                     </li>
 
                 );}

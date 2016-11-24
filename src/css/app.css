@@ -23,7 +23,7 @@ body {
 }
 
 .search {
-    flex: 0 1 25%;
+    flex: 0 auto;
     align-self: flex-start;
     height: 100%;
     z-index: 5;
@@ -74,16 +74,27 @@ ul {
     overflow-y: auto;
 }
 
-.list ul{
+.list ul {
     list-style: none;
     padding: 0;
     margin: 0;
     margin-top: 1em;
 }
+
 .list li {
     padding: 0.35rem;
     border-bottom: solid black 1px;
     cursor: default;
+}
+
+.list_with_header {
+    padding: 1em;
+}
+
+.list_with_header li:first-of-type {
+    list-style: none;
+    font-weight: bold;
+    padding-bottom: 0.3em;
 }
 
 .list li button {
@@ -94,6 +105,11 @@ ul {
 
 .list li button.info_button {
     background: #EDF7A1;
+}
+
+.list li button.delete_button {
+    background: #ff7b80;
+    color: ghostwhite;
 }
 
 .info {
