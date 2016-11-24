@@ -14,7 +14,7 @@ export default function List({ items = [], onItemClick,onLevelDownClick ,onShowM
                 return(
                     <li key={item.id} >
                         {item.displayName}
-                        <button onClick={() => onItemClick(item)}> info </button>
+                        <button className="info_button" onClick={() => onItemClick(item)}> info </button>
 
                     </li>
                 ) } else {

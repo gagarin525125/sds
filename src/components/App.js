@@ -41,7 +41,7 @@ export default class App extends Component {
         this.onLevelDownClick = this.onLevelDownClick.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
        // this.filterItems = this.filterItems.bind(this);
-       // this.filterItems2 = this.filterItems2.bind(this);
+        this.filterItems2 = this.filterItems2.bind(this);
         this.handleLevelUpClick = this.handleLevelUpClick.bind(this);
         this.findElement = this.findElement.bind(this);
        // this.onAlert = this.onAlert.bind(this);

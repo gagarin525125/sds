@@ -107,7 +107,7 @@ export function mapAddItems(organisationUnits) {
         let ou = organisationUnits[i];
         let newPoints = [];
         if (!ou.coordinates) {
-            console.log(`mapSetItems: missing coordinates for ${ou.displayName} (${ou.id})`);
+            console.log(`mapAddItems: missing coordinates for ${ou.displayName} (${ou.id})`);
             continue;
         }
 
@@ -136,7 +136,7 @@ export function mapAddItems(organisationUnits) {
                              title: ou.displayName, callback: ou.callback }]);
         }
         else {
-            console.log(`mapSetItems: unrecognized featureType ${ou.featureType} for
+            console.log(`mapAddItems: unrecognized featureType ${ou.featureType} for
                          ${ou.displayName} (${ou.id})`);
         }
 
