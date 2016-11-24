@@ -4,7 +4,7 @@ import React, { PropTypes } from 'react';
  * A stateless function component
  * https://facebook.github.io/react/docs/reusable-components.html#stateless-functions
  */
-export default function List({ items = [], onItemClick,onLevelDownClick ,onShowMapClick,levels}) {
+export default function List({ items = [], onItemClick,onLevelDownClick ,onDeleteClick,levels}) {
     // Create a list of li elements that make up the list of organisation units units
     // Each has a click handler for that specific item
 
@@ -12,9 +12,9 @@ export default function List({ items = [], onItemClick,onLevelDownClick ,onShowM
         .map(item => {
             if(item.level === levels ){
                 return(
-                    <li key={item.id} >
+                    <li key={item.id} onClick={() => onItemClick(item)}>
                         {item.displayName}
-                        <button className="info_button" onClick={() => onItemClick(item)}> info </button>
+                        <button className="info_button" onClick={() => onDeleteClick(item)}> del </button>
 
                     </li>
                 ) } else {
