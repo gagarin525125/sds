@@ -6,9 +6,9 @@
  * You obviously should not do this for your production apps.
  */
 //const serverUrl = 'http://localhost:8082/api/';
-const serverUrl = 'https://play.dhis2.org/demo/api/';
+//const serverUrl = 'https://play.dhis2.org/demo/api/';
 //const serverUrl = 'https://play.dhis2.org/dev/api/';
-//const serverUrl = 'https://play.dhis2.org/test/api/';
+const serverUrl = 'https://play.dhis2.org/test/api/';
 const basicAuth = `Basic ${btoa('admin:district')}`;
 
 /* For app deployment */
@@ -115,7 +115,7 @@ export function updateOrganisationUnit(formData,itemTo){
 
 }
 
-/*
+
 export function deleteOrganisationUnit(organisationUnit) {
     // Send DELETE request to the server to delete the organisation unit
     return fetch(
@@ -125,9 +125,10 @@ export function deleteOrganisationUnit(organisationUnit) {
             method: 'DELETE',
         }
     )
-    .then(onlySuccessResponses);
+    .then(onlySuccessResponses)
+    .catch((error) => alert(`error delete org.unit api ${error}`));
 }
-*/
+
 export function findChildren(organisationUnit) {
     console.log("findChildren  api");
 
