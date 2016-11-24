@@ -63,8 +63,7 @@ export default class App extends Component {
         // Keep the map in sync with the unfiltered list of org.units.
         if (!arraysEqual(nextState.items, this.state.items)) {
             mapSetItems(addCallbackToItems(nextState.items, this.onLevelDownClick));
-            if (nextState.items.length > 0 && nextState.items[0].featureType == "POINT") {
-                //console.log(`Adding parent item ${this.state.parentItem.displayName}`);
+            if (nextState.items.length > 0 && nextState.items[0].level == this.state.levels) {
                 mapAddItems([this.state.parentItem]);
             }
         }
