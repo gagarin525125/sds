@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import { saveOrganisationUnit, loadOrganisationUnits, findChildren, findOrganisationUnitGroups,  organisationUnitLevels,liveSearch,updateOrganisationUnit} from '../api';
+import { saveOrganisationUnit, loadOrganisationUnits, findChildren, deleteOrganisationUnit, organisationUnitLevels,liveSearch,updateOrganisationUnit} from '../api';
 import List from './List';
 import Form from './Form';
 import { mapSetItems, mapAddItems, mapSetCoordinatesCallback } from '../map';
@@ -21,16 +21,16 @@ export default class App extends Component {
             items: [],
             itemsToShow: [],
             parentItem: {},
-            levels:{},
+            maxLevels: {},
             toScreenP: [],
-            toScreenO: [],
+            toScreenG: [],
             itemTo: {
                 id: "0",
                 displayName: '',
                 shortName: '',
                 openingDate: '1111-11-11',
-                coordinates: ``,//'empty',
-                level: '0',
+                coordinates: ``,
+                level: '4',
             },
             wantToChange: false,
             rigid: true,
@@ -41,15 +41,13 @@ export default class App extends Component {
         this.onItemClick = this.onItemClick.bind(this);
         this.onLevelDownClick = this.onLevelDownClick.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
-       // this.filterItems = this.filterItems.bind(this);
-        this.filterItems2 = this.filterItems2.bind(this);
+        this.liveSearch = this.liveSearch.bind(this);
         this.handleLevelUpClick = this.handleLevelUpClick.bind(this);
         this.findElement = this.findElement.bind(this);
-       // this.onAlert = this.onAlert.bind(this);
         this.onCoordinatesFromMap = this.onCoordinatesFromMap.bind(this);
         this.handleBackToRootClick = this.handleBackToRootClick.bind(this);
         this.resetItemToClick = this.resetItemToClick.bind(this);
-      //  this.onShowMapClick = this.onShowMapClick.bind(this);
+        this.onDeleteClick = this.onDeleteClick.bind(this);
     }
 
     componentDidMount() {
@@ -64,14 +62,16 @@ export default class App extends Component {
         if (!arraysEqual(nextState.items, this.state.items)) {
             mapSetItems(addCallbackToItems(nextState.items, this.onLevelDownClick));
 
+
             // When displaying facilities, draw boundaries for the parent org.unit.
-            if (nextState.items.length > 0 && nextState.items[0].level == this.state.levels) {
+            if (nextState.items.length > 0 && nextState.items[0].level == this.state.maxLevels) {
                 let parentItem = this.state.parentItem;
                 let name = parentItem.displayName;
                 // This prevents the center marker from being added.
                 parentItem.displayName = null;
                 mapAddItems([parentItem]);
                 parentItem.displayName = name;
+
             }
         }
     }
@@ -82,13 +82,12 @@ export default class App extends Component {
             .then((result) => {console.log("Levels");
                                console.log(result);
                                 this.setState({
-                                            levels: result.pager.total,
+                                    maxLevels: result.pager.total,
                                               });
 
                       })
-              .then(() => console.log(this.state.levels))
 
-              .catch((error) => alert("Error loadOrgUnitLevels  App  ${error.message}"));
+           .catch((error) => alert(`Error loadOrgUnLevels App  ${error.stack}`))
     }
 
 //----------------------------------------  part of componentDidMount   --------------
@@ -102,12 +101,13 @@ export default class App extends Component {
                     itemsToShow: organisationUnits,
                                   });
             })
-            .catch((error) => alert(`loadOrgUnits  App ${error.message}`)
+            .catch((error) => alert(`loadOrgUnits  App ${error.stack}`)
             )
 
     }
 
     //--------------------------------------------------------------------------------------------------------
+
 
     loadOrganisationUnitsChildren(item) {
           // save in item to be the parent of future children
@@ -117,12 +117,7 @@ export default class App extends Component {
                 this.setState({
                     isLoading: false,
                     items: organisationUnits,
-                    itemsToShow: organisationUnits,
-                });
-            })
-            .then(() => {
-                console.log("this.state.items load org child   App");
-                console.log(this.state.items);
+                             });
             })
             .catch((error) => alert(`Error loadOrgUnitsChildren App  ${error.stack}`))
     }
@@ -134,17 +129,27 @@ export default class App extends Component {
     }
     //------------------------------------------------------------------------------------------
     onLevelDownClick(item){    // drill down
-        if(item.level < this.state.levels){
+        if(item.level === this.state.maxLevels-1){
+            let temp = this.state.itemTo;
+            temp.level = this.state.maxLevels ;
+            this.setState({
+                itemTo: temp,
+                parentItem: item
+            });
+           // this.resetItemToClick();
+            this.loadOrganisationUnitsChildren(item);
+        }
+      else  if(item.level < this.state.maxLevels){
             this.setState({ parentItem: item });
             this.resetItemToClick();
             this.loadOrganisationUnitsChildren(item);
         } else {
-            alert(`Lowest Level`);// additional check ,maybe not necessary
+            alert(`Lowest Level`);
         }
 
     }
 onItemClick(item) {  // show info
-    if(item.level < this.state.levels){
+    if(item.level < this.state.maxLevels){
 
         item.coordinates = "not listed";
         this.setState({
@@ -197,27 +202,45 @@ onItemClick(item) {  // show info
         }
         //}else{ alert(' cannot be changed ')}
     }
+    //------------------------------------------------------------------------------------------
+    onDeleteClick(item){
+        deleteOrganisationUnit(item)
+            .then(() => this.loadOrganisationUnits())
+            .catch((error) => alert(`Error onDeleteClick App  ${error.stack}`))
+
+    }
  //----------------------------------------------------------------------------------------------
     updateOrganisationUnit(formData,itemTo){
         updateOrganisationUnit(formData,itemTo )
             .then(() => this.loadOrganisationUnitsChildren(itemTo.parent))// update state with new born lazaret
+
+            .then(() => {
+                let temp = this.state.itemTo;
+                temp.level = this.state.maxLevels ;
+                this.setState({
+                    isSaving: false,
+                    itemTo: temp,
+                })}
+            )
             .catch(error => alert(`error updateOrganisationUnit App${error.message}`))
-            .then(() => this.setState({
-                isSaving: false,
-            }) )
     }
 
     //--------------------------------------------------------------------------------------------
     // item - parent to listed ogrUnits
     saveOrganisationUnit(formData,parent){
         console.log("saveogun App levels");
-        console.log(this.state.levels);
-        saveOrganisationUnit(formData, parent, this.state.levels)
+        console.log(this.state.maxLevels);
+        saveOrganisationUnit(formData, parent, this.state.maxLevels)
             .then(() => this.loadOrganisationUnitsChildren(parent))// update state with new born lazaret
+            .then(() => {
+                let temp = this.state.itemTo;
+                temp.level = this.state.maxLevels ;
+                              this.setState({
+                                       isSaving: false,
+                                       itemTo: temp,
+            })}
+            )
             .catch(error => alert(`error saveOrganisationUnit App${error.message}`))
-            .then(() => this.setState({
-                isSaving: false,
-            }))
     }
 
 //---------------------------------------------------------------------------------------
@@ -232,6 +255,7 @@ onItemClick(item) {  // show info
             wantedToChange: false,
         });
     }
+    //-----------------------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------------------------
     render() {
@@ -254,23 +278,22 @@ onItemClick(item) {  // show info
                            onClick={this.handleBackToRootClick}/>
                     <input type="button" id="levelUp" name="levelUp" value="One level up" onClick={this.handleLevelUpClick}/>
 
-                    <input id="live" type="text" placeholder="livesearch" onChange={this.filterItems2}/>
+                    <input id="live" type="search" className="form-control" placeholder="live search" onChange={this.liveSearch}/>
+
                     < List items={this.state.items/*ToShow*/} onItemClick={this.onItemClick}
                            onLevelDownClick={this.onLevelDownClick}
-                           onShowMapClick={this.onShowMapClick} levels={this.state.levels}/>
+                           onShowMapClick={this.onShowMapClick} levels={this.state.maxLevels}
+                           onDeleteClick={this.onDeleteClick}/>
                 </div>
                 <div className="info">
                     {/*<List onItemClick={this.onItemClick} items={this.state.items}/>*/}
                     {/*this.state.isSaving ? <div>Saving organisation unit</div> : <Form onSubmit={this.onSubmit}/>*/}
                     {<Form onSubmit={this.onSubmit} item={this.state.itemTo}
-                           resetItemToClick={this.resetItemToClick}/> }
+                           resetItemToClick={this.resetItemToClick}
+                           maxLevels={this.state.maxLevels}/> }
                     <div>
-
-
                         {<InfoP toScreenP={this.state.toScreenP}/>}
-
-                        {<InfoO toScreenO={this.state.toScreenO}/>}
-
+                        {<InfoG toScreenG={this.state.toScreenG}/>}
                     </div>
 
                 </div>
@@ -301,13 +324,13 @@ onItemClick(item) {  // show info
         //--------------------------
         console.log("item.orgUnGroups");
 
-       let infoO = [];
+       let infoG = [];
        if(item.organisationUnitGroups.length !== 0) { // to add ?
            let groups = item.organisationUnitGroups;
            console.log(groups);
-           infoO[0] = {name: <h4>Organisation Groups : : </h4>};
+           infoG[0] = {name: <h4>Organisation Groups : : </h4>};
            for (let i = 0; i < groups.length; i++) {
-               infoO.push({
+               infoG.push({
                    name: groups[i].name
                });
            }
@@ -315,7 +338,7 @@ onItemClick(item) {  // show info
         //--------------------------
         this.setState({
             toScreenP : infoP,
-            toScreenO : infoO,
+            toScreenG : infoG,
         })
 
     }
@@ -327,29 +350,31 @@ onItemClick(item) {  // show info
 
     //-----------------------------------------------------------------------------------------
     // not ready
-    filterItems2(event){
+    liveSearch(event){
         this.resetItemToClick();
         event.preventDefault();
+        console.log(event.target.value);
         if(event.target.value === ''){
 
-                this.setState({
-                    items/*ToShow*/: this.state.items
-                });
-                return;
+              /*  this.setState({
+                    items/*ToShow*/ //: this.state.items
+             //   }); */
+              //  return;
+    this.loadOrganisationUnits() ;
         }
 
 
         liveSearch(event.target.value.toLowerCase())
 
             .then(result => {
-                console.log(result);
+               // console.log(result);
 
                 this.setState({
                     items/*ToShow*/: result.organisationUnits
                 })
             })
 
-            .catch((error) => alert(`Error filterItems2 App  ${error.message}`))
+            .catch((error) => alert(`Error liveSearch App  ${error.stack}`))
 
     }
 //----------------------------------------------------------------------------------------------
@@ -357,7 +382,7 @@ onItemClick(item) {  // show info
         console.log("this.state.item  handleLevelUp  App  ");
         let ancestors = this.state.items[0].ancestors;
         let i = ancestors.length;
-       if( i === 1) {alert(`You are on HIGHEST level`); this.resetItemToClick(); }//this.loadOrganisationUnits() :
+       if( i === 1) {alert(`You are on HIGHEST level`); this.resetItemToClick(); }
                   else {
            this.loadOrganisationUnitsChildren(ancestors[i - 2]);
            this.resetItemToClick();
@@ -374,9 +399,9 @@ onItemClick(item) {  // show info
                 displayName: '',
                 shortName: '',
                 openingDate: '',
-                coordinates: ``,//'[   ,   ]',
+                coordinates: ``,
             },
-            toScreenO : [],
+            toScreenG : [],
             toScreenP: [],
             wantToChange : false,
             rigid: true,
@@ -398,11 +423,11 @@ class InfoP extends React.Component {
     }
 }
 //-------------------------------------------------------
-class InfoO extends React.Component {
+class InfoG extends React.Component {
 
     render() {
 
-        let list = this.props.toScreenO.map(function (stuka, i) {
+        let list = this.props.toScreenG.map(function (stuka, i) {
             return  <li key={i} style={{marginLeft: i + 'em'}}> {stuka.name} </li>;
 
         });
