@@ -73,6 +73,7 @@ function mapAddPolygon(points, text, callback) {
     var poly = new google.maps.Polygon({
         map: map,
         paths: coords,
+        clickable: callback != null,
         strokeColor: '#0000B0',
         strokeOpacity: 0.8,
         strokeWeight: 2,
