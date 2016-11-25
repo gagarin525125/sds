@@ -24,6 +24,10 @@ export function mapSetCoordinatesCallback(callback) {
 
 /** Highlight at item on the map. */
 export function mapSelectItem(id) {
+    if (!markers[id]) {
+        console.log(`mapSelectItem: no marker found for id ${id}`);
+        return;
+    }
     if (popup)
         popup.close();
     popup = new google.maps.InfoWindow({content: markers[id].title});
