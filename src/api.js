@@ -6,9 +6,9 @@
  * You obviously should not do this for your production apps.
  */
 //const serverUrl = 'http://localhost:8082/api/';
-//const serverUrl = 'https://play.dhis2.org/demo/api/';
+const serverUrl = 'https://play.dhis2.org/demo/api/';
 //const serverUrl = 'https://play.dhis2.org/dev/api/';
-const serverUrl = 'https://play.dhis2.org/test/api/';
+//const serverUrl = 'https://play.dhis2.org/test/api/';
 const basicAuth = `Basic ${btoa('admin:district')}`;
 
 /* For app deployment */
@@ -144,7 +144,7 @@ export function findChildren(organisationUnit) {
         .then(response => {
             if (response.status === 404) {
                 alert(`Something wrong , children query`);
-                console.error("error");
+             //   console.error("error");
 
             }
             console.log("findchildren api response");
@@ -174,8 +174,8 @@ export function loadOrganisationUnits() {
         .then(response => response.json())
         // pick the organisationUnits property from the payload
         .then(({organisationUnits}) => {
-            console.log("organisationUnits children   api");
-            console.log(organisationUnits);
+           // console.log("organisationUnits children   api");
+          //  console.log(organisationUnits);
             return organisationUnits;
         })
         .catch((error) => alert(`loadOrganisationUnits api ${error}`));
