@@ -1,7 +1,8 @@
 var map;
-var markers = [];
+var markers = {};  // A mapping of string ID's to Marker objects.
 var polygons = [];
 var coordinatesCallback;
+var popup;
 
 /** Show a map of Sierra Leone. */
 export function initMap() {
@@ -21,9 +22,17 @@ export function mapSetCoordinatesCallback(callback) {
     coordinatesCallback = callback;
 }
 
+/** Highlight at item on the map. */
+export function mapSelectItem(id) {
+    if (popup)
+        popup.close();
+    popup = new google.maps.InfoWindow({content: markers[id].title});
+    popup.open(map, markers[id]);
+}
+
 /** Add markers. places is an array of
- * { lat: n, lng: n, title: s, callback: func } objects, the callback is
- * optional. */
+ * { id: s, lat: n, lng: n, title: s, callback: func } objects, the callback is
+ * optional. id a string that uniquely identifies the marker. */
 function mapAddMarkers(places) {
     places.forEach(p => {
         var m = new google.maps.Marker({
@@ -35,14 +44,15 @@ function mapAddMarkers(places) {
         if (p.callback)
             google.maps.event.addListener(m, "click", event => p.callback());
 
-        markers.push(m);
+        markers[p.id] = m;
     });
 }
 
 /** Remove all markers from the map.*/
 function mapClearMarkers() {
-    markers.forEach(m => m.setMap(null));
-    markers.length = 0;
+    for (let m in markers)
+        markers[m].setMap(null);
+    markers = {};
 }
 
 function getPolygonCenter(points) {
@@ -64,10 +74,11 @@ function getBoundsForPoints(points, currentBounds) {
 }
 
 /**
- * Draw a polygon on the map. points is an array of [lng, lat] arrays. callback
- * is optional. If text is not null, a marker with that title will be added.
+ * Draw a polygon on the map. points is an array of [lng, lat] arrays. id is a
+ * string that uniquely identifies the polygon. callback is optional. If text
+ * is not null, a marker with that title will be added.
  */
-function mapAddPolygon(points, text, callback) {
+function mapAddPolygon(id, points, text, callback) {
     var coords = points.map(a => ({lat: a[1], lng: a[0]}));
 
     var poly = new google.maps.Polygon({
@@ -85,6 +96,7 @@ function mapAddPolygon(points, text, callback) {
 
     if (text) {
         let place = getPolygonCenter(points);
+        place.id = id;
         place.title = text;
         place.callback = callback;
         mapAddMarkers([place]);
@@ -115,25 +127,25 @@ export function mapAddItems(organisationUnits) {
         if (ou.featureType == "POINT") {
             let coords = JSON.parse(ou.coordinates);
             places.push({
+                id: ou.id, title: `${ou.displayName}\n${ou.id}`,
                 lat: coords[1], lng: coords[0],
-                title: `${ou.displayName}\n${ou.id}`,
                 callback: ou.callback
             });
             newPoints = [coords];
         }
         else if (ou.featureType == "POLYGON") {
             newPoints = JSON.parse(ou.coordinates)[0][0];
-            mapAddPolygon(newPoints, ou.displayName, ou.callback);
+            mapAddPolygon(ou.id, newPoints, ou.displayName, ou.callback);
         }
         else if (ou.featureType == "MULTI_POLYGON") {
             let matches = ou.coordinates.match(/\[\[[^[].*?\]\]/g);
             let polys = matches.map(m => JSON.parse(m));
-            polys.forEach(p => mapAddPolygon(p, null, ou.callback));
+            polys.forEach(p => mapAddPolygon(ou.id, p, null, ou.callback));
             newPoints = [].concat(...polys);
 
             // Add a clickable, hoverable marker inside the area.
             let center = getPolygonCenter(newPoints);
-            mapAddMarkers([{ lat: center.lat, lng: center.lng,
+            mapAddMarkers([{ id: ou.id, lat: center.lat, lng: center.lng,
                              title: ou.displayName, callback: ou.callback }]);
         }
         else {
@@ -155,13 +167,16 @@ export function mapAddItems(organisationUnits) {
 
 /** Set the information to be displayed on the map. */
 export function mapSetItems(organisationUnits) {
-    mapClearPolygons();
-    mapClearMarkers();
+    mapClearAll();
     mapAddItems(organisationUnits);
 }
 
 /** Clear all info on the map. */
 export function mapClearAll() {
+    if (popup) {
+        popup.close();
+        popup = null;
+    }
     mapClearPolygons();
     mapClearMarkers();
 }

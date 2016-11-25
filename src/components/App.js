@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import { saveOrganisationUnit, loadOrganisationUnits, findChildren, deleteOrganisationUnit, organisationUnitLevels,liveSearch,updateOrganisationUnit} from '../api';
 import List from './List';
 import Form from './Form';
-import { mapSetItems, mapAddItems, mapClearAll, mapSetCoordinatesCallback } from '../map';
+import { mapSetItems, mapAddItems, mapClearAll, mapSelectItem, mapSetCoordinatesCallback } from '../map';
 import { addCallbackToItems, arraysEqual } from '../util';
 
 
@@ -155,6 +155,7 @@ export default class App extends Component {
 
     }
 onItemClick(item) {  // show info
+    mapSelectItem(item.id);
     if(item.level < this.state.maxLevels){
 
         item.coordinates = "not listed";
