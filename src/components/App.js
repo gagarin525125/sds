@@ -299,8 +299,8 @@ onItemClick(item) {  // show info
                            resetItemToClick={this.resetItemToClick}
                            maxLevels={this.state.maxLevels}/> }
                     <div>
-                        {this.state.toScreenP.length && <InfoP toScreenP={this.state.toScreenP}/>}
-                        {this.state.toScreenG.length && <InfoG toScreenG={this.state.toScreenG}/>}
+                        <InfoP toScreenP={this.state.toScreenP}/>
+                        <InfoG toScreenG={this.state.toScreenG}/>
                     </div>
 
                 </div>
@@ -421,6 +421,8 @@ onItemClick(item) {  // show info
 class InfoP extends React.Component {
 
     render() {
+        if (this.props.toScreenP.length == 0)
+            return null;
 
         let list = this.props.toScreenP.map(function (name, i) {
             return <li key={i} style={{marginLeft: i + 'em'}}> {name.name} </li>;
@@ -433,6 +435,8 @@ class InfoP extends React.Component {
 class InfoG extends React.Component {
 
     render() {
+        if (this.props.toScreenG.length == 0)
+            return null;
 
         let list = this.props.toScreenG.map(function (stuka, i) {
             return  <li key={i} style={{marginLeft: i + 'em'}}> {stuka.name} </li>;
