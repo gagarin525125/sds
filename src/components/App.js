@@ -19,7 +19,7 @@ export default class App extends Component {
             isSaving: false,
             isLoading: true,
             items: [],
-            itemsToShow: [],
+         //   itemsToShow: [],
             parentItem: {},
             maxLevels: {},
             toScreenP: [],
@@ -28,7 +28,7 @@ export default class App extends Component {
                 id: "0",
                 displayName: '',
                 shortName: '',
-                openingDate: '1111-11-11',
+                openingDate:  ``,// this.convertDate(new Date()),//'1111-11-11',
                 coordinates: ``,
                 level: '4',
             },
@@ -47,7 +47,7 @@ export default class App extends Component {
         this.onCoordinatesFromMap = this.onCoordinatesFromMap.bind(this);
         this.handleBackToRootClick = this.handleBackToRootClick.bind(this);
         this.resetItemToClick = this.resetItemToClick.bind(this);
-        this.onDeleteClick = this.onDeleteClick.bind(this);
+        this.onSelectClick = this.onSelectClick.bind(this);
     }
 
     componentDidMount() {
@@ -65,8 +65,16 @@ export default class App extends Component {
         else if (!arraysEqual(nextState.items, this.state.items)) {
             let atFacilityLevel = nextState.items[0].level ==
                                                 this.state.maxLevels;
+            /*
             let callback = atFacilityLevel ? this.onItemClick :
                                              this.onLevelDownClick;
+            */
+            let callback;
+            if(atFacilityLevel){
+                callback = this.onItemClick;
+            }else{
+                callback = this.onLevelDownClick;
+            }
             mapSetItems(addCallbackToItems(nextState.items, callback));
 
             // When displaying facilities, draw boundaries for the parent org.unit.
@@ -86,7 +94,7 @@ export default class App extends Component {
 
      organisationUnitLevels()
             .then((result) => {console.log("Levels");
-                               console.log(result);
+                             //  console.log(result);
                                 this.setState({
                                     maxLevels: result.pager.total,
                                               });
@@ -101,10 +109,11 @@ export default class App extends Component {
         // Loads the organisation units from the api and sets the loading state to false and puts the items onto the component state.
         loadOrganisationUnits()
             .then((organisationUnits) => {
+
                 this.setState({
                     isLoading: false,
                     items: organisationUnits,
-                    itemsToShow: organisationUnits,
+
                                   });
             })
             .catch((error) => alert(`loadOrgUnits  App ${error.stack}`)
@@ -127,17 +136,13 @@ export default class App extends Component {
             })
             .catch((error) => alert(`Error loadOrgUnitsChildren App  ${error.stack}`))
     }
-//---------------------------------------------------------------------------------------------
-    onShowMapClick(item){
-        console.log("on show map click ");
-        console.log(item);
 
-    }
     //------------------------------------------------------------------------------------------
     onLevelDownClick(item){    // drill down
         if(item.level === this.state.maxLevels-1){
             let temp = this.state.itemTo;
             temp.level = this.state.maxLevels ;
+            temp.openingDate = this.convertDate(new Date());
             this.setState({
                 itemTo: temp,
                 parentItem: item
@@ -146,7 +151,12 @@ export default class App extends Component {
             this.loadOrganisationUnitsChildren(item);
         }
       else  if(item.level < this.state.maxLevels){
-            this.setState({ parentItem: item });
+            let temp = this.state.itemTo;
+            temp.openingDate = this.convertDate(new Date());
+            this.setState({
+                itemTo: temp,
+                parentItem: item
+            });
             this.resetItemToClick();
             this.loadOrganisationUnitsChildren(item);
         } else {
@@ -155,6 +165,7 @@ export default class App extends Component {
 
     }
 onItemClick(item) {  // show info
+    if(!item) return;
     mapSelectItem(item.id);
     if(item.level < this.state.maxLevels){
 
@@ -210,11 +221,15 @@ onItemClick(item) {  // show info
         //}else{ alert(' cannot be changed ')}
     }
     //------------------------------------------------------------------------------------------
-    onDeleteClick(item){
-        deleteOrganisationUnit(item)
-            .then(() => this.loadOrganisationUnits())
-            .catch((error) => alert(`Error onDeleteClick App  ${error.stack}`))
+    onSelectClick(item) {
 
+        let temp = this.state.itemTo;
+        temp.level = this.state.maxLevels;
+        this.setState({
+            itemTo: temp,
+            parentItem: item
+        });
+        this.loadOrganisationUnitsChildren(item.parent);
     }
  //----------------------------------------------------------------------------------------------
     updateOrganisationUnit(formData,itemTo){
@@ -289,8 +304,8 @@ onItemClick(item) {  // show info
 
                     < List items={this.state.items/*ToShow*/} onItemClick={this.onItemClick}
                            onLevelDownClick={this.onLevelDownClick}
-                           onShowMapClick={this.onShowMapClick} levels={this.state.maxLevels}
-                           onDeleteClick={this.onDeleteClick}/>
+                            levels={this.state.maxLevels}
+                           onSelectClick={this.onSelectClick}/>
                 </div>
                 <div className="info">
                     {/*<List onItemClick={this.onItemClick} items={this.state.items}/>*/}
@@ -405,7 +420,7 @@ onItemClick(item) {  // show info
                 id: "0",
                 displayName: '',
                 shortName: '',
-                openingDate: '',
+                openingDate: this.convertDate(new Date()),//'',
                 coordinates: ``,
             },
             toScreenG : [],
@@ -414,7 +429,16 @@ onItemClick(item) {  // show info
             rigid: true,
         })
     }
+    convertDate(){
+        let d = new Date();
+        let m = d.getMonth() + 1;
+        if(m < 10) m = '0' + m;
+        let day = d.getDate();
+        if(day < 10) day = '0' + day;
 
+        let newD =  `${d.getFullYear()}-${m}-${day}` ;
+        return newD.toString();
+    }
      //----------------------- end class ---------------------------------
   }
 
@@ -528,5 +552,12 @@ class InfoG extends React.Component {
 
  }
  */
+/*
+ //---------------------------------------------------------------------------------------------
+ onShowMapClick(item){
+ console.log("on show map click ");
+ console.log(item);
 
+ }
+ */
 
