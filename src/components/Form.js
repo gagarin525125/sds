@@ -8,7 +8,7 @@ export default class Form extends Component {
             id: `0`,
             name: '',
             shortName: '',
-            openingDate: `1111-11-11`,
+            openingDate: this.convertDate(new Date()),//`1111-11-11`,
             coordinates: ``,
             isChanged: false,
             level: ``,
@@ -26,14 +26,15 @@ export default class Form extends Component {
 
     }
     componentWillReceiveProps(nextProps) {
+
             console.log("this props");
-            console.log(this.props.item);
+          //  console.log(this.props.item);
 
 
             if(nextProps.item !== this.state){
                 this.setState({
                     isChanged : false,
-                })
+                });
 
             this.loadData(nextProps.item);
             }else{
@@ -48,7 +49,7 @@ export default class Form extends Component {
 
 
         console.log("next props");
-        console.log(item);
+     //   console.log(item);
        if(!this.state.isChanged) {
            if (item.coordinates) {
                this.setState({
@@ -91,7 +92,7 @@ export default class Form extends Component {
            this.setState({
             name: '',
             shortName: '',
-            openingDate: '',
+            openingDate: this.convertDate(new Date()),//'',
             coordinates: ``,
             isChanged: false,
 
