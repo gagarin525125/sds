@@ -4,7 +4,8 @@
 
 body {
     margin: 0;
-    font-family: monospace;
+    font-family: sans-serif;
+    font-size: 0.825em;
 }
 
 .container {
@@ -49,8 +50,8 @@ body {
 
 .map {
     position: absolute;
-    top: 0px;
-    left: 0px;
+    top: 0;
+    left: 0;
     height: 100%;
     width: 100%;
 }
@@ -103,14 +104,8 @@ ul {
     cursor: default;
 }
 
-.list_with_header {
-    padding: 1em;
-}
-
-.list_with_header li:first-of-type {
-    list-style: none;
-    font-weight: bold;
-    padding-bottom: 0.3em;
+.search li:last-of-type {
+    border-bottom: 0;
 }
 
 .search li button {
@@ -152,7 +147,7 @@ ul {
     display: flex;
     flex-direction: row;
     width: 100%;
-    margin-bottom: 0rem;
+    margin-bottom: 0;
     align-items: center;
 }
 
@@ -187,4 +182,14 @@ ul {
 
 .form #empty_fields {
     background-color: #BB8B71;
+}
+
+.list_with_header {
+    padding: 1em;
+}
+
+.list_with_header li:first-of-type {
+    list-style: none;
+    font-weight: bold;
+    padding-bottom: 0.3em;
 }
