@@ -129,28 +129,55 @@ export function mapAddItems(organisationUnits) {
         }
 
         if (ou.featureType == "POINT") {
-            let coords = JSON.parse(ou.coordinates);
-            places.push({
-                id: ou.id, title: `${ou.displayName}\n${ou.id}`,
-                lat: coords[1], lng: coords[0],
-                callback: ou.callback
-            });
-            newPoints = [coords];
+            let coords;
+
+            try {
+                coords = JSON.parse(ou.coordinates);
+            }
+            catch (e) {
+                console.log(`Exception in mapAddItems: ${e.message}`)
+            }
+
+            if (coords) {
+                places.push({
+                    id: ou.id, title: `${ou.displayName}\n${ou.id}`,
+                    lat: coords[1], lng: coords[0],
+                    callback: ou.callback
+                });
+                newPoints = [coords];
+            }
         }
         else if (ou.featureType == "POLYGON") {
-            newPoints = JSON.parse(ou.coordinates)[0][0];
-            mapAddPolygon(ou.id, newPoints, ou.displayName, ou.callback);
+            try {
+                newPoints = JSON.parse(ou.coordinates)[0][0];
+                mapAddPolygon(ou.id, newPoints, ou.displayName, ou.callback);
+            }
+            catch (e) {
+                console.log(`Exception in mapAddItems: ${e.message}`)
+            }
         }
         else if (ou.featureType == "MULTI_POLYGON") {
             let matches = ou.coordinates.match(/\[\[[^[].*?\]\]/g);
-            let polys = matches.map(m => JSON.parse(m));
-            polys.forEach(p => mapAddPolygon(ou.id, p, null, ou.callback));
-            newPoints = [].concat(...polys);
+            let polys;
 
-            // Add a clickable, hoverable marker inside the area.
-            let center = getPolygonCenter(newPoints);
-            mapAddMarkers([{ id: ou.id, lat: center.lat, lng: center.lng,
-                             title: ou.displayName, callback: ou.callback }]);
+            try {
+                polys = matches.map(m => JSON.parse(m));
+            }
+            catch (e) {
+                console.log(`Exception in mapAddItems: ${e.message}`)
+            }
+
+            if (polys) {
+                polys.forEach(p => mapAddPolygon(ou.id, p, null, ou.callback));
+                newPoints = [].concat(...polys);
+
+                // Add a clickable, hoverable marker inside the area.
+                let center = getPolygonCenter(newPoints);
+                mapAddMarkers([{
+                    id: ou.id, lat: center.lat, lng: center.lng,
+                    title: ou.displayName, callback: ou.callback
+                }]);
+            }
         }
         else {
             console.log(`mapAddItems: unrecognized featureType ${ou.featureType} for
