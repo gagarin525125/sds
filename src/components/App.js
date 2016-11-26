@@ -194,21 +194,9 @@ onItemClick(item) {  // show info
     onSubmit(formData) {
       //  if(!this.state.rigid){
         if (this.state.wantToChange) {
-            let res = prompt(`want to change existing orgUnit? Y/no`, "no");
-            if (res == null) {  // cancel
-                console.log("hit - cancel");// something to add ?
-            } else if (res.toLowerCase() === "no") {
-                console.log("hit - no "); // something to add ?
-
-            }
-            else if (res.toLowerCase() === "") {
-                console.log("hit - empty"); // something to add ?
-            }
-            else if (res.toLowerCase() === "y") {
-                console.log("hit - yes ");
+            if (confirm(`Click OK to save edits to ${this.state.itemTo.displayName}`)) {
                 this.setState({
                     isSaving: true,
-
                 });
                 this.updateOrganisationUnit(formData, this.state.itemTo);
                 this.resetItemToClick();
