@@ -285,10 +285,7 @@ onItemClick(item) {  // show info
 
         // If the component state is set to isLoading we hide the app and show a loading message
         if (this.state.isLoading) {
-            return (
-                <div> Loading data...
-            </div >
-        );
+            return <div><p/>Loading data...</div>;
         }
 
         // Render the app which includes the list component and the form component
