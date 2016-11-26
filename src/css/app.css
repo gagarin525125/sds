@@ -78,6 +78,10 @@ button {
     border: solid 1px black;
 }
 
+button:disabled {
+    cursor: default;
+}
+
 input[type="button"] {
     cursor: pointer;
     border-radius: 0.3em;
@@ -121,10 +125,10 @@ ul {
     background: #EDF7A1;
 }
 
-.search li button.delete_button {
+/*.search li button.delete_button {
     background: #ff7b80;
     color: ghostwhite;
-}
+}*/
 
 .info {
     flex: 0 auto;
@@ -182,7 +186,6 @@ ul {
 
 .form button:disabled {
     opacity: 0.3;
-    cursor: default;
 }
 
 .form #submit {

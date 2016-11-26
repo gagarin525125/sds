@@ -28,8 +28,8 @@ export default function List({ items = [], onItemClick,onLevelDownClick ,onSelec
                 return(
                     <li key={item.id} >
                         {item.displayName}
-                        <button   onClick={() => onItemClick(item)}>info</button>
-                        <button className="select_button" disabled={bol} onClick={() => onSelectClick(item)}>home</button>
+                        <button className="info_button" onClick={() => onItemClick(item)}>Info</button>
+                        <button className="select_button" disabled={bol} onClick={() => onSelectClick(item)}>Home</button>
 
                     </li>
                 ) } else {
