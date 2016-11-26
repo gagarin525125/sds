@@ -103,6 +103,7 @@ export function updateOrganisationUnit(formData,itemTo){
       //  featureType: itemTo.featureType,
         level: itemTo.level,
     };
+    console.log(toSend);
     let options = Object.assign({}, fetchOptions, {
         method: 'PUT',
         body: JSON.stringify(toSend)

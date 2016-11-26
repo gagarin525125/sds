@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
-import { saveOrganisationUnit, loadOrganisationUnits, findChildren, deleteOrganisationUnit, organisationUnitLevels,liveSearch,updateOrganisationUnit} from '../api';
+import { saveOrganisationUnit, loadOrganisationUnits, findChildren,
+     organisationUnitLevels,liveSearch,updateOrganisationUnit} from '../api';
 import List from './List';
 import Form from './Form';
 import { mapSetItems, mapAddItems, mapClearAll, mapSelectItem, mapSetCoordinatesCallback } from '../map';
@@ -19,7 +20,7 @@ export default class App extends Component {
             isSaving: false,
             isLoading: true,
             items: [],
-         //   itemsToShow: [],
+            itemsToKeep: [],
             parentItem: {},
             maxLevels: {},
             toScreenP: [],
@@ -28,12 +29,12 @@ export default class App extends Component {
                 id: "0",
                 displayName: '',
                 shortName: '',
-                openingDate:  ``,// this.convertDate(new Date()),//'1111-11-11',
+                openingDate:  ``,
                 coordinates: ``,
-                level: '4',
+                level: '',
             },
             wantToChange: false,
-            rigid: true,
+          //  rigid: true,
 
         };
 
@@ -51,9 +52,11 @@ export default class App extends Component {
     }
 
     componentDidMount() {
-        console.log("componentDisMount");
+
         this.loadOrganisationUnits();
-        this.loadOrganisationUnitLevels();
+
+        this.loadOrganisationUnitMaxLevels();
+        this.resetItemToClick();
         mapSetCoordinatesCallback(this.onCoordinatesFromMap);
     }
 
@@ -90,34 +93,32 @@ export default class App extends Component {
         }
     }
  //-------------------------------------  part of componentDidMount ---------------
-    loadOrganisationUnitLevels(){
+    loadOrganisationUnitMaxLevels(){
 
      organisationUnitLevels()
-            .then((result) => {console.log("Levels");
-                             //  console.log(result);
+            .then((result) => {
                                 this.setState({
                                     maxLevels: result.pager.total,
                                               });
-
                       })
-
-           .catch((error) => alert(`Error loadOrgUnLevels App  ${error.stack}`))
+           .catch((error) => alert(`Error loadOrgUnMaxLevels App  ${error.stack}`))
     }
 
 //----------------------------------------  part of componentDidMount   --------------
    loadOrganisationUnits() {
         // Loads the organisation units from the api and sets the loading state to false and puts the items onto the component state.
-        loadOrganisationUnits()
+        console.log("load org units ");
+       loadOrganisationUnits()
             .then((organisationUnits) => {
 
                 this.setState({
                     isLoading: false,
                     items: organisationUnits,
+                    itemsToKeep: organisationUnits,
 
                                   });
             })
-            .catch((error) => alert(`loadOrgUnits  App ${error.stack}`)
-            )
+            .catch((error) => alert(`loadOrgUnits  App ${error.stack}`))
 
     }
 
@@ -147,7 +148,6 @@ export default class App extends Component {
                 itemTo: temp,
                 parentItem: item
             });
-           // this.resetItemToClick();
             this.loadOrganisationUnitsChildren(item);
         }
       else  if(item.level < this.state.maxLevels){
@@ -173,17 +173,14 @@ onItemClick(item) {  // show info
         this.setState({
             itemTo: item,
             wantedToChange: false,
-            rigid: true
-
-        });
+                });
         this.findElement(item);// show Parents and Groups
     } else {
 
         this.setState({
             itemTo: item,
             wantToChange : true,
-            rigid: false
-        });
+                   });
        this.findElement(item);
             }
 }
@@ -192,7 +189,7 @@ onItemClick(item) {  // show info
     //----------------------------------------------------------------------------------------------
 
     onSubmit(formData) {
-      //  if(!this.state.rigid){
+
         if (this.state.wantToChange) {
             if (confirm(`Click OK to save edits to ${this.state.itemTo.displayName}`)) {
                 this.setState({
@@ -203,11 +200,11 @@ onItemClick(item) {  // show info
             }
         } else {
             this.resetItemToClick();
-            this.saveOrganisationUnit(formData,this.state.items[0].parent);
+            this.saveOrganisationUnit(formData, this.state.items[0].parent);
 
         }
-        //}else{ alert(' cannot be changed ')}
     }
+ //--
     //------------------------------------------------------------------------------------------
     onSelectClick(item) {
 
@@ -238,8 +235,7 @@ onItemClick(item) {  // show info
     //--------------------------------------------------------------------------------------------
     // item - parent to listed ogrUnits
     saveOrganisationUnit(formData,parent){
-        console.log("saveogun App levels");
-        console.log(this.state.maxLevels);
+
         saveOrganisationUnit(formData, parent, this.state.maxLevels)
             .then(() => this.loadOrganisationUnitsChildren(parent))// update state with new born lazaret
             .then(() => {
@@ -294,14 +290,13 @@ onItemClick(item) {  // show info
                                onChange={this.liveSearch}/>
                     </div>
 
-                    < List items={this.state.items/*ToShow*/} onItemClick={this.onItemClick}
+                    < List items={this.state.items} onItemClick={this.onItemClick}
                            onLevelDownClick={this.onLevelDownClick}
                             levels={this.state.maxLevels}
                            onSelectClick={this.onSelectClick}/>
                 </div>
                 <div className="info">
-                    {/*<List onItemClick={this.onItemClick} items={this.state.items}/>*/}
-                    {/*this.state.isSaving ? <div>Saving organisation unit</div> : <Form onSubmit={this.onSubmit}/>*/}
+
                     {<Form onSubmit={this.onSubmit} item={this.state.itemTo}
                            resetItemToClick={this.resetItemToClick}
                            maxLevels={this.state.maxLevels}/> }
@@ -319,13 +314,12 @@ onItemClick(item) {  // show info
 //---------------------------------------------------------------------------------------------
     handleBackToRootClick(event){
         event.preventDefault();
-        this.loadOrganisationUnits() ;
+       this.loadOrganisationUnits() ;
     }
 //----------------------------------------------------------------------------------------------
     findElement(item) {
 
-        console.log(" hit - find ");
-        let elem = item;
+
         let infoP = [];
 
         infoP[0] = {name: "Parents"};
@@ -336,12 +330,12 @@ onItemClick(item) {  // show info
             });
         }
         //--------------------------
-        console.log("item.orgUnGroups");
+
 
        let infoG = [];
        if(item.organisationUnitGroups.length !== 0) { // to add ?
            let groups = item.organisationUnitGroups;
-           console.log(groups);
+
            infoG[0] = {name: "Organisation Groups"};
            for (let i = 0; i < groups.length; i++) {
                infoG.push({
@@ -357,34 +351,30 @@ onItemClick(item) {  // show info
 
     }
 
-//----------------------------------------------------------------------------------------------
-
-
-//----------------------------------------------------------------------------------------------
 
     //-----------------------------------------------------------------------------------------
     // not ready
     liveSearch(event){
         this.resetItemToClick();
         event.preventDefault();
-        console.log(event.target.value);
+
         if(event.target.value === ''){
 
-              /*  this.setState({
-                    items/*ToShow*/ //: this.state.items
-             //   }); */
-              //  return;
-    this.loadOrganisationUnits() ;
+               this.setState({
+                    items: this.state.itemsToKeep,
+               });
+                return;
+  //  this.loadOrganisationUnits() ;
         }
 
 
         liveSearch(event.target.value.toLowerCase())
 
             .then(result => {
-               // console.log(result);
 
                 this.setState({
-                    items/*ToShow*/: result.organisationUnits
+                    items: result.organisationUnits,
+
                 })
             })
 
@@ -393,7 +383,7 @@ onItemClick(item) {  // show info
     }
 //----------------------------------------------------------------------------------------------
     handleLevelUpClick() {
-        console.log("this.state.item  handleLevelUp  App  ");
+
         let ancestors = this.state.items[0].ancestors;
         let i = ancestors.length;
        if( i === 1) {alert(`You are on HIGHEST level`); this.resetItemToClick(); }
@@ -412,13 +402,14 @@ onItemClick(item) {  // show info
                 id: "0",
                 displayName: '',
                 shortName: '',
-                openingDate: this.convertDate(new Date()),//'',
+                openingDate: this.convertDate(new Date()),
                 coordinates: ``,
+                level: ``,
             },
             toScreenG : [],
             toScreenP: [],
             wantToChange : false,
-            rigid: true,
+
         })
     }
     convertDate(){
@@ -440,8 +431,8 @@ class InfoP extends React.Component {
         if (this.props.toScreenP.length == 0)
             return null;
 
-        let list = this.props.toScreenP.map(function (name, i) {
-            return <li key={i} style={{marginLeft: i + 'em'}}> {name.name} </li>;
+        let list = this.props.toScreenP.map(function (stuka, i) {
+            return <li key={i} style={{marginLeft: i + 'em'}}> {stuka.name} </li>;
 
         });
         return <ul className="list_with_header">{list}</ul>
@@ -461,89 +452,9 @@ class InfoG extends React.Component {
         return <ul className="list_with_header">{list}</ul>
     }
 }
+
   //--------------------------------------------------------
-/*
- {this.state.items[0].level === this.state.levels ?  <Form onSubmit={this.onSubmit}
- item={this.state.itemTo}   /> :  console.log()}
 
- <input id="search" type="text" placeholder="Search" onChange={this.filterItems}/>
- <input type="button" value="find" onClick={this.findElement}/>
- <input type="button" value="find" onClick={this.findElement}/>
-
-
- this.state.items[0].level === this.state.levels ?
- this.saveOrganisationUnit(formData,parent)
- : this.rejectSaveOrganisationUnit(parent);
-
-
-
- //  console.log("onItemClick  levels App");
- // console.log(this.state.itemTo);
- /*
-
-
- let filteredItem = this.state.items;
- // actually , this search is not necessary
- filteredItem = filteredItem.filter(stuka => stuka.id.toLowerCase()
- .search(item.id.toLowerCase()) !== -1);
- console.log(this.state.levels);
- console.log(filteredItem[0].level);
-
-
-
- //  if (filteredItem[0].level < this.state.levels) {
-
- <button id="reset"  onClick={this.resetItemToClick}>reset</button>
- */
-
-
-/*   findOrganisationUnitGroups(groupId)
- .then((result) => {
- console.log("groupId result ");
- console.log(result);
- let grName = result.displayName;
- console.log(grName);
- info.push({name : grName});
- this.setState({
- isLoading: false,
- });
- })
- .catch((error) => alert(`Error findElement App  ${error.message}`));
-
-
-
- /* rejectSaveOrganisationUnit(item){
- this.onAlert();
- this.setState({
- isSaving: false
- });
- }*/
-//----------------------------------------------------------------------------------------------
-
-
-/*
- onAlert() {
- alert(`You cannot add org.unit here-not LAST level`);
- event.preventDefault();
- }
- */
-
-/*
- filterItems(event) {
- event.preventDefault();
- let updatedItems = this.state.items;
- updatedItems = updatedItems.filter(stuka =>
- stuka.displayName.toLowerCase().search(event.target.value.toLowerCase()) !== -1);
-
- this.setState({
- itemsToShow: updatedItems
- });
- console.log("items filterItems");
- console.log(this.state.itemsToShow);
- console.log(this.state.items);
-
- }
- */
 /*
  //---------------------------------------------------------------------------------------------
  onShowMapClick(item){
@@ -553,3 +464,18 @@ class InfoG extends React.Component {
  }
  */
 
+/*
+ </div>
+ <div className="info">
+ {/*<List onItemClick={this.onItemClick} items={this.state.items}/>*/
+/*this.state.isSaving ? <div>Saving organisation unit</div> : <Form onSubmit={this.onSubmit}/>}
+{<Form onSubmit={this.onSubmit} item={this.state.itemTo}
+       resetItemToClick={this.resetItemToClick}
+       maxLevels={this.state.maxLevels}/> }
+<div>
+    <InfoP toScreenP={this.state.toScreenP}/>
+    <InfoG toScreenG={this.state.toScreenG}/>
+</div>
+
+</div>
+    */

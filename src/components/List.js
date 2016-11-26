@@ -29,8 +29,7 @@ export default function List({ items = [], onItemClick,onLevelDownClick ,onSelec
                     <li key={item.id} >
                         {item.displayName}
                         <button className="info_button" onClick={() => onItemClick(item)}>Info</button>
-                        <button className="select_button" disabled={bol} onClick={() => onSelectClick(item)}>Home</button>
-
+                        <button className="select_button" disabled={bol} onClick={() => onSelectClick(item)}>Zoom</button>
                     </li>
                 ) } else {
                 return (
@@ -53,7 +52,7 @@ List.propTypes = {
     onItemClick: PropTypes.func.isRequired,
     onLevelDownClick: PropTypes.func.isRequired,
     onSelectClick: PropTypes.func.isRequired,
-    levels: PropTypes.number,
+    //levels: PropTypes.number,
 
 };
 
