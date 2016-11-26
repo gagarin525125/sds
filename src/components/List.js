@@ -45,13 +45,7 @@ export default function List({ items = [], onItemClick,onLevelDownClick ,onSelec
         });
 
     // Render the list with the items
-    return (
-        <div className="list">
-            <ul>
-                {listItems}
-            </ul>
-        </div>
-    );
+    return <ul>{listItems}</ul>;
 }
 
 List.propTypes = {

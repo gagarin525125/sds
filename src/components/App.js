@@ -296,11 +296,18 @@ onItemClick(item) {  // show info
         return (
             <div className="app">
                 <div className="search">
-                    <input type="button" id="backToRoot" name="backToRoot" value="Top level"
-                           onClick={this.handleBackToRootClick}/>
-                    <input type="button" id="levelUp" name="levelUp" value="One level up" onClick={this.handleLevelUpClick}/>
+                    <div className="search_controls">
+                        <input type="button" id="backToRoot" name="backToRoot"
+                               value="Top level"
+                               onClick={this.handleBackToRootClick}/>
+                        <input type="button" id="levelUp" name="levelUp"
+                               value="One level up"
+                               onClick={this.handleLevelUpClick}/>
 
-                    <input id="live" type="search" className="form-control" placeholder="live search" onChange={this.liveSearch}/>
+                        <input id="live" type="search" className="form-control"
+                               placeholder="live search"
+                               onChange={this.liveSearch}/>
+                    </div>
 
                     < List items={this.state.items/*ToShow*/} onItemClick={this.onItemClick}
                            onLevelDownClick={this.onLevelDownClick}
