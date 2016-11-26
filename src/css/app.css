@@ -29,6 +29,7 @@ body {
     align-self: flex-start;
     height: 100%;
     z-index: 5;
+    pointer-events: none;
 }
 
 .search input {
@@ -68,6 +69,7 @@ body {
 .search_controls {
     flex: 0 0 auto;
     margin-top: 1em;
+    pointer-events: auto;
 }
 
 button {
@@ -96,6 +98,7 @@ ul {
     margin: 0;
     margin-top: 1em;
     overflow-y: auto;
+    pointer-events: auto;
 }
 
 .search li {
@@ -129,6 +132,11 @@ ul {
     margin-left: auto;
     margin-right: 1em;
     z-index: 5;
+    pointer-events: none;
+}
+
+.info ul {
+    pointer-events: auto;
 }
 
 .form {
@@ -137,6 +145,7 @@ ul {
     padding: 0.5em;
     border: none;
     border-radius: 0.7em;
+    pointer-events: auto;
 }
 
 .form div {
