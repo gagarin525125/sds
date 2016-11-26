@@ -140,7 +140,7 @@ export function mapAddItems(organisationUnits) {
 
             if (coords) {
                 places.push({
-                    id: ou.id, title: `${ou.displayName}\n${ou.id}`,
+                    id: ou.id, title: ou.displayName,
                     lat: coords[1], lng: coords[0],
                     callback: ou.callback
                 });
