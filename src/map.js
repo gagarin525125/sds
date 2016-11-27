@@ -1,8 +1,15 @@
+/**
+ * Functions for managing and interacting with a Google Maps map.
+ */
+
+import { getPolygonCenter, getBoundsForPoints } from './util';
+
 var map;
 var markers = {};  // A mapping of string ID's to Marker objects.
 var polygons = {};  // A mapping of string ID's to Polygon objects.
 var coordinatesCallback;
 var popup;
+
 
 /** Show a map of Sierra Leone. */
 export function initMap() {
@@ -18,6 +25,10 @@ export function initMap() {
     });
 }
 
+/**
+ * Set a callback function that will receive coordinates from the map, its
+ * signature is func(latitude, longitude).
+ */
 export function mapSetCoordinatesCallback(callback) {
     coordinatesCallback = callback;
 }
@@ -51,7 +62,8 @@ export function mapSelectItem(id) {
     popup.open(map, markers[id]);
 }
 
-/** Add markers. places is an array of
+/**
+ * Add markers. places is an array of
  * { id: s, lat: n, lng: n, title: s, callback: func } objects, the callback is
  * optional. id a string that uniquely identifies the marker. */
 function mapAddMarkers(places) {
@@ -74,24 +86,6 @@ function mapClearMarkers() {
     for (let id in markers)
         markers[id].setMap(null);
     markers = {};
-}
-
-function getPolygonCenter(points) {
-    let lngSum = points.reduce((acc, point) => acc + point[0], 0);
-    let latSum = points.reduce((acc, point) => acc + point[1], 0);
-    return { lat: latSum/points.length, lng: lngSum/points.length };
-}
-
-function getBoundsForPoints(points, currentBounds) {
-    if (!currentBounds)
-        currentBounds = { south: -90, west: 180, north: 90, east: -180 };
-
-    var latArray = points.map(p => p[1]);
-    var lngArray = points.map(p => p[0]);
-    return { south: Math.max(currentBounds.south, ...latArray),
-             west:  Math.min(currentBounds.west,  ...lngArray),
-             north: Math.min(currentBounds.north, ...latArray),
-             east:  Math.max(currentBounds.east,  ...lngArray) };
 }
 
 /**
