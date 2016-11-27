@@ -173,6 +173,7 @@ onItemClick(item) {  // show info
         this.setState({
             itemTo: item,
             wantedToChange: false,
+            parentItem: item.parent,
                 });
         this.findElement(item);// show Parents and Groups
     } else {
@@ -180,6 +181,7 @@ onItemClick(item) {  // show info
         this.setState({
             itemTo: item,
             wantToChange : true,
+            parentItem: item.parent,
                    });
        this.findElement(item);
             }
@@ -212,7 +214,7 @@ onItemClick(item) {  // show info
         temp.level = this.state.maxLevels;
         this.setState({
             itemTo: temp,
-            parentItem: item
+            parentItem: item.parent,
         });
         this.loadOrganisationUnitsChildren(item.parent);
     }
@@ -374,6 +376,7 @@ onItemClick(item) {  // show info
 
                 this.setState({
                     items: result.organisationUnits,
+                    parentItem: {},
 
                 })
             })
