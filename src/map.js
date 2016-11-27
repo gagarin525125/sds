@@ -1,5 +1,5 @@
 /**
- * Functions for managing and interacting with a Google Maps map.
+ * Manage and interact with a Google Maps map.
  */
 
 import { getPolygonCenter, getBoundsForPoints } from './util';
@@ -9,6 +9,7 @@ var markers = {};  // A mapping of string ID's to Marker objects.
 var polygons = {};  // A mapping of string ID's to Polygon objects.
 var coordinatesCallback;
 var popup;
+var selectedId = "";
 
 
 /** Show a map of Sierra Leone. */
@@ -33,18 +34,21 @@ export function mapSetCoordinatesCallback(callback) {
     coordinatesCallback = callback;
 }
 
-/** Enable or disable highlighting of an item on the map. */
+/**
+ * Enable or disable highlighting of an item on the map. Has no effect if id
+ * represents the currently selected item.
+ */
 export function mapHighlightItem(id, enable) {
     if (!markers[id]) {
         console.log(`mapHighlightItem: no marker found for id ${id}`);
         return;
     }
+    if (id == selectedId)
+        return;
 
-    // If this is not the currently selected item, highlight it.
-    let shouldEnable = enable && !(popup && popup.itemId == id);
-    markers[id].setAnimation(shouldEnable ? google.maps.Animation.BOUNCE : null);
+    markers[id].setAnimation(enable ? google.maps.Animation.BOUNCE : null);
     if (polygons[id])
-        polygons[id].setOptions({fillOpacity: shouldEnable ? 0.2 : 0});
+        polygons[id].setOptions({fillOpacity: enable ? 0.2 : 0});
 }
 
 /** Show an item as selected on the map. */
@@ -53,13 +57,22 @@ export function mapSelectItem(id) {
         console.log(`mapSelectItem: no marker found for id ${id}`);
         return;
     }
+
+    // Remove the previous selection first.
     if (popup)
         popup.close();
+    if (selectedId && polygons[selectedId])
+        polygons[selectedId].setOptions({fillOpacity: 0});
 
+    // Remove any highlightning so it doesn't interfere.
     mapHighlightItem(id, false);
+    selectedId = id;
+
     popup = new google.maps.InfoWindow({content: markers[id].title});
-    popup.itemId = id;
     popup.open(map, markers[id]);
+
+    if (polygons[id])
+        polygons[id].setOptions({fillOpacity: 0.2});
 }
 
 /**
