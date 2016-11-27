@@ -191,15 +191,19 @@ onItemClick(item) {  // show info
     //----------------------------------------------------------------------------------------------
 
     onSubmit(formData) {
+        console.log("onsubmit app");
+        console.log(formData.id);
+
 
         if (this.state.wantToChange) {
+
             if (confirm(`Click OK to save edits to ${this.state.itemTo.displayName}`)) {
                 this.setState({
                     isSaving: true,
                 });
                 this.updateOrganisationUnit(formData, this.state.itemTo);
                 this.resetItemToClick();
-            }
+            }else alert(`not confirmed`);
         } else {
             this.resetItemToClick();
             this.saveOrganisationUnit(formData, this.state.items[0].parent);
@@ -220,6 +224,9 @@ onItemClick(item) {  // show info
     }
  //----------------------------------------------------------------------------------------------
     updateOrganisationUnit(formData,itemTo){
+        console.log("update org unit app");
+        console.log(formData);
+        console.log(itemTo);
         updateOrganisationUnit(formData,itemTo )
             .then(() => this.loadOrganisationUnitsChildren(itemTo.parent))// update state with new born lazaret
 
@@ -407,7 +414,7 @@ onItemClick(item) {  // show info
                 shortName: '',
                 openingDate: this.convertDate(new Date()),
                 coordinates: ``,
-                level: ``,
+                level: this.state.maxLevels,
             },
             toScreenG : [],
             toScreenP: [],
