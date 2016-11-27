@@ -1,4 +1,5 @@
 import React, { PropTypes } from 'react';
+import { mapHighlightItem } from '../map';
 
 /**
  * A stateless function component
@@ -26,18 +27,27 @@ export default function List({ items = [], onItemClick,onLevelDownClick ,onSelec
         .map(item => {
             if(item.level === levels ){
                 return(
-                    <li key={item.id} >
+                    <li key={item.id}
+                        onMouseEnter={() => mapHighlightItem(item.id, true)}
+                        onMouseLeave={() => mapHighlightItem(item.id, false)}
+                        onClick={() => onItemClick(item)}>
                         {item.displayName}
-                        <button className="info_button" onClick={() => onItemClick(item)}>Info</button>
-                        <button className="select_button" disabled={bol} onClick={() => onSelectClick(item)}>Zoom</button>
+                        <button hidden={bol}
+                                onClick={e => {e.stopPropagation(); onSelectClick(item)}}>
+                                Zoom
+                        </button>
                     </li>
                 ) } else {
                 return (
 
-                    <li key={item.id} >
+                    <li key={item.id}
+                        onMouseEnter={() => mapHighlightItem(item.id, true)}
+                        onMouseLeave={() => mapHighlightItem(item.id, false)}
+                        onClick={() => onItemClick(item)}>
                         {item.displayName}
-                        <button className="info_button" onClick={() => onItemClick(item)}>Info</button>
-                        <button onClick={() => onLevelDownClick(item)}>Drill down</button>
+                        <button onClick={e => {e.stopPropagation(); onLevelDownClick(item)}}>
+                            Drill down
+                        </button>
                     </li>
 
                 );}

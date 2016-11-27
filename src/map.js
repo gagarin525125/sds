@@ -22,15 +22,30 @@ export function mapSetCoordinatesCallback(callback) {
     coordinatesCallback = callback;
 }
 
-/** Highlight at item on the map. */
+/** Enable or disable highlighting of an item on the map. */
+export function mapHighlightItem(id, enable) {
+    if (!markers[id]) {
+        console.log(`mapHighlightItem: no marker found for id ${id}`);
+        return;
+    }
+
+    // If this is not the currently selected item, highlight it.
+    let shouldEnable = enable && !(popup && popup.itemId == id);
+    markers[id].setAnimation(shouldEnable ? google.maps.Animation.BOUNCE : null);
+}
+
+/** Show an item as selected on the map. */
 export function mapSelectItem(id) {
     if (!markers[id]) {
         console.log(`mapSelectItem: no marker found for id ${id}`);
         return;
     }
-    if (popup)
+    if (popup) {
         popup.close();
+    }
+    mapHighlightItem(id, false);
     popup = new google.maps.InfoWindow({content: markers[id].title});
+    popup.itemId = id;
     popup.open(map, markers[id]);
 }
 
