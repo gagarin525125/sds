@@ -111,18 +111,24 @@ ul {
     cursor: default;
 }
 
+.search li:hover {
+    background: #c1ffb4;
+    cursor: pointer;
+}
+
 .search li:last-of-type {
     border-bottom: 0;
 }
 
 .search li button {
     float: right;
-    background: #ffaffb;
+    background: #EDF7A1;
     margin: 0;
 }
 
-.search li button.info_button {
-    background: #EDF7A1;
+.search li button:hover {
+    background: #fff934;
+    border: 2px;
 }
 
 /*.search li button.delete_button {
