@@ -138,7 +138,7 @@ export function findChildren(organisationUnit) {
     let a = fetch(`${serverUrl}/organisationUnits/${organisationUnit.id}
     ?paging=false&level=1&fields= 
     id,displayName,featureType,coordinates,level,
-    openingDate,ancestors[id,displayName],shortName,parent[id,displayName,level,ancestors],
+    openingDate,ancestors[id,displayName],shortName,parent[id,displayName,level,ancestors,coordinates],
     organisationUnitGroups[id,name]`, fetchOptions)
 
     .then(onlySuccessResponses)
@@ -169,7 +169,7 @@ export function loadOrganisationUnits() {
     // return fetch(`${serverUrl}/organisationUnits?paging=false&level=1`, fetchOptions)
     return fetch(`${serverUrl}/organisationUnits?paging=false&level=2&fields=
     id,displayName,featureType,coordinates,level,
-    openingDate,ancestors[id,displayName],shortName,parent[id,displayName,level,ancestors],
+    openingDate,ancestors[id,displayName],shortName,parent[id,displayName,level,ancestors,coordinates],
     organisationUnitGroups[id,name]`, fetchOptions)
         .then(onlySuccessResponses)
         .then(response => response.json())
@@ -190,7 +190,7 @@ export function liveSearch(searchString) {
     // paging=false
     return fetch(`${serverUrl}/organisationUnits?paging=true&fields=
     id,displayName,featureType,coordinates,level,
-    openingDate,ancestors[id,displayName],shortName,parent[id,displayName,level,ancestors],
+    openingDate,ancestors[id,displayName],shortName,parent[id,displayName,level,ancestors,coordinates],
     organisationUnitGroups[id,name]
     &filter=name:ilike:${searchString}`, fetchOptions)
         .then(onlySuccessResponses)
