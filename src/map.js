@@ -1,6 +1,6 @@
 var map;
 var markers = {};  // A mapping of string ID's to Marker objects.
-var polygons = [];
+var polygons = {};  // A mapping of string ID's to Polygon objects.
 var coordinatesCallback;
 var popup;
 
@@ -32,6 +32,8 @@ export function mapHighlightItem(id, enable) {
     // If this is not the currently selected item, highlight it.
     let shouldEnable = enable && !(popup && popup.itemId == id);
     markers[id].setAnimation(shouldEnable ? google.maps.Animation.BOUNCE : null);
+    if (polygons[id])
+        polygons[id].setOptions({fillOpacity: shouldEnable ? 0.2 : 0});
 }
 
 /** Show an item as selected on the map. */
@@ -40,9 +42,9 @@ export function mapSelectItem(id) {
         console.log(`mapSelectItem: no marker found for id ${id}`);
         return;
     }
-    if (popup) {
+    if (popup)
         popup.close();
-    }
+
     mapHighlightItem(id, false);
     popup = new google.maps.InfoWindow({content: markers[id].title});
     popup.itemId = id;
@@ -69,8 +71,8 @@ function mapAddMarkers(places) {
 
 /** Remove all markers from the map.*/
 function mapClearMarkers() {
-    for (let m in markers)
-        markers[m].setMap(null);
+    for (let id in markers)
+        markers[id].setMap(null);
     markers = {};
 }
 
@@ -107,6 +109,7 @@ function mapAddPolygon(id, points, text, callback) {
         strokeColor: '#0000B0',
         strokeOpacity: 0.8,
         strokeWeight: 2,
+        fillColor: '#0000B0',
         fillOpacity: 0
     });
 
@@ -121,13 +124,14 @@ function mapAddPolygon(id, points, text, callback) {
         mapAddMarkers([place]);
     }
 
-    polygons.push(poly);
+    polygons[id]= poly;
 }
 
 /** Remove all polygons from the map. */
 function mapClearPolygons() {
-    polygons.forEach(p => p.setMap(null));
-    polygons.length = 0;
+    for (let id in polygons)
+        polygons[id].setMap(null);
+    polygons = {};
 }
 
 /** Add to the information displayed on the map. */
