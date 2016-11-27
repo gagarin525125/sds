@@ -14,13 +14,15 @@ export default function List({ items = [], onItemClick,onLevelDownClick ,onSelec
     //   this doesnt work
     // let bol =  items.every((val,i,arr) => val == arr[0].parent.id);
        let bol = true;
+
       for(let i = 0;i < items.length - 1;i++){
+
           if(items[i].parent.id === items[i+1].parent.id){
               bol = bol && true;
           }else {
               bol = bol && false;
           }
-
+             if(bol == false) break;
       }
 
     const listItems = items
