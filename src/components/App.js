@@ -220,7 +220,7 @@ onItemClick(item) {  // show info
             itemTo: temp,
             parentItem: item.parent,
         });
-        this.loadOrganisationUnitsChildren(item.parent);
+        this.loadOrganisationUnitsChildren(item.parent);//
     }
  //----------------------------------------------------------------------------------------------
     updateOrganisationUnit(formData,itemTo){
