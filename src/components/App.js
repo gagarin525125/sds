@@ -17,8 +17,9 @@ export default class App extends Component {
 
         // Set some initial state variables that are used within the component
         this.state = {
-            isSaving: false,
+           // isSaving: false,
             isLoading: true,
+             isTransition: true,
             items: [],
             itemsToKeep: [],
             parentItem: {},
@@ -52,11 +53,12 @@ export default class App extends Component {
     }
 
     componentDidMount() {
+        this.loadOrganisationUnitMaxLevels();
 
         this.loadOrganisationUnits();
 
-        this.loadOrganisationUnitMaxLevels();
-        this.resetItemToClick();
+
+        this.resetItemToClick(); // ?
         mapSetCoordinatesCallback(this.onCoordinatesFromMap);
     }
 
@@ -113,6 +115,7 @@ export default class App extends Component {
 
                 this.setState({
                     isLoading: false,
+                    isTransition : false,
                     items: organisationUnits,
                     itemsToKeep: organisationUnits,
 
@@ -131,6 +134,7 @@ export default class App extends Component {
         findChildren(item)
             .then((organisationUnits) => {
                 this.setState({
+                    isTransition: false,
                     isLoading: false,
                     items: organisationUnits,
                              });
@@ -145,6 +149,7 @@ export default class App extends Component {
             temp.level = this.state.maxLevels ;
             temp.openingDate = this.convertDate(new Date());
             this.setState({
+                isTransition: true,
                 itemTo: temp,
                 parentItem: item
             });
@@ -154,12 +159,21 @@ export default class App extends Component {
             let temp = this.state.itemTo;
             temp.openingDate = this.convertDate(new Date());
             this.setState({
+                isTransition: true,
                 itemTo: temp,
                 parentItem: item
             });
             this.resetItemToClick();
             this.loadOrganisationUnitsChildren(item);
         } else {
+          /*
+            this.setState({
+                isTransition: true,       //  ?
+                itemTo: temp,
+                parentItem: item
+            });  */
+
+
             alert(`Lowest Level`);
         }
 
@@ -217,6 +231,7 @@ onItemClick(item) {  // show info
         let temp = this.state.itemTo;
         temp.level = this.state.maxLevels;
         this.setState({
+            isTransition: true,
             itemTo: temp,
             parentItem: item.parent,
         });
@@ -224,6 +239,10 @@ onItemClick(item) {  // show info
     }
  //----------------------------------------------------------------------------------------------
     updateOrganisationUnit(formData,itemTo){
+        this.setState({
+            isTransition: true,
+
+        });
         console.log("update org unit app");
         console.log(formData);
         console.log(itemTo);
@@ -234,7 +253,8 @@ onItemClick(item) {  // show info
                 let temp = this.state.itemTo;
                 temp.level = this.state.maxLevels ;
                 this.setState({
-                    isSaving: false,
+                   isTransition: false,
+                  //  isSaving: false,
                     itemTo: temp,
                 })}
             )
@@ -244,6 +264,9 @@ onItemClick(item) {  // show info
     //--------------------------------------------------------------------------------------------
     // item - parent to listed ogrUnits
     saveOrganisationUnit(formData,parent){
+        this.setState({
+            isTransition: true,
+                 });
 
         saveOrganisationUnit(formData, parent, this.state.maxLevels)
             .then(() => this.loadOrganisationUnitsChildren(parent))// update state with new born lazaret
@@ -251,7 +274,8 @@ onItemClick(item) {  // show info
                 let temp = this.state.itemTo;
                 temp.level = this.state.maxLevels ;
                               this.setState({
-                                       isSaving: false,
+                                       isTransition: false,
+                                      // isSaving: false,
                                        itemTo: temp,
             })}
             )
@@ -298,15 +322,16 @@ onItemClick(item) {  // show info
                                placeholder="live search"
                                onChange={this.liveSearch}/>
                     </div>
-
+                    {this.state.isTransition ? <div>Transition</div> :
                     < List items={this.state.items} onItemClick={this.onItemClick}
                            onLevelDownClick={this.onLevelDownClick}
                             levels={this.state.maxLevels}
-                           onSelectClick={this.onSelectClick}/>
+                           onSelectClick={this.onSelectClick}/>}
                 </div>
                 <div className="info">
 
-                    {<Form onSubmit={this.onSubmit} item={this.state.itemTo}
+                    {this.state.isTransition ? <div>Transition</div> :
+                        <Form onSubmit={this.onSubmit} item={this.state.itemTo}
                            resetItemToClick={this.resetItemToClick}
                            maxLevels={this.state.maxLevels}/> }
                     <div>
@@ -323,6 +348,10 @@ onItemClick(item) {  // show info
 //---------------------------------------------------------------------------------------------
     handleBackToRootClick(event){
         event.preventDefault();
+        this.setState({
+           // isLoading: true,
+            isTransitiion: true,
+        });
        this.loadOrganisationUnits() ;
     }
 //----------------------------------------------------------------------------------------------
@@ -364,12 +393,17 @@ onItemClick(item) {  // show info
     //-----------------------------------------------------------------------------------------
     // not ready
     liveSearch(event){
+        this.setState({
+            isTransition: true,
+
+        });
         this.resetItemToClick();
         event.preventDefault();
 
         if(event.target.value === ''){
 
                this.setState({
+                   isTransition: false,
                     items: this.state.itemsToKeep,
                });
                 return;
@@ -384,6 +418,7 @@ onItemClick(item) {  // show info
                 this.setState({
                     items: result.organisationUnits,
                     parentItem: {},
+                    isTransition: false,
 
                 })
             })
@@ -393,10 +428,18 @@ onItemClick(item) {  // show info
     }
 //----------------------------------------------------------------------------------------------
     handleLevelUpClick() {
+        this.setState({
+            isTransition: true,
+                  });
 
         let ancestors = this.state.items[0].ancestors;
         let i = ancestors.length;
-       if( i === 1) {alert(`You are on HIGHEST level`); this.resetItemToClick(); }
+       if( i === 1) {
+           this.setState({
+               isTransition: false,
+
+           });
+           alert(`You are on HIGHEST level`); this.resetItemToClick(); }
                   else {
            this.loadOrganisationUnitsChildren(ancestors[i - 2]);
            this.resetItemToClick();
