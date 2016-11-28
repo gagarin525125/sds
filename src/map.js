@@ -64,7 +64,7 @@ export function mapSelectItem(id) {
     if (selectedId && polygons[selectedId])
         polygons[selectedId].setOptions({fillOpacity: 0});
 
-    // Remove any highlightning so it doesn't interfere.
+    // Remove any highlighting so it doesn't interfere.
     mapHighlightItem(id, false);
     selectedId = id;
 
@@ -78,7 +78,7 @@ export function mapSelectItem(id) {
 /**
  * Add markers. places is an array of
  * { id: s, lat: n, lng: n, title: s, callback: func } objects, the callback is
- * optional. id a string that uniquely identifies the marker. */
+ * optional. id is a string that uniquely identifies the marker. */
 function mapAddMarkers(places) {
     places.forEach(p => {
         var m = new google.maps.Marker({
@@ -146,23 +146,24 @@ export function mapAddItems(organisationUnits) {
     var places = [];
     var bounds;
 
+    function parseJson(maybeJson) {
+        try       { return JSON.parse(maybeJson); }
+        catch (e) { console.log(`mapAddItems: invalid JSON: ${e.message}`) }
+        return null;
+    }
+
     for(let i = 0; i < organisationUnits.length; i++) {
         let ou = organisationUnits[i];
         let newPoints = [];
+
         if (!ou.coordinates) {
-            console.log(`mapAddItems: missing coordinates for ${ou.displayName} (${ou.id})`);
+            console.log(`mapAddItems: missing coordinates for ${ou.displayName}
+                         (${ou.id})`);
             continue;
         }
 
         if (ou.featureType == "POINT") {
-            let coords;
-
-            try {
-                coords = JSON.parse(ou.coordinates);
-            }
-            catch (e) {
-                console.log(`Exception in mapAddItems: ${e.message}`)
-            }
+            let coords = parseJson(ou.coordinates);
 
             if (coords) {
                 places.push({
@@ -174,40 +175,28 @@ export function mapAddItems(organisationUnits) {
             }
         }
         else if (ou.featureType == "POLYGON") {
-            try {
-                newPoints = JSON.parse(ou.coordinates)[0][0];
+            let parsed = parseJson(ou.coordinates);
+            newPoints = parsed ? parsed[0][0] : [];
+            if (newPoints.length > 0)
                 mapAddPolygon(ou.id, newPoints, ou.displayName, ou.callback);
-            }
-            catch (e) {
-                console.log(`Exception in mapAddItems: ${e.message}`)
-            }
         }
         else if (ou.featureType == "MULTI_POLYGON") {
             let matches = ou.coordinates.match(/\[\[[^[].*?\]\]/g);
-            let polys;
+            let polys = matches.map(m => parseJson(m)).filter(a => a);
 
-            try {
-                polys = matches.map(m => JSON.parse(m));
-            }
-            catch (e) {
-                console.log(`Exception in mapAddItems: ${e.message}`)
-            }
+            polys.forEach(p => mapAddPolygon(ou.id, p, null, ou.callback));
+            newPoints = [].concat(...polys);
 
-            if (polys) {
-                polys.forEach(p => mapAddPolygon(ou.id, p, null, ou.callback));
-                newPoints = [].concat(...polys);
-
-                // Add a clickable, hoverable marker inside the area.
-                let center = getPolygonCenter(newPoints);
-                mapAddMarkers([{
-                    id: ou.id, lat: center.lat, lng: center.lng,
-                    title: ou.displayName, callback: ou.callback
-                }]);
-            }
+            // Add a clickable, hoverable marker inside the area.
+            let center = getPolygonCenter(newPoints);
+            mapAddMarkers([{
+                id: ou.id, lat: center.lat, lng: center.lng,
+                title: ou.displayName, callback: ou.callback
+            }]);
         }
         else {
-            console.log(`mapAddItems: unrecognized featureType ${ou.featureType} for
-                         ${ou.displayName} (${ou.id})`);
+            console.log(`mapAddItems: unrecognized featureType
+                         ${ou.featureType} for ${ou.displayName} (${ou.id})`);
         }
 
         // Update bounds to include the new coordinates.
