@@ -48,7 +48,7 @@ export function mapHighlightItem(id, enable) {
 
     markers[id].setAnimation(enable ? google.maps.Animation.BOUNCE : null);
     if (polygons[id])
-        polygons[id].for.each(p >=
+        polygons[id].forEach(p =>
             p.setOptions({fillOpacity: enable ? 0.2 : 0}));
 }
 
