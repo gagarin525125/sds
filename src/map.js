@@ -6,7 +6,7 @@ import { getPolygonCenter, getBoundsForPoints } from './util';
 
 var map;
 var markers = {};  // A mapping of string ID's to Marker objects.
-var polygons = {};  // A mapping of string ID's to Polygon objects.
+var polygons = {};  // A mapping of string ID's to arrays of Polygon objects.
 var coordinatesCallback;
 var popup;
 var selectedId = "";
@@ -48,7 +48,8 @@ export function mapHighlightItem(id, enable) {
 
     markers[id].setAnimation(enable ? google.maps.Animation.BOUNCE : null);
     if (polygons[id])
-        polygons[id].setOptions({fillOpacity: enable ? 0.2 : 0});
+        polygons[id].for.each(p >=
+            p.setOptions({fillOpacity: enable ? 0.2 : 0}));
 }
 
 /** Show an item as selected on the map. */
@@ -62,7 +63,7 @@ export function mapSelectItem(id) {
     if (popup)
         popup.close();
     if (selectedId && polygons[selectedId])
-        polygons[selectedId].setOptions({fillOpacity: 0});
+        polygons[selectedId].forEach(p => p.setOptions({fillOpacity: 0}));
 
     // Remove any highlighting so it doesn't interfere.
     mapHighlightItem(id, false);
@@ -72,7 +73,7 @@ export function mapSelectItem(id) {
     popup.open(map, markers[id]);
 
     if (polygons[id])
-        polygons[id].setOptions({fillOpacity: 0.2});
+        polygons[id].forEach(p => p.setOptions({fillOpacity: 0.2}));
 }
 
 /**
@@ -131,13 +132,15 @@ function mapAddPolygon(id, points, text, callback) {
         mapAddMarkers([place]);
     }
 
-    polygons[id]= poly;
+    if (!polygons[id])
+        polygons[id] = [];
+    polygons[id].push(poly);
 }
 
 /** Remove all polygons from the map. */
 function mapClearPolygons() {
     for (let id in polygons)
-        polygons[id].setMap(null);
+        polygons[id].forEach(p => p.setMap(null));
     polygons = {};
 }
 
