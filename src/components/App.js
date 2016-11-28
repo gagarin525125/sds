@@ -414,17 +414,36 @@ onItemClick(item) {  // show info
         liveSearch(event.target.value.toLowerCase())
 
             .then(result => {
+                if(!result.organisationUnits){
+                    this.setState({
+                        isTransition: false,
+                        items: [],
+                        parentItem: {},
+                    })
 
+                }else{
                 this.setState({
-                    items: result.organisationUnits,
-                    parentItem: {},
                     isTransition: false,
-
-                })
+                    items: result.organisationUnits.length < 20 ? result.organisationUnits : this.pruneArr(result.organisationUnits),
+                    parentItem: {},
+                })}
             })
 
             .catch((error) => alert(`Error liveSearch App  ${error.stack}`))
 
+    }
+    //---------------------------------------
+
+    pruneArr(array) {
+        // console.log(array);
+        let temp = [];
+        if (!array) return temp;
+        for (let i = 0; i < 40; i++) {
+            if (!array[i]) return temp;
+            if (i % 2 === 0)
+                temp.push(array[i]);
+        }
+        return temp;
     }
 //----------------------------------------------------------------------------------------------
     handleLevelUpClick() {
