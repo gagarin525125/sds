@@ -198,7 +198,7 @@ ul {
     background-color: #BB8B71;
 }
 
-.list_with_header {
+.list_with_header ul {
     padding: 1em;
 }
 

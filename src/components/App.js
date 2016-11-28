@@ -546,7 +546,7 @@ class InfoP extends React.Component {
             return null;
 
         let list = this.props.toScreenP.map(function (stuka, i) {
-            return <li key={i} style={{marginLeft: i + 'em'}}> {stuka.name} </li>;
+            return <li style={{marginLeft: i + 'em'}}> {stuka.name} </li>;
 
         });
         return <ul className="list_with_header">{list}</ul>
@@ -560,8 +560,9 @@ class InfoG extends React.Component {
             return null;
 
         let list = this.props.toScreenG.map(function (stuka, i) {
-            return  <li key={i} style={{marginLeft: i + 'em'}}> {stuka.name} </li>;
-
+            return <li style={{marginLeft: (i == 0 ? 0 : 1) + 'em'}}>
+                      {stuka.name}
+                   </li>;
         });
         return <ul className="list_with_header">{list}</ul>
     }
