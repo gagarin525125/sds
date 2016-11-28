@@ -4,6 +4,10 @@
 
 import { getPolygonCenter, getBoundsForPoints } from './util';
 
+/* A rectangle containing Sierra Leone. */
+const defaultBounds = { south: 10.012, west: -13.304,
+                        north:  6.905, east: -10.250 };
+
 var map;
 var markers = {};  // A mapping of string ID's to Marker objects.
 var polygons = {};  // A mapping of string ID's to arrays of Polygon objects.
@@ -145,7 +149,7 @@ function mapClearPolygons() {
 }
 
 /** Add to the information displayed on the map. */
-export function mapAddItems(organisationUnits) {
+export function mapAddItems(organisationUnits, autoZoom=true) {
     var places = [];
     var bounds;
 
@@ -210,14 +214,14 @@ export function mapAddItems(organisationUnits) {
     if (places.length > 0)
         mapAddMarkers(places);
 
-    if (bounds)
+    if (autoZoom && bounds)
         map.fitBounds(bounds);
 }
 
 /** Set the information to be displayed on the map. */
-export function mapSetItems(organisationUnits) {
+export function mapSetItems(organisationUnits, autoZoom=true) {
     mapClearAll();
-    mapAddItems(organisationUnits);
+    mapAddItems(organisationUnits, autoZoom);
 }
 
 /** Clear all info on the map. */
@@ -228,6 +232,7 @@ export function mapClearAll() {
     }
     mapClearPolygons();
     mapClearMarkers();
+    map.fitBounds(defaultBounds);
 }
 
 /** Load the Google Maps API, call a function when it's done. */
