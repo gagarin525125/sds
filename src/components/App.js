@@ -35,7 +35,9 @@ export default class App extends Component {
                 level: '',
             },
             wantToChange: false,
-          //  rigid: true,
+    searchMode: false,
+            pageSize: 20,
+            searchParam: 1,
 
         };
 
@@ -50,6 +52,10 @@ export default class App extends Component {
         this.handleBackToRootClick = this.handleBackToRootClick.bind(this);
         this.resetItemToClick = this.resetItemToClick.bind(this);
         this.onSelectClick = this.onSelectClick.bind(this);
+        this.convertDate = this.convertDate.bind(this);
+        this.resetItemToClickForm = this.resetItemToClickForm.bind(this);
+        this.resetItemToClickChoice = this.resetItemToClickChoice.bind(this);
+
     }
 
     componentDidMount() {
@@ -156,8 +162,10 @@ export default class App extends Component {
             this.setState({
                 isTransition: true,
                 itemTo: temp,
-                parentItem: item
+                parentItem: item,
+                searchMode: false,
             });
+            this.resetItemToClick();
             this.loadOrganisationUnitsChildren(item);
         }
       else  if(item.level < this.state.maxLevels){
@@ -166,7 +174,8 @@ export default class App extends Component {
             this.setState({
                 isTransition: true,
                 itemTo: temp,
-                parentItem: item
+                parentItem: item,
+                searchMode: false,
             });
             this.resetItemToClick();
             this.loadOrganisationUnitsChildren(item);
@@ -232,14 +241,20 @@ onItemClick(item) {  // show info
     }
  //--
     //------------------------------------------------------------------------------------------
-    onSelectClick(item) {
-
+    onSelectClick(item) {  // zoom
+        /*
+        console.log("onselect app");
+        let a = new CustomEvent(``);         //  trying to pass empty string
+        this.liveSearch(a);
+        */
+        this.resetItemToClickChoice(item);
         let temp = Object.assign({},this.state.itemTo); // 13:45
         temp.level = this.state.maxLevels;
         this.setState({
             isTransition: true,
             itemTo: temp,
             parentItem: item.parent,
+            searchMode: false,
         });
         this.loadOrganisationUnitsChildren(item.parent);//
     }
@@ -301,54 +316,6 @@ onItemClick(item) {  // show info
     }
     //-----------------------------------------------------------------------------------------
 
-//----------------------------------------------------------------------------------------------
-    render() {
-
-
-        // If the component state is set to isLoading we hide the app and show a loading message
-        if (this.state.isLoading) {
-            return <div><p/>Loading data...</div>;
-        }
-
-        // Render the app which includes the list component and the form component
-        // We hide the form component when we are in the saving state.
-        return (
-            <div className="app">
-                <div className="search">
-                    <div className="search_controls">
-                        <input type="button" id="backToRoot" name="backToRoot"
-                               value="Top level"
-                               onClick={this.handleBackToRootClick}/>
-                        <input type="button" id="levelUp" name="levelUp"
-                               value="One level up"
-                               onClick={this.handleLevelUpClick}/>
-
-                        <input id="live" type="search" className="form-control"
-                               placeholder="live search"
-                               onChange={this.liveSearch}/>
-                    </div>
-                    {this.state.isTransition ? <div>Transition</div> :
-                    < List items={this.state.items} onItemClick={this.onItemClick}
-                           onLevelDownClick={this.onLevelDownClick}
-                            levels={this.state.maxLevels}
-                           onSelectClick={this.onSelectClick}/>}
-                </div>
-                <div className="info">
-
-                    {this.state.isTransition ? <div>Transition</div> :
-                        <Form onSubmit={this.onSubmit} item={this.state.itemTo}
-                           resetItemToClick={this.resetItemToClickForm}
-                           maxLevels={this.state.maxLevels}/> }
-                    <div>
-                        <InfoP toScreenP={this.state.toScreenP}/>
-                        <InfoG toScreenG={this.state.toScreenG}/>
-                    </div>
-
-                </div>
-            </div>
-
-        );
-    }
   //
 //---------------------------------------------------------------------------------------------
     handleBackToRootClick(event){
@@ -373,8 +340,6 @@ onItemClick(item) {  // show info
             });
         }
         //--------------------------
-
-
        let infoG = [];
        if(item.organisationUnitGroups.length !== 0) { // to add ?
            let groups = item.organisationUnitGroups;
@@ -397,58 +362,47 @@ onItemClick(item) {  // show info
 
     //-----------------------------------------------------------------------------------------
     // not ready
-    liveSearch(event){
+    liveSearch(event) {
+        console.log("livesearch app");
+        console.log(event); // complex when hit 'x'
+        if(event == null) return;
+        event.preventDefault();
         this.setState({
-            isTransition: true,
-
+           isTransition: true,
+            searchMode: true,
+           // items: this.state.itemsToKeep,
         });
         this.resetItemToClick();
-        event.preventDefault();
+        if (event.target == null || event.target.value === '' || event.target.value.length < this.state.searchParam) {
 
-        if(event.target.value === ''){
-
-               this.setState({
-                   isTransition: false,
-                    items: this.state.itemsToKeep,
-               });
-                return;
-          }
-
-
-        liveSearch(event.target.value.toLowerCase())
-
+            this.setState({
+                isTransition: false,
+                items: this.state.itemsToKeep,
+                searchMode: false,
+            });
+            return;
+        }
+        liveSearch(event.target.value.toLowerCase().trim(), this.state.pageSize) //  ?
             .then(result => {
-                if(!result.organisationUnits){
+                console.log("result live app");
+                console.log(result.organisationUnits.length);
+                if ( result.organisationUnits.length == 0) {
+                    this.setState({
+                        isTransition: true,
+                       // items: this.state.itemsToKeep,
+                    })
+                } else {
                     this.setState({
                         isTransition: false,
-                        items: [],
+                        items: result.organisationUnits,
                         parentItem: {},
-                    })
-
-                }else{
-                this.setState({
-                    isTransition: false,
-                    items: result.organisationUnits.length < 20 ? result.organisationUnits : this.pruneArr(result.organisationUnits),
-                    parentItem: {},
-                })}
+                        searchMode: true,
+                    });
+                }
             })
-
             .catch((error) => alert(`Error liveSearch App  ${error.stack}`))
-
     }
-    //---------------------------------------
 
-    pruneArr(array) {
-        // console.log(array);
-        let temp = [];
-        if (!array) return temp;
-        for (let i = 0; i < 40; i++) {
-            if (!array[i]) return temp;
-            if (i % 2 === 0)
-                temp.push(array[i]);
-        }
-        return temp;
-    }
 //----------------------------------------------------------------------------------------------
     handleLevelUpClick() {
         this.setState({
@@ -462,50 +416,68 @@ onItemClick(item) {  // show info
                isTransition: false,
 
            });
-          /* alert(`You are on HIGHEST level`); */this.resetItemToClick(); }
+          this.resetItemToClick();
+          }
                   else {
            this.loadOrganisationUnitsChildren(ancestors[i - 2]);
            this.resetItemToClick();
        }
     }
      //---------------------------------------------------------------------------------------
+resetItemToClickChoice(item){
+        if(!item){
+   if( this.state.items[0].level < this.state.maxLevels){
+       this.resetItemToClick();
+   }else{
+       this.resetItemToClickForm();
+   }}else {
+            if (item.level < this.state.maxLevels) {
+                this.resetItemToClick();
+            } else {
+                this.resetItemToClickForm();
+            }
+        }
+}
 
-
-     //----------------------------------------------------------------------------------------
+    //----------------------------------------------------------------------------------------
     resetItemToClick() {
-        this.setState({
+          this.setState({
             itemTo: {
                 id: "0",
                 displayName: '',
                 shortName: '',
                 openingDate: this.convertDate(new Date()),
                 coordinates: ``,
-                level: ``//this.state.maxLevels,
+                level: ``,
             },
             toScreenG : [],
             toScreenP: [],
             wantToChange : false,
-
         })
     }
+
+    //----------------------------------
     resetItemToClickForm() {
+        let temp = Object.assign({},this.state);
+        temp.itemTo.id = `0`;
+        temp.itemTo.displayName = ``;
+        temp.itemTo.shortName = ``;
+        temp.itemTo.openingDate = this.convertDate(new Date());
+        temp.itemTo.coordinates = ``;
+        temp.itemTo.level = this.state.maxLevels;
+        temp.toScreenP = [];
+        temp.toScreenG = [];
+        temp.wantToChange = false;
         this.setState({
-            itemTo: {
-                id: "0",
-                displayName: '',
-                shortName: '',
-                openingDate: this.convertDate(new Date()),
-                coordinates: ``,
-                level: this.state.maxLevels,
-            },
-            toScreenG : [],
-            toScreenP: [],
-            wantToChange : false,
-
+            itemTo: temp.itemTo,
+            toScreenG : temp.toScreenG,
+            toScreenP: temp.toScreenP,
+            wantToChange : temp.wantToChange,
         })
     }
-    convertDate(){
-        let d = new Date();
+    convertDate(date){
+
+        let d = date ? date : new Date();
         let m = d.getMonth() + 1;
         if(m < 10) m = '0' + m;
         let day = d.getDate();
@@ -514,8 +486,58 @@ onItemClick(item) {  // show info
         let newD =  `${d.getFullYear()}-${m}-${day}` ;
         return newD.toString();
     }
-     //----------------------- end class ---------------------------------
+    //----------------------------------------------------------------------------------------------
+    render() {
+
+
+        // If the component state is set to isLoading we hide the app and show a loading message
+        if (this.state.isLoading) {
+            return <div><p/>Loading data...</div>;
+        }
+
+        // Render the app which includes the list component and the form component
+        // We hide the form component when we are in the saving state.
+        return (
+            <div className="app">
+                <div className="search">
+                    <div className="search_controls">
+                        <input type="button" id="backToRoot" name="backToRoot"
+                               value="Top level"
+                               onClick={this.handleBackToRootClick}/>
+                        <input type="button" id="levelUp" name="levelUp"
+                               value="One level up"
+                               onClick={this.handleLevelUpClick}/>
+
+                        <input id="live" type="search" className="form-control"
+                               placeholder="search (3 or more chars)"
+                               onChange={this.liveSearch}/>
+                    </div>
+                    {this.state.isTransition ? <div>Searching ...</div> :
+                        < List items={this.state.items} onItemClick={this.onItemClick}
+                               onLevelDownClick={this.onLevelDownClick}
+                               levels={this.state.maxLevels}
+                               onSelectClick={this.onSelectClick}/>}
+                </div>
+                <div className="info">
+                    {this.state.isTransition ? <div>Searching ...</div> :
+                        <Form onSubmit={this.onSubmit} item={this.state.itemTo}
+                              maxLevels={this.state.maxLevels}
+                              resetItemToClickChoice={this.resetItemToClickChoice}/>}
+                    <div>
+                        <InfoP toScreenP={this.state.toScreenP}/>
+                        <InfoG toScreenG={this.state.toScreenG}/>
+                    </div>
+
+                </div>
+            </div>
+
+        );
+    }
+
+    //----------------------- end class ---------------------------------
   }
+
+//-----------------------------------------------------
 
 class InfoP extends React.Component {
 
@@ -554,6 +576,7 @@ class InfoG extends React.Component {
  console.log(item);
 
  }
+ this.state.items[0].level < this.state.maxLevels ?
  */
 
 /*
@@ -570,4 +593,36 @@ class InfoG extends React.Component {
 </div>
 
 </div>
+ {<LiveSearch/>}
+
+ this.setState({
+ isTransition: false,
+ items: result.organisationUnits.length < 20 ? result.organisationUnits : this.pruneArr(result.organisationUnits),
+ parentItem: {},
+ })}
+ //---------------------------------------------------
+ class  LiveSearch extends React.Component{
+
+ // let a =   this.props.liveSearch ;
+
+ render(){
+ /*
+ let b = <input  type="search" className="f"
+ placeholder="live search"
+ onChange={this.liveSearch}/>
+
+ //---------------------------------------
+
+ pruneArr(array) {
+ // console.log(array);
+ let temp = [];
+ if (!array) return temp;
+ for (let i = 0; i < 40; i++) {
+ if (!array[i]) return temp;
+ if (i % 2 === 0)
+ temp.push(array[i]);
+ }
+ return temp;
+ }
+
     */
