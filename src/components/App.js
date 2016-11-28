@@ -63,13 +63,23 @@ export default class App extends Component {
     }
 
     componentWillUpdate(_, nextState) {
-        // Keep the map in sync with the unfiltered list of org.units.
-        if (nextState.items.length == 0) {
-            mapClearAll();
+        this.updateMap(nextState);
+    }
+
+    /* Keep the map in sync with the unfiltered list of org.units. */
+    updateMap(nextState) {
+        let needToUpdate = !arraysEqual(nextState.items, this.state.items);
+
+        if (!needToUpdate || nextState.items.length == 0)
+            return;
+
+        if (nextState.searchMode) {
+            mapSetItems(addCallbackToItems(nextState.items, this.onItemClick),
+                        false);
         }
-        else if (!arraysEqual(nextState.items, this.state.items)) {
+        else {
             let atFacilityLevel = nextState.items[0].level ==
-                                                this.state.maxLevels;
+                                  this.state.maxLevels;
 
             let callback = atFacilityLevel ? this.onItemClick :
                                              this.onLevelDownClick;
@@ -88,6 +98,7 @@ export default class App extends Component {
             }
         }
     }
+
  //-------------------------------------  part of componentDidMount ---------------
     loadOrganisationUnitMaxLevels(){
 

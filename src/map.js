@@ -216,6 +216,8 @@ export function mapAddItems(organisationUnits, autoZoom=true) {
 
     if (autoZoom && bounds)
         map.fitBounds(bounds);
+    else if (!autoZoom)
+        map.fitBounds(defaultBounds);
 }
 
 /** Set the information to be displayed on the map. */
@@ -232,7 +234,8 @@ export function mapClearAll() {
     }
     mapClearPolygons();
     mapClearMarkers();
-    map.fitBounds(defaultBounds);
+    if (map)
+        map.fitBounds(defaultBounds);
 }
 
 /** Load the Google Maps API, call a function when it's done. */
