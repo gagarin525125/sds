@@ -70,16 +70,10 @@ export default class App extends Component {
         else if (!arraysEqual(nextState.items, this.state.items)) {
             let atFacilityLevel = nextState.items[0].level ==
                                                 this.state.maxLevels;
-            /*
+
             let callback = atFacilityLevel ? this.onItemClick :
                                              this.onLevelDownClick;
-            */
-            let callback;
-            if(atFacilityLevel){
-                callback = this.onItemClick;
-            }else{
-                callback = this.onLevelDownClick;
-            }
+
             mapSetItems(addCallbackToItems(nextState.items, callback));
 
             // When displaying facilities, draw boundaries for the parent org.unit.
