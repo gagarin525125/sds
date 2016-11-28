@@ -87,6 +87,7 @@ export function saveOrganisationUnit(organisationUnit, parentOf, levels) {
 //------------------------------------------------------------------------------------------------------
 
 export function updateOrganisationUnit(formData,itemTo){
+    console.log("update api");
     if(!itemTo.id)
         alert("something wrong with  Id ,updateOrgUnit   api  ");
       else if(!itemTo.parent)
@@ -103,7 +104,8 @@ export function updateOrganisationUnit(formData,itemTo){
       //  featureType: itemTo.featureType,
         level: itemTo.level,
     };
-    console.log(toSend);
+    console.log("update org un api to send");
+    console.log(JSON.stringify(toSend));
     let options = Object.assign({}, fetchOptions, {
         method: 'PUT',
         body: JSON.stringify(toSend)

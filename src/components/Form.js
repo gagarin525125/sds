@@ -6,7 +6,7 @@ export default class Form extends Component {
 
         this.state = {
                element: {
-                         id: `0`,
+                         id: ``,
                          name: '',
                          shortName: '',
                          openingDate: this.convertDate(new Date()),
@@ -29,25 +29,30 @@ export default class Form extends Component {
 
     }
     componentWillReceiveProps(nextProps) {
+       console.log("receive props");
+       if(nextProps.item.id != this.state.element.id){
+           this.loadData(nextProps.item)
+       } else {
+           this.keepData(this.state.element,nextProps.item.coordinates)
+       }
 
-          //
-          //  console.log(this.props.item);
 
+    }
+    shouldComponentUpdate(nextProps,nextState) {
+    /*    console.log("should");
+        if(! this.state.isChanged){
+        if (nextProps.item.id !== nextState.element.id) {
 
-        /*    if(nextProps.item.displayName != this.state.element.name &&
-            nextProps.item.shortname !== this.state.element.shortName &&
-            nextProps.item.openingDate !== this.state.element.openingDate &&
-            nextProps.item.coordinates !== this.state.element.coordinates){*/
-               /* this.setState({
-                    isChanged : false,
-                }); */
-           if(this.state.isChanged == false)
             this.loadData(nextProps.item);
-           else{
-              this.keepData(this.props.item);
-           }
+        } else
+            this.keepData(this.state.element, nextProps.item.coordinates);
+    }else{
+            this.keepData(this.state.element, nextProps.item.coordinates);
+        }
+*/
+       return true;
+    }
 
-           }
     loadData(item){
        console.log("loadData");
 
@@ -63,10 +68,16 @@ export default class Form extends Component {
         });
             }
     //------------------
-    keepData(item){
+    keepData(item,coord){
         console.log("keepData");
         let temp = this.state.element;
-        temp.coordinates = item.coordinates;
+        temp.id = item.id;
+      //  temp.name = item.name;
+        //temp.shortName = item.shortName;
+        //temp.level = item.level;
+        //temp.openingDate = item.openingDate;
+        temp.coordinates =   coord ? coord : ``;//nextProps.coordinates ? this.props.coordinates : `` ; //
+
         this.setState({
 
             element: temp,
@@ -77,24 +88,26 @@ export default class Form extends Component {
     onSubmitClick(event) {
         event.preventDefault();
 
-        console.log("this.state Form ");
-        console.log(this.state);
+        console.log("this.state Form element");
+        console.log(this.state.element);
         this.props.onSubmit(this.state.element);
         this.resetFormClick();
     }
 
     resetFormClick(){
         let temp = {};
+       // temp.id = ``;
         temp.name = ``;
         temp.shortName = ``;
         temp.openingDate = this.convertDate(new Date());
         temp.coordinates = ``;
+      //  temp.level = this.props.maxLevels;
 
            this.setState({
             element: temp,
             isChanged: false,
                });
-        this.props.resetItemToClick();
+      //  this.props.resetItemToClick();
     }
 
     setName(event) {
@@ -191,7 +204,7 @@ export default class Form extends Component {
                 </form>
 
                <div>
-                   <button id="empty_fields" onClick={this.resetFormClick}>Clear/add new</button>
+                   <button id="empty_fields" onClick={this.resetFormClick}>Clear/Add new</button>
                </div>
             
             </div>
