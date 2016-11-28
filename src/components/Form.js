@@ -29,18 +29,27 @@ export default class Form extends Component {
 
     }
     componentWillReceiveProps(nextProps) {
-        console.log("receive props");
+       console.log("receive props");
+       if(nextProps.item.id != this.state.element.id){
+           this.loadData(nextProps.item)
+       } else {
+           this.keepData(this.state.element,nextProps.item.coordinates)
+       }
 
 
     }
     shouldComponentUpdate(nextProps,nextState) {
-        console.log("should");
-        if (nextProps.item.id !== nextState.element.id){
+    /*    console.log("should");
+        if(! this.state.isChanged){
+        if (nextProps.item.id !== nextState.element.id) {
 
-           this.loadData(nextProps.item);
-    }else
-        this.keepData(this.state.element,nextProps.item.coordinates);
-
+            this.loadData(nextProps.item);
+        } else
+            this.keepData(this.state.element, nextProps.item.coordinates);
+    }else{
+            this.keepData(this.state.element, nextProps.item.coordinates);
+        }
+*/
        return true;
     }
 
@@ -63,11 +72,11 @@ export default class Form extends Component {
         console.log("keepData");
         let temp = this.state.element;
         temp.id = item.id;
-        temp.name = item.name;
-        temp.shortName = item.shortName;
-        temp.level = item.level;
-        temp.openingDate = item.openingDate;
-        temp.coordinates =   coord ? coord : ``;
+      //  temp.name = item.name;
+        //temp.shortName = item.shortName;
+        //temp.level = item.level;
+        //temp.openingDate = item.openingDate;
+        temp.coordinates =   coord ? coord : ``;//nextProps.coordinates ? this.props.coordinates : `` ; //
 
         this.setState({
 
@@ -82,7 +91,7 @@ export default class Form extends Component {
         console.log("this.state Form element");
         console.log(this.state.element);
         this.props.onSubmit(this.state.element);
-       // this.resetFormClick();
+        this.resetFormClick();
     }
 
     resetFormClick(){
@@ -195,7 +204,7 @@ export default class Form extends Component {
                 </form>
 
                <div>
-                   <button id="empty_fields" onClick={this.resetFormClick}>Clear/add new</button>
+                   <button id="empty_fields" onClick={this.resetFormClick}>Clear/Add new</button>
                </div>
             
             </div>
