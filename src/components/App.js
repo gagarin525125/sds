@@ -145,7 +145,7 @@ export default class App extends Component {
     //------------------------------------------------------------------------------------------
     onLevelDownClick(item){    // drill down
         if(item.level === this.state.maxLevels-1){
-            let temp = this.state.itemTo;
+            let temp = Object.assign({},this.state.itemTo); // just changed 13:18
             temp.level = this.state.maxLevels ;
             temp.openingDate = this.convertDate(new Date());
             this.setState({
@@ -156,7 +156,7 @@ export default class App extends Component {
             this.loadOrganisationUnitsChildren(item);
         }
       else  if(item.level < this.state.maxLevels){
-            let temp = this.state.itemTo;
+            let temp = Object.assign({},this.state.itemTo);
             temp.openingDate = this.convertDate(new Date());
             this.setState({
                 isTransition: true,
@@ -181,11 +181,12 @@ export default class App extends Component {
 onItemClick(item) {  // show info
     if(!item) return;
     mapSelectItem(item.id);
+    let temp = Object.assign({},item);
     if(item.level < this.state.maxLevels){
 
-        item.coordinates = "not listed";
+        temp.coordinates = "not listed";
         this.setState({
-            itemTo: item,
+            itemTo: temp,
             wantedToChange: false,
             parentItem: item.parent,
                 });
@@ -193,7 +194,7 @@ onItemClick(item) {  // show info
     } else {
 
         this.setState({
-            itemTo: item,
+            itemTo: temp,
             wantToChange : true,
             parentItem: item.parent,
                    });
@@ -213,7 +214,7 @@ onItemClick(item) {  // show info
 
             if (confirm(`Click OK to save edits to ${this.state.itemTo.displayName}`)) {
                 this.setState({
-                    isSaving: true,
+                    isTransition: true,
                 });
                 this.updateOrganisationUnit(formData, this.state.itemTo);
                 this.resetItemToClick();
@@ -228,7 +229,7 @@ onItemClick(item) {  // show info
     //------------------------------------------------------------------------------------------
     onSelectClick(item) {
 
-        let temp = this.state.itemTo;
+        let temp = Object.assign({},this.state.itemTo); // 13:45
         temp.level = this.state.maxLevels;
         this.setState({
             isTransition: true,
@@ -250,8 +251,7 @@ onItemClick(item) {  // show info
             .then(() => this.loadOrganisationUnitsChildren(itemTo.parent))// update state with new born lazaret
 
             .then(() => {
-                let temp = this.state.itemTo;
-                temp.level = this.state.maxLevels ;
+                let temp = Object.assign({}, this.state.itemTo); // 13:45
                 this.setState({
                    isTransition: false,
                   //  isSaving: false,
@@ -271,7 +271,7 @@ onItemClick(item) {  // show info
         saveOrganisationUnit(formData, parent, this.state.maxLevels)
             .then(() => this.loadOrganisationUnitsChildren(parent))// update state with new born lazaret
             .then(() => {
-                let temp = this.state.itemTo;
+                let temp = Object.assign({},this.state.itemTo);       // 13:45
                 temp.level = this.state.maxLevels ;
                               this.setState({
                                        isTransition: false,
@@ -287,10 +287,10 @@ onItemClick(item) {  // show info
 
         let longitude = lng.toFixed(4);
         let latitude = lat.toFixed(4);
-        const nova = this.state.itemTo;
-        nova.coordinates = `[ ${longitude}, ${latitude} ]`;
+        let temp = Object.assign({},this.state.itemTo);
+        temp.coordinates = `[ ${longitude}, ${latitude} ]`;
         this.setState({
-            itemTo: nova,
+            itemTo: temp,                           // 13:45
             wantedToChange: false,
         });
     }
@@ -332,7 +332,7 @@ onItemClick(item) {  // show info
 
                     {this.state.isTransition ? <div>Transition</div> :
                         <Form onSubmit={this.onSubmit} item={this.state.itemTo}
-                           resetItemToClick={this.resetItemToClick}
+                           resetItemToClick={this.resetItemToClickForm}
                            maxLevels={this.state.maxLevels}/> }
                     <div>
                         <InfoP toScreenP={this.state.toScreenP}/>
@@ -407,8 +407,7 @@ onItemClick(item) {  // show info
                     items: this.state.itemsToKeep,
                });
                 return;
-  //  this.loadOrganisationUnits() ;
-        }
+          }
 
 
         liveSearch(event.target.value.toLowerCase())
@@ -458,7 +457,7 @@ onItemClick(item) {  // show info
                isTransition: false,
 
            });
-           alert(`You are on HIGHEST level`); this.resetItemToClick(); }
+          /* alert(`You are on HIGHEST level`); */this.resetItemToClick(); }
                   else {
            this.loadOrganisationUnitsChildren(ancestors[i - 2]);
            this.resetItemToClick();
@@ -469,6 +468,22 @@ onItemClick(item) {  // show info
 
      //----------------------------------------------------------------------------------------
     resetItemToClick() {
+        this.setState({
+            itemTo: {
+                id: "0",
+                displayName: '',
+                shortName: '',
+                openingDate: this.convertDate(new Date()),
+                coordinates: ``,
+                level: ``//this.state.maxLevels,
+            },
+            toScreenG : [],
+            toScreenP: [],
+            wantToChange : false,
+
+        })
+    }
+    resetItemToClickForm() {
         this.setState({
             itemTo: {
                 id: "0",
