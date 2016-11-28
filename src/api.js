@@ -140,25 +140,17 @@ export function findChildren(organisationUnit) {
     let a = fetch(`${serverUrl}/organisationUnits/${organisationUnit.id}
     ?paging=false&level=1&fields= 
     id,displayName,featureType,coordinates,level,
-    openingDate,ancestors[id,displayName],shortName,parent[id,displayName,level,ancestors,coordinates],
+    openingDate,ancestors[id,displayName],shortName,parent[id,displayName,level,ancestors],
     organisationUnitGroups[id,name]`, fetchOptions)
 
     .then(onlySuccessResponses)
         .then(response => {
             if (response.status === 404) {
                 alert(`Something wrong , children query`);
-             //   console.error("error");
-
-            }
-            console.log("findchildren api response");
-          //  console.log(response);
-            let a = response.json();
-          //  console.log(a);
-            return a;
+                        }
+               return response.json();
         })
         .then(({ organisationUnits }) => {
-         //   console.log("children");
-        //    console.log(organisationUnits);
             return organisationUnits;
         })
         .catch((error) => alert(`findChildren api ${error}`));
@@ -171,7 +163,7 @@ export function loadOrganisationUnits() {
     // return fetch(`${serverUrl}/organisationUnits?paging=false&level=1`, fetchOptions)
     return fetch(`${serverUrl}/organisationUnits?paging=false&level=2&fields=
     id,displayName,featureType,coordinates,level,
-    openingDate,ancestors[id,displayName],shortName,parent[id,displayName,level,ancestors,coordinates],
+    openingDate,ancestors[id,displayName],shortName,parent[id,displayName,level,ancestors],
     organisationUnitGroups[id,name]`, fetchOptions)
         .then(onlySuccessResponses)
         .then(response => response.json())
@@ -184,15 +176,15 @@ export function loadOrganisationUnits() {
         .catch((error) => alert(`loadOrganisationUnits api ${error}`));
 }
 
-export function liveSearch(searchString) {
+export function liveSearch(searchString,pS) {
     console.log("searchString api");
     console.log(searchString);
      if (searchString === '') return null;
 
     // paging=false
-    return fetch(`${serverUrl}/organisationUnits?paging=true&fields=
+    return fetch(`${serverUrl}/organisationUnits?paging=true&pageSize=${pS}&fields=
     id,displayName,featureType,coordinates,level,
-    openingDate,ancestors[id,displayName],shortName,parent[id,displayName,level,ancestors,coordinates],
+    openingDate,ancestors[id,displayName],shortName,parent[id,displayName,level,ancestors],
     organisationUnitGroups[id,name]
     &filter=name:ilike:${searchString}`, fetchOptions)
         .then(onlySuccessResponses)
@@ -223,17 +215,3 @@ export function itemFeatures(item){
 
 
 
- /*level=1&*/
-
-/*
- let check = fetch(`${serverUrl}/organisationUnits/${organisationUnit.id}`,fetchOptions)
- .then(response => {
- if (response.status === 200) {
- alert(`this unit exists,want to replace ?`);
- }
- let a = response.json();
- return a;
- })
- .catch((error) => alert(`saveOrgUnits check api ${error}`));
- */
-//-----------------------------------------------------------
