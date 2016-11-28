@@ -1,22 +1,20 @@
-import React, { Component, PropTypes} from 'react';
+import React, {Component, PropTypes} from 'react';
 
 export default class Form extends Component {
     constructor(props) {
         super(props);
 
         this.state = {
-               element: {
-                         id: ``,
-                         name: '',
-                         shortName: '',
-                         openingDate: this.convertDate(new Date()),
-                         coordinates: ``,
-                         level: ``,
-                         },
-                isChanged: false,
+            element: {
+                id: ``,
+                name: '',
+                shortName: '',
+                openingDate: this.convertDate(new Date()),
+                coordinates: ``,
+                level: ``,
+            },
+           // isChanged: false,
         };
-
-
 
         this.onSubmitClick = this.onSubmitClick.bind(this);
         this.setName = this.setName.bind(this);
@@ -25,38 +23,25 @@ export default class Form extends Component {
         this.setNewCoordinates = this.setNewCoordinates.bind(this);
         this.resetFormClick = this.resetFormClick.bind(this);
 
-
-
     }
+
     componentWillReceiveProps(nextProps) {
-       console.log("receive props");
-       if(nextProps.item.id != this.state.element.id){
-           this.loadData(nextProps.item)
-       } else {
-           this.keepData(this.state.element,nextProps.item.coordinates)
-       }
-
-
-    }
-    shouldComponentUpdate(nextProps,nextState) {
-    /*    console.log("should");
-        if(! this.state.isChanged){
-        if (nextProps.item.id !== nextState.element.id) {
-
-            this.loadData(nextProps.item);
-        } else
-            this.keepData(this.state.element, nextProps.item.coordinates);
-    }else{
-            this.keepData(this.state.element, nextProps.item.coordinates);
+        console.log("receive props");
+        if (nextProps.item.id != this.state.element.id) {
+            this.loadData(nextProps.item)
+        } else {
+            this.keepData(this.state.element, nextProps.item.coordinates)
         }
-*/
-       return true;
+    }
+
+    shouldComponentUpdate(nextProps, nextState) {
+        return true;
     }
 
     loadData(item){
        console.log("loadData");
 
-        let temp = this.state.element;
+        let temp = Object.assign({},this.state.element);
         temp.id = item.id;
         temp.name = item.displayName;
         temp.shortName = item.shortName;
@@ -70,24 +55,16 @@ export default class Form extends Component {
     //------------------
     keepData(item,coord){
         console.log("keepData");
-        let temp = this.state.element;
+        let temp = Object.assign({},this.state.element);
         temp.id = item.id;
-      //  temp.name = item.name;
-        //temp.shortName = item.shortName;
-        //temp.level = item.level;
-        //temp.openingDate = item.openingDate;
-        temp.coordinates =   coord ? coord : ``;//nextProps.coordinates ? this.props.coordinates : `` ; //
-
+        temp.coordinates =   coord ? coord : ``;
         this.setState({
-
             element: temp,
         });
-
     }
     //------------------
     onSubmitClick(event) {
         event.preventDefault();
-
         console.log("this.state Form element");
         console.log(this.state.element);
         this.props.onSubmit(this.state.element);
@@ -95,19 +72,17 @@ export default class Form extends Component {
     }
 
     resetFormClick(){
+        console.log("reset form");
         let temp = {};
-       // temp.id = ``;
         temp.name = ``;
         temp.shortName = ``;
         temp.openingDate = this.convertDate(new Date());
         temp.coordinates = ``;
-      //  temp.level = this.props.maxLevels;
-
-           this.setState({
+               this.setState({
             element: temp,
-            isChanged: false,
+           // isChanged: false,
                });
-      //  this.props.resetItemToClick();
+        this.props.resetItemToClickChoice();
     }
 
     setName(event) {
@@ -118,7 +93,7 @@ export default class Form extends Component {
         temp.name = event.target.value;
                 this.setState({
                     element: temp,
-                    isChanged: true,
+                  //  isChanged: true,
                            });
             }
 
@@ -130,7 +105,7 @@ export default class Form extends Component {
         temp.shortName = event.target.value;
         this.setState({
            element: temp,
-            isChanged: true,
+          //  isChanged: true,
         });
     }
 
@@ -142,7 +117,7 @@ export default class Form extends Component {
         temp.openingDate = event.target.value;
         this.setState({
             element: temp,
-            isChanged: true,
+           // isChanged: true,
         });
     }
 
@@ -162,7 +137,7 @@ export default class Form extends Component {
         temp.coordinates = event.target.value;
     this.setState({
         element: temp,
-        isChanged: true,
+       // isChanged: true,
                  });
     }
 
@@ -206,11 +181,11 @@ export default class Form extends Component {
                <div>
                    <button id="empty_fields" onClick={this.resetFormClick}>Clear/Add new</button>
                </div>
-            
+
             </div>
-            
-            
-            
+
+
+
         );
     }
     //-------------
@@ -238,64 +213,3 @@ Form.propTypes = {
 
 };
 
-/*
-    <input id="selection" type="button" value="add child" onClick={this.onSubmitClick}/>
-                 <label><input type="radio" name="choice" value="A" onChange={this.handleClick}/>add child<br />
-             <input type="radio" name="choice" value="A" onChange={this.handleClick}/>back to root</label>
- <input id="selection" type="button" id="back to root" onClick={this.onSubmitClick}/>BackToRoot
-
-
-
-*/
-/*
- checkPermission(){
- let res = prompt(`want to change existing orgUnit? Y/no`, "no");
- if (res == null) {  // cancel
- console.log("hit - cancel");// something to add ?
- } else if (res.toLowerCase() === "no") {
- console.log("hit - no "); // something to add ?
-
- }
- else if (res.toLowerCase() === "") {
- console.log("hit - empty"); // something to add ?
- }
- else if (res.toLowerCase() === "y") {
- console.log("hit - yes ");
-
- this.setState({
- allowance : true
-
- });
- return true;
- //   this.updateOrganisationUnit(formData, this.state.itemTo);
- //   this.resetItemToClick();
- }
- }*/
-
-/*
-    removed from reset
-*  // this.props.resetItemToClick();
-*
-* ---------------------
- let temp = this.state.element;
- //  temp.id = item.id;
- temp.name = item.displayName;
- temp.shortName = item.shortName;
- temp.openingDate = this.convertDate(item.openingDate);
- temp.coordinates = item.coordinates ? item.coordinates : ``;
- // temp.level = item.level;
-
- if(!this.state.isChanged) {
-
- this.setState({
- element : temp,
- })
-
- } else{
- let newTemp = this.state.element;
- newTemp.coordinates = item.coordinates;
- this.setState({
- element : newTemp,
- })
- }
-    */
