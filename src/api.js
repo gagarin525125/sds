@@ -202,6 +202,18 @@ export function  findOrganisationUnitGroups(groupId) {
 
 }
 
+/** Retrieve one org.unit from DHIS. */
+export function loadOrganisationUnit(id) {
+    console.log("loadOrganisationUnit api");
+
+    return fetch(`${serverUrl}organisationUnits/${id}?fields=id,displayName,
+    featureType,coordinates,level,openingDate,shortName,
+    parent[id,displayName,level]`, fetchOptions)
+        .then(onlySuccessResponses)
+        .then(response => response.json())
+        .catch(error => console.log(`loadCoordinatesForOrgUnit api ${error}`));
+}
+
 /*
 export function itemFeatures(item){
 
