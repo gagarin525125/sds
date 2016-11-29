@@ -25,7 +25,7 @@ export default class App extends Component {
 
         // Set some initial state variables that are used within the component
         this.state = {
-            // isSaving: false,
+
             isLoading: true,
             isTransition: true,
             items: [],
@@ -46,7 +46,7 @@ export default class App extends Component {
             },
             wantToChange: false,
             searchMode: false,
-            pageSize: 0,
+            pageSize: 20,
             searchParam: 1,
 
         };
@@ -148,7 +148,7 @@ export default class App extends Component {
                 });
             })
 
-            .catch((error) => alert(`loadOrgUnits  App ${error.stack}`))
+            .catch((error) => alert(`Error loadOrgUnits  App ${error.stack}`))
 
 
     }
@@ -199,22 +199,13 @@ export default class App extends Component {
             this.resetItemToClick();
             this.loadOrganisationUnitsChildren(item);
         } else {
-            /*
-             this.setState({
-             isTransition: true,       //  ?
-             itemTo: temp,
-             parentItem: item
-             });  */
-
-
-            alert(`Lowest Level`);
+                alert(`Lowest Level`);
         }
-
     }
 
     onItemClick(item) {  // show info
-        if (!item) return;
-        mapSelectItem(item.id);
+
+         mapSelectItem(item.id);
         let temp = Object.assign({}, item);
 
         if (item.level < this.state.maxLevels) {
@@ -244,7 +235,6 @@ export default class App extends Component {
         console.log("onsubmit app");
         console.log(formData.id);
 
-
         if (this.state.wantToChange) {
 
             if (confirm(`Click OK to save edits to ${this.state.itemTo.displayName}`)) {
@@ -255,6 +245,9 @@ export default class App extends Component {
                 this.resetItemToClick();
             } else alert(`not confirmed`);
         } else {
+            this.setState({
+                isTransition: true,
+            });
             this.resetItemToClick();
             this.saveOrganisationUnit(formData, this.state.items[0].parent);
 
@@ -280,7 +273,9 @@ export default class App extends Component {
         });
         loadOrganisationUnit(item.parent.id)
             .then(ou => {
-                this.setState({parentItem: ou});
+                this.setState({
+                    parentItem: ou,
+                });
                 this.loadOrganisationUnitsChildren(item.parent)
             });
     }
@@ -291,46 +286,35 @@ export default class App extends Component {
             isTransition: true,
 
         });
-        console.log("update org unit app");
-        console.log(formData);
-        console.log(itemTo);
         updateOrganisationUnit(formData, itemTo)
-            .then(() => this.loadOrganisationUnitsChildren(itemTo.parent))// update state with new born lazaret
+            .then(() => this.loadOrganisationUnitsChildren(itemTo.parent))
 
             .then(() => {
                     let temp = Object.assign({}, this.state.itemTo); // 13:45
                     this.setState({
                         isTransition: false,
-                        //  isSaving: false,
                         itemTo: temp,
                     })
                 }
             )
-            .catch(error => alert(`error updateOrganisationUnit App${error.message}`))
+            .catch(error => alert(`Error updateOrgUnit App ${error.stack}`))
     }
 
     //--------------------------------------------------------------------------------------------
     // item - parent to listed ogrUnits
     saveOrganisationUnit(formData, parent) {
-
-        this.setState({
-            isTransition: true,
-        });
-
-
         saveOrganisationUnit(formData, parent, this.state.maxLevels)
-            .then(() => this.loadOrganisationUnitsChildren(parent))// update state with new born lazaret
+            .then(() => this.loadOrganisationUnitsChildren(parent))
             .then(() => {
-                    let temp = Object.assign({}, this.state.itemTo);       // 13:45
+                    let temp = Object.assign({}, this.state.itemTo);
                     temp.level = this.state.maxLevels;
                     this.setState({
                         isTransition: false,
-                        // isSaving: false,
                         itemTo: temp,
                     })
                 }
             )
-            .catch(error => alert(`error saveOrganisationUnit App${error.message}`))
+            .catch(error => alert(`Error saveOrgUnit App ${error.stack}`))
     }
 
 //---------------------------------------------------------------------------------------
@@ -341,7 +325,7 @@ export default class App extends Component {
         let temp = Object.assign({}, this.state.itemTo);
         temp.coordinates = `[ ${longitude}, ${latitude} ]`;
         this.setState({
-            itemTo: temp,                           // 13:45
+            itemTo: temp,
             wantedToChange: false,
         });
     }
@@ -354,7 +338,6 @@ export default class App extends Component {
     handleBackToRootClick(event) {
         event.preventDefault();
         this.setState({
-            // isLoading: true,
             isTransitiion: true,
         });
         this.resetItemToClick();
@@ -363,12 +346,8 @@ export default class App extends Component {
 
 //----------------------------------------------------------------------------------------------
     findElement(item) {
-
-
         let infoP = [];
-
         infoP[0] = {name: "Parents"};
-
         for (let i = 0; i < item.ancestors.length; i++) {
             infoP.push({
                 name: item.ancestors[i].displayName
@@ -377,7 +356,7 @@ export default class App extends Component {
         //--------------------------
 
         let infoG = [];
-        if (item.organisationUnitGroups.length !== 0) { // to add ?
+        if (item.organisationUnitGroups.length !== 0) {
             let groups = item.organisationUnitGroups;
 
             infoG[0] = {name: "Organisation Groups"};
@@ -396,9 +375,7 @@ export default class App extends Component {
 
     }
 
-
     //-----------------------------------------------------------------------------------------
-    // not ready
 
     liveSearch(event) {
         console.log("livesearch app");
@@ -408,7 +385,6 @@ export default class App extends Component {
         this.setState({
             isTransition: true,
             searchMode: true,
-            // items: this.state.itemsToKeep,
         });
         this.resetItemToClick();
         if (event.target == null || event.target.value === '' || event.target.value.length < this.state.searchParam) {
@@ -425,8 +401,6 @@ export default class App extends Component {
         liveSearch(event.target.value.toLowerCase().trim(), this.state.pageSize) //  ?
             .then(result => {
 
-                console.log("result live app");
-                console.log(result.organisationUnits.length);
                 if (result.organisationUnits.length == 0) {
                     this.setState({
                         isTransition: true,
