@@ -1,0 +1,17 @@
+{
+    "version": "1.0",
+    "name": "SDS Manager",
+    "description": "DHIS2 facility manager",
+    "launch_path": "src/index.html",
+    "appType": "APP",
+    "developer": {
+        "name": "Sibir & Dovre Software",
+        "url": "http://example.com"
+    },
+    "default_locale": "en",
+    "activities": {
+        "dhis": {
+            "href": "*"
+        }
+    }
+}
