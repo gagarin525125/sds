@@ -5,6 +5,7 @@ export default class Form extends Component {
         super(props);
 
         this.state = {
+
             element: {
                 id: ``,
                 name: '',
@@ -13,7 +14,8 @@ export default class Form extends Component {
                 coordinates: ``,
                 level: ``,
             },
-           // isChanged: false,
+             isChanged: false,
+
         };
 
         this.onSubmitClick = this.onSubmitClick.bind(this);
@@ -23,25 +25,35 @@ export default class Form extends Component {
         this.setNewCoordinates = this.setNewCoordinates.bind(this);
         this.resetFormClick = this.resetFormClick.bind(this);
 
+
     }
 
     componentWillReceiveProps(nextProps) {
+
         console.log("receive props");
+/*
         if (nextProps.item.id != this.state.element.id) {
-            this.loadData(nextProps.item)
-        } else {
+            this.setState({
+                isChanged: false,
+            });
+        }*/
+        if (nextProps.item.id != this.state.element.id)
+            this.loadData(nextProps.item,this.state.element);
+        else
+
             this.keepData(this.state.element, nextProps.item.coordinates)
-        }
+
     }
+
 
     shouldComponentUpdate(nextProps, nextState) {
         return true;
     }
 
-    loadData(item){
-       console.log("loadData");
+    loadData(item,stateItem) {
+        console.log("loadData");
 
-        let temp = Object.assign({},this.state.element);
+        let temp = Object.assign({}, this.state.element);
         temp.id = item.id;
         temp.name = item.displayName;
         temp.shortName = item.shortName;
@@ -51,94 +63,128 @@ export default class Form extends Component {
         this.setState({
             element: temp,
         });
-            }
+    }
+
     //------------------
-    keepData(item,coord){
+    keepData(item, coord) {
         console.log("keepData");
-        let temp = Object.assign({},this.state.element);
+        let temp = Object.assign({}, this.state.element);
         temp.id = item.id;
-        temp.coordinates =   coord ? coord : ``;
+        temp.coordinates = coord ? coord : ``;
         this.setState({
             element: temp,
         });
     }
+
     //------------------
     onSubmitClick(event) {
         event.preventDefault();
         console.log("this.state Form element");
         console.log(this.state.element);
         this.props.onSubmit(this.state.element);
-        this.resetFormClick();
+        this.resetFormClick2();
     }
 
-    resetFormClick(){
+    resetFormClick() {
         console.log("reset form");
-        let temp = {};
+        let temp = Object.assign({},this.state.element);
+        temp.id = this.state.element.id;
         temp.name = ``;
         temp.shortName = ``;
         temp.openingDate = this.convertDate(new Date());
         temp.coordinates = ``;
-               this.setState({
+        this.setState({
             element: temp,
-           // isChanged: false,
-               });
+             isChanged: false,
+        });
         this.props.resetItemToClickChoice();
+
+    }
+    resetFormClick2() {
+        console.log("reset form");
+        let temp = Object.assign({},this.state.element);
+        temp.id = `0`;
+        temp.name = ``;
+        temp.shortName = ``;
+        temp.openingDate = this.convertDate(new Date());
+        temp.coordinates = ``;
+        this.setState({
+            element: temp,
+            isChanged: false,
+        });
+
     }
 
     setName(event) {
-        if (this.props.item.level !== this.props.maxLevels){
-            alert(`cannot change`);return;
-    }
-        let temp = this.state.element;
+        if (this.props.item.level !== this.props.maxLevels) {
+            alert(`cannot change`);
+            return;
+        }
+
+        let temp = Object.assign({},this.state.element);
         temp.name = event.target.value;
-                this.setState({
-                    element: temp,
-                  //  isChanged: true,
-                           });
-            }
+        this.setState({
+            element: temp,
+            isChanged: true,
+
+        });
+    }
 
     setShortName(event) {
-        if (this.props.item.level !== this.props.maxLevels){
-            alert(`cannot change`);return;
+        if (this.props.item.level !== this.props.maxLevels) {
+            alert(`cannot change`);
+            return;
         }
+
         let temp = this.state.element;
         temp.shortName = event.target.value;
         this.setState({
-           element: temp,
-          //  isChanged: true,
+            element: temp,
+            isChanged: true,
+
         });
     }
 
     setOpeningDate(event) {
-        if (this.props.item.level !== this.props.maxLevels){
-            alert(`cannot change`);return;
+        if (this.props.item.level !== this.props.maxLevels) {
+            alert(`cannot change`);
+            return;
         }
+
         let temp = this.state.element;
         temp.openingDate = event.target.value;
         this.setState({
             element: temp,
-           // isChanged: true,
+             isChanged: true,
+
         });
     }
 
     isFormValid() {
+
         return !(this.state.element.name && this.state.element.shortName && this.state.element.openingDate
         && this.areCoordinatesValid()  );
     }
-    areCoordinatesValid(){
+
+    areCoordinatesValid() {
         let temp = this.state.element.coordinates;
         return temp.includes("[", 0) && temp.includes(",") && temp.includes("]");
+
     }
-    setNewCoordinates(event){
-        if (this.props.item.level !== this.props.maxLevels){
-            alert(`cannot change`);return;
+
+    setNewCoordinates(event) {
+        if (this.props.item.level !== this.props.maxLevels) {
+            alert(`cannot change`);
+            return;
         }
+
         let temp = this.state.element;
         temp.coordinates = event.target.value;
-    this.setState({
-        element: temp,
-       // isChanged: true,
-                 });
+        this.setState({
+            element: temp,
+             isChanged: true,
+        });
+
     }
 
     render() {
@@ -148,39 +194,42 @@ export default class Form extends Component {
                     <div>
                         <label>
                             <span>Name</span>
-                            <input type="text" value={this.state.element.name} onChange={this.setName} />
+                            <input type="text" value={this.state.element.name} onChange={this.setName}/>
                         </label>
                     </div>
                     <div>
                         <label>
                             <span>Short name</span>
-                            <input type="text" value={this.state.element.shortName} onChange={this.setShortName} />
+                            <input type="text" value={this.state.element.shortName} onChange={this.setShortName}/>
                         </label>
                     </div>
                     <div>
                         <label>
                             <span>Opening date</span>
-                            <input type="date" value={this.state.element.openingDate} onChange={this.setOpeningDate} />
+                            <input type="date" value={this.state.element.openingDate} onChange={this.setOpeningDate}/>
                         </label>
                     </div>
                     <div>
-                         <label>
-                             <span>Location</span>
-                             <input type="text"  value={this.state.element.coordinates}  placeholder="[ latitude , longitude ]"
-                                onChange={this.setNewCoordinates}/>
-                         </label>
+                        <label>
+                            <span>Location</span>
+                            <input type="text" value={this.state.element.coordinates}
+                                   placeholder="[ latitude , longitude ] "
+                                   onChange={this.setNewCoordinates}/>
+                        </label>
+
                     </div>
                     <div>
-                        <button disabled={this.isFormValid()}    id="submit" onClick={this.onSubmitClick}>Submit</button>
+                        (right click)
+                        <button disabled={this.isFormValid()} id="submit" onClick={this.onSubmitClick}>Submit</button>
 
                     </div>
 
 
                 </form>
 
-               <div>
-                   <button id="empty_fields" onClick={this.resetFormClick}>Clear/Add new</button>
-               </div>
+                <div>
+                    <button id="empty_fields" onClick={this.resetFormClick}>Clear Before Add </button>
+                </div>
 
             </div>
 
@@ -188,19 +237,18 @@ export default class Form extends Component {
 
         );
     }
+
     //-------------
 
 
-
-
-   convertDate(dateForm){
+    convertDate(dateForm) {
         let d = new Date(dateForm);
         let m = d.getMonth() + 1;
-        if(m < 10) m = '0' + m;
+        if (m < 10) m = '0' + m;
         let day = d.getDate();
-        if(day < 10) day = '0' + day;
+        if (day < 10) day = '0' + day;
 
-        let newD =  `${d.getFullYear()}-${m}-${day}` ;
+        let newD = `${d.getFullYear()}-${m}-${day}`;
         return newD.toString();
     }
 
@@ -212,4 +260,5 @@ Form.propTypes = {
     item: PropTypes.object,
 
 };
+
 

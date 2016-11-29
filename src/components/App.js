@@ -25,7 +25,7 @@ export default class App extends Component {
 
         // Set some initial state variables that are used within the component
         this.state = {
-            // isSaving: false,
+
             isLoading: true,
             isTransition: true,
             items: [],
@@ -148,7 +148,7 @@ export default class App extends Component {
                 });
             })
 
-            .catch((error) => alert(`loadOrgUnits  App ${error.stack}`))
+            .catch((error) => alert(`Error loadOrgUnits  App ${error.stack}`))
 
 
     }
@@ -172,7 +172,7 @@ export default class App extends Component {
 
     //------------------------------------------------------------------------------------------
     onLevelDownClick(item) {    // drill down
-        if (item.level === this.state.maxLevels - 1) {
+      /*  if (item.level === this.state.maxLevels - 1) {
 
             let temp = Object.assign({}, this.state.itemTo); // just changed 13:18
             temp.level = this.state.maxLevels;
@@ -186,7 +186,8 @@ export default class App extends Component {
             this.resetItemToClickForm(); //  29   1045
             this.loadOrganisationUnitsChildren(item);
         }
-        else if (item.level < this.state.maxLevels) {
+        else */
+            if (item.level < this.state.maxLevels) {
             let temp = Object.assign({}, this.state.itemTo);
             temp.openingDate = this.convertDate(new Date());
             this.setState({
@@ -199,22 +200,13 @@ export default class App extends Component {
             this.resetItemToClick();
             this.loadOrganisationUnitsChildren(item);
         } else {
-            /*
-             this.setState({
-             isTransition: true,       //  ?
-             itemTo: temp,
-             parentItem: item
-             });  */
-
-
-            alert(`Lowest Level`);
+                alert(`Lowest Level`);
         }
-
     }
 
     onItemClick(item) {  // show info
-        if (!item) return;
-        mapSelectItem(item.id);
+
+         mapSelectItem(item.id);
         let temp = Object.assign({}, item);
 
         if (item.level < this.state.maxLevels) {
@@ -222,7 +214,7 @@ export default class App extends Component {
             temp.coordinates = "not listed";
             this.setState({
                 itemTo: temp,
-                wantedToChange: false,
+                wantToChange: false,
                 parentItem: item.parent,
             });
             this.findElement(item);// show Parents and Groups
@@ -231,8 +223,7 @@ export default class App extends Component {
             this.setState({
                 itemTo: temp,
                 wantToChange: true,
-                //parentItem: item.parent,
-            });
+                            });
             this.findElement(item);
         }
     }
@@ -244,7 +235,6 @@ export default class App extends Component {
         console.log("onsubmit app");
         console.log(formData.id);
 
-
         if (this.state.wantToChange) {
 
             if (confirm(`Click OK to save edits to ${this.state.itemTo.displayName}`)) {
@@ -255,6 +245,9 @@ export default class App extends Component {
                 this.resetItemToClick();
             } else alert(`not confirmed`);
         } else {
+            this.setState({
+                isTransition: true,
+            });
             this.resetItemToClick();
             this.saveOrganisationUnit(formData, this.state.items[0].parent);
 
@@ -271,7 +264,7 @@ export default class App extends Component {
 
         this.resetItemToClickChoice(item);
         let temp = Object.assign({}, this.state.itemTo); // 13:45
-        temp.level = this.state.maxLevels;
+       // temp.level = this.state.maxLevels;
         this.setState({
             isTransition: true,
             itemTo: temp,
@@ -280,7 +273,9 @@ export default class App extends Component {
         });
         loadOrganisationUnit(item.parent.id)
             .then(ou => {
-                this.setState({parentItem: ou});
+                this.setState({
+                    parentItem: ou,
+                });
                 this.loadOrganisationUnitsChildren(item.parent)
             });
     }
@@ -291,46 +286,35 @@ export default class App extends Component {
             isTransition: true,
 
         });
-        console.log("update org unit app");
-        console.log(formData);
-        console.log(itemTo);
         updateOrganisationUnit(formData, itemTo)
-            .then(() => this.loadOrganisationUnitsChildren(itemTo.parent))// update state with new born lazaret
+            .then(() => this.loadOrganisationUnitsChildren(itemTo.parent))
 
             .then(() => {
-                    let temp = Object.assign({}, this.state.itemTo); // 13:45
+                    let temp = Object.assign({}, this.state.itemTo);
                     this.setState({
                         isTransition: false,
-                        //  isSaving: false,
                         itemTo: temp,
                     })
                 }
             )
-            .catch(error => alert(`error updateOrganisationUnit App${error.message}`))
+            .catch(error => alert(`Error updateOrgUnit App ${error.stack}`))
     }
 
     //--------------------------------------------------------------------------------------------
     // item - parent to listed ogrUnits
     saveOrganisationUnit(formData, parent) {
-
-        this.setState({
-            isTransition: true,
-        });
-
-
         saveOrganisationUnit(formData, parent, this.state.maxLevels)
-            .then(() => this.loadOrganisationUnitsChildren(parent))// update state with new born lazaret
+            .then(() => this.loadOrganisationUnitsChildren(parent))
             .then(() => {
-                    let temp = Object.assign({}, this.state.itemTo);       // 13:45
+                    let temp = Object.assign({}, this.state.itemTo);
                     temp.level = this.state.maxLevels;
                     this.setState({
                         isTransition: false,
-                        // isSaving: false,
                         itemTo: temp,
                     })
                 }
             )
-            .catch(error => alert(`error saveOrganisationUnit App${error.message}`))
+            .catch(error => alert(`Error saveOrgUnit App ${error.stack}`))
     }
 
 //---------------------------------------------------------------------------------------
@@ -341,7 +325,7 @@ export default class App extends Component {
         let temp = Object.assign({}, this.state.itemTo);
         temp.coordinates = `[ ${longitude}, ${latitude} ]`;
         this.setState({
-            itemTo: temp,                           // 13:45
+            itemTo: temp,
             wantedToChange: false,
         });
     }
@@ -354,7 +338,6 @@ export default class App extends Component {
     handleBackToRootClick(event) {
         event.preventDefault();
         this.setState({
-            // isLoading: true,
             isTransitiion: true,
         });
         this.resetItemToClick();
@@ -363,12 +346,8 @@ export default class App extends Component {
 
 //----------------------------------------------------------------------------------------------
     findElement(item) {
-
-
         let infoP = [];
-
         infoP[0] = {name: "Parents"};
-
         for (let i = 0; i < item.ancestors.length; i++) {
             infoP.push({
                 name: item.ancestors[i].displayName
@@ -377,7 +356,7 @@ export default class App extends Component {
         //--------------------------
 
         let infoG = [];
-        if (item.organisationUnitGroups.length !== 0) { // to add ?
+        if (item.organisationUnitGroups.length !== 0) {
             let groups = item.organisationUnitGroups;
 
             infoG[0] = {name: "Organisation Groups"};
@@ -396,9 +375,7 @@ export default class App extends Component {
 
     }
 
-
     //-----------------------------------------------------------------------------------------
-    // not ready
 
     liveSearch(event) {
         console.log("livesearch app");
@@ -408,7 +385,6 @@ export default class App extends Component {
         this.setState({
             isTransition: true,
             searchMode: true,
-            // items: this.state.itemsToKeep,
         });
         this.resetItemToClick();
         if (event.target == null || event.target.value === '' || event.target.value.length < this.state.searchParam) {
@@ -425,8 +401,6 @@ export default class App extends Component {
         liveSearch(event.target.value.toLowerCase().trim(), this.state.pageSize) //  ?
             .then(result => {
 
-                console.log("result live app");
-                console.log(result.organisationUnits.length);
                 if (result.organisationUnits.length == 0) {
                     this.setState({
                         isTransition: true,
@@ -476,10 +450,10 @@ export default class App extends Component {
                 this.resetItemToClickForm();
             }
         } else {
-               if(item.level === this.state.maxLevels - 1){
+                  /*  if(item.level === this.state.maxLevels - 1){
                    this.resetItemToClickForm();
                }
-          else  if (item.level < this.state.maxLevels) {
+          else */ if (item.level < this.state.maxLevels) {
                 this.resetItemToClick();
             } else {
                 this.resetItemToClickForm();
@@ -494,11 +468,9 @@ export default class App extends Component {
                 id: "0",
                 displayName: '',
                 shortName: '',
-
                 openingDate: this.convertDate(new Date()),
                 coordinates: ``,
                 level: ``,
-
             },
             toScreenG: [],
             toScreenP: [],
@@ -509,7 +481,7 @@ export default class App extends Component {
     //----------------------------------
     resetItemToClickForm() {
         let temp = Object.assign({}, this.state);
-        //temp.itemTo.id = `0`;
+        temp.itemTo.id = `0`;
         temp.itemTo.displayName = ``;
         temp.itemTo.shortName = ``;
         temp.itemTo.openingDate = this.convertDate(new Date());
