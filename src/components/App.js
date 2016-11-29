@@ -211,7 +211,7 @@ export default class App extends Component {
 
         if (item.level < this.state.maxLevels) {
 
-            temp.coordinates = "not listed";
+            temp.coordinates = "N/A";
             this.setState({
                 itemTo: temp,
                 wantToChange: false,

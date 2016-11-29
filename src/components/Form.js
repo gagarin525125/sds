@@ -116,11 +116,6 @@ export default class Form extends Component {
     }
 
     setName(event) {
-        if (this.props.item.level !== this.props.maxLevels) {
-            alert(`cannot change`);
-            return;
-        }
-
         let temp = Object.assign({},this.state.element);
         temp.name = event.target.value;
         this.setState({
@@ -131,11 +126,6 @@ export default class Form extends Component {
     }
 
     setShortName(event) {
-        if (this.props.item.level !== this.props.maxLevels) {
-            alert(`cannot change`);
-            return;
-        }
-
         let temp = this.state.element;
         temp.shortName = event.target.value;
         this.setState({
@@ -146,11 +136,6 @@ export default class Form extends Component {
     }
 
     setOpeningDate(event) {
-        if (this.props.item.level !== this.props.maxLevels) {
-            alert(`cannot change`);
-            return;
-        }
-
         let temp = this.state.element;
         temp.openingDate = event.target.value;
         this.setState({
@@ -191,45 +176,37 @@ export default class Form extends Component {
         return (
             <div className="form">
                 <form>
-                    <div>
+                    <fieldset disabled={this.props.item.level != this.props.maxLevels}>
                         <label>
                             <span>Name</span>
                             <input type="text" value={this.state.element.name} onChange={this.setName}/>
                         </label>
-                    </div>
-                    <div>
                         <label>
                             <span>Short name</span>
                             <input type="text" value={this.state.element.shortName} onChange={this.setShortName}/>
                         </label>
-                    </div>
-                    <div>
                         <label>
                             <span>Opening date</span>
                             <input type="date" value={this.state.element.openingDate} onChange={this.setOpeningDate}/>
                         </label>
-                    </div>
-                    <div>
                         <label>
                             <span>Location</span>
                             <input type="text" value={this.state.element.coordinates}
                                    placeholder="[ latitude , longitude ] "
                                    onChange={this.setNewCoordinates}/>
                         </label>
+                        <div>
+                            (right click)
+                            <button disabled={this.isFormValid()} id="submit" onClick={this.onSubmitClick}>Submit</button>
 
-                    </div>
-                    <div>
-                        (right click)
-                        <button disabled={this.isFormValid()} id="submit" onClick={this.onSubmitClick}>Submit</button>
-
-                    </div>
-
-
+                        </div>
+                    </fieldset>
                 </form>
 
-                <div>
-                    <button id="empty_fields" onClick={this.resetFormClick}>Clear Before Add </button>
-                </div>
+                <button id="empty_fields" onClick={this.resetFormClick}
+                        disabled={this.props.item.level != this.props.maxLevels}>
+                    Add new
+                </button>
 
             </div>
 

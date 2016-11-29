@@ -145,6 +145,12 @@ ul {
     pointer-events: auto;
 }
 
+fieldset {
+    margin: 0;
+    border: 0;
+    padding: 0;
+}
+
 .form {
     background-color: #b4eea7;
     opacity: 0.9;
