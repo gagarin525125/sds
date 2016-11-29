@@ -231,7 +231,7 @@ export default class App extends Component {
             this.setState({
                 itemTo: temp,
                 wantToChange: true,
-                parentItem: item.parent,
+                //parentItem: item.parent,
             });
             this.findElement(item);
         }
