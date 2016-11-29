@@ -172,7 +172,7 @@ export default class App extends Component {
 
     //------------------------------------------------------------------------------------------
     onLevelDownClick(item) {    // drill down
-        if (item.level === this.state.maxLevels - 1) {
+      /*  if (item.level === this.state.maxLevels - 1) {
 
             let temp = Object.assign({}, this.state.itemTo); // just changed 13:18
             temp.level = this.state.maxLevels;
@@ -186,7 +186,8 @@ export default class App extends Component {
             this.resetItemToClickForm(); //  29   1045
             this.loadOrganisationUnitsChildren(item);
         }
-        else if (item.level < this.state.maxLevels) {
+        else */
+            if (item.level < this.state.maxLevels) {
             let temp = Object.assign({}, this.state.itemTo);
             temp.openingDate = this.convertDate(new Date());
             this.setState({
@@ -213,7 +214,7 @@ export default class App extends Component {
             temp.coordinates = "not listed";
             this.setState({
                 itemTo: temp,
-                wantedToChange: false,
+                wantToChange: false,
                 parentItem: item.parent,
             });
             this.findElement(item);// show Parents and Groups
@@ -222,8 +223,7 @@ export default class App extends Component {
             this.setState({
                 itemTo: temp,
                 wantToChange: true,
-                //parentItem: item.parent,
-            });
+                            });
             this.findElement(item);
         }
     }
@@ -264,7 +264,7 @@ export default class App extends Component {
 
         this.resetItemToClickChoice(item);
         let temp = Object.assign({}, this.state.itemTo); // 13:45
-        temp.level = this.state.maxLevels;
+       // temp.level = this.state.maxLevels;
         this.setState({
             isTransition: true,
             itemTo: temp,
@@ -290,7 +290,7 @@ export default class App extends Component {
             .then(() => this.loadOrganisationUnitsChildren(itemTo.parent))
 
             .then(() => {
-                    let temp = Object.assign({}, this.state.itemTo); // 13:45
+                    let temp = Object.assign({}, this.state.itemTo);
                     this.setState({
                         isTransition: false,
                         itemTo: temp,
@@ -450,10 +450,10 @@ export default class App extends Component {
                 this.resetItemToClickForm();
             }
         } else {
-               if(item.level === this.state.maxLevels - 1){
+                  /*  if(item.level === this.state.maxLevels - 1){
                    this.resetItemToClickForm();
                }
-          else  if (item.level < this.state.maxLevels) {
+          else */ if (item.level < this.state.maxLevels) {
                 this.resetItemToClick();
             } else {
                 this.resetItemToClickForm();
@@ -468,11 +468,9 @@ export default class App extends Component {
                 id: "0",
                 displayName: '',
                 shortName: '',
-
                 openingDate: this.convertDate(new Date()),
                 coordinates: ``,
                 level: ``,
-
             },
             toScreenG: [],
             toScreenP: [],
@@ -483,7 +481,7 @@ export default class App extends Component {
     //----------------------------------
     resetItemToClickForm() {
         let temp = Object.assign({}, this.state);
-        //temp.itemTo.id = `0`;
+        temp.itemTo.id = `0`;
         temp.itemTo.displayName = ``;
         temp.itemTo.shortName = ``;
         temp.itemTo.openingDate = this.convertDate(new Date());
