@@ -6,8 +6,8 @@
  * You obviously should not do this for your production apps.
  */
 //const serverUrl = 'http://localhost:8082/api/';
-const serverUrl = 'https://play.dhis2.org/demo/api/';
-//const serverUrl = 'https://play.dhis2.org/dev/api/';
+//const serverUrl = 'https://play.dhis2.org/demo/api/';
+const serverUrl = 'https://play.dhis2.org/dev/api/';
 //const serverUrl = 'https://play.dhis2.org/test/api/';
 const basicAuth = `Basic ${btoa('admin:district')}`;
 
@@ -43,7 +43,7 @@ return fetch(`${serverUrl}organisationUnitLevels`,fetchOptions)
 }
 export function saveOrganisationUnit(organisationUnit, parentOf, levels) {
     //-----------------------------------------------------------
-    alert(`levels : ${levels}`);
+    alert(`Adding new unit at level  : ${levels}`);
     // POST the payload to the server to save the organisationUnit
     console.log("levels  " + levels);
     let toSend = {
