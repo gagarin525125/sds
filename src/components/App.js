@@ -8,9 +8,9 @@ import {
 
 import List from './List';
 import Form from './Form';
+import MaxResults from './MaxResults';
 import {mapSetItems, mapAddItems, mapClearAll, mapSelectItem, mapSetCoordinatesCallback} from '../map';
 import {addCallbackToItems, arraysEqual} from '../util';
-import NumericInput from 'react-numeric-input';
 
 
 
@@ -46,7 +46,7 @@ export default class App extends Component {
             },
             wantToChange: false,
             searchMode: false,
-            pageSize: 0,
+            pageSize: 20,
             searchParam: 1,
 
         };
@@ -562,12 +562,12 @@ export default class App extends Component {
                         <input type="button" id="levelUp" name="levelUp"
                                value="One level up"
                                onClick={this.handleLevelUpClick}/>
-
+                        <br/>
                         <input id="live" type="search" className="form-control"
-                               placeholder="live search"
+                               placeholder="Type to search"
                                onChange={this.liveSearch}/>
-                        <SetUpLiveSearch setLiveSearchValue={this.setLiveSearchValue}/>
-                        set page size
+                        <MaxResults value={this.state.pageSize}
+                                    onChange={this.setLiveSearchValue}/>
                     </div>
                     {this.state.isTransition ? <div>Searching ...</div> :
                         < List items={this.state.items} onItemClick={this.onItemClick}
@@ -589,35 +589,20 @@ export default class App extends Component {
             </div>
 
         );
+
+        // Render the app which includes the list component and the form component
+        // We hide the form component when we are in the saving state.
     }
     //--------------
-    setLiveSearchValue(value){   // uncomment this.setState
-        console.log("new value  " + value);
-         let temp = Object.assign({},this.state);
-         temp.pageSize = value;
-         /*
+    setLiveSearchValue(value) {
         this.setState({
-            temp
-        })
-*/
+            pageSize: value
+        });
 
     }
 
     //----------------------- end class ---------------------------------
 }
-//-------------------------------
-class SetUpLiveSearch extends React.Component{
-
-    render(){
-        return(
-        <NumericInput className="form-control"  min={0} max={50} value={20} step={5}
-                      onChange={value => this.props.setLiveSearchValue(value) }/>
-        );
-    }
-}
-
-//-----------------------------------------------------
-
 class InfoP extends React.Component {
 
     render() {

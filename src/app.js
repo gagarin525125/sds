@@ -4,7 +4,7 @@ import App from './components/App';
 import { loadGoogleMaps, initMap } from './map';
 
 
-/* Load the DHIS API from the manifest. */
+/* Load the DHIS API URL from the manifest. */
 (function () {
     fetch("manifest.webapp")
         .then(response => response.json())
