@@ -37,10 +37,11 @@ export default class Form extends Component {
                 isChanged: false,
             });
         }*/
+        if (nextProps.item.id != this.state.element.id)
+            this.loadData(nextProps.item,this.state.element);
+        else
 
-            this.loadData(nextProps.item,this.state.element)
-
-           // this.keepData(this.state.element, nextProps.item.coordinates)
+            this.keepData(this.state.element, nextProps.item.coordinates)
 
     }
 
@@ -81,12 +82,13 @@ export default class Form extends Component {
         console.log("this.state Form element");
         console.log(this.state.element);
         this.props.onSubmit(this.state.element);
-        this.resetFormClick();
+        this.resetFormClick2();
     }
 
     resetFormClick() {
         console.log("reset form");
         let temp = Object.assign({},this.state.element);
+        temp.id = this.state.element.id;
         temp.name = ``;
         temp.shortName = ``;
         temp.openingDate = this.convertDate(new Date());
@@ -98,6 +100,20 @@ export default class Form extends Component {
         this.props.resetItemToClickChoice();
 
     }
+    resetFormClick2() {
+        console.log("reset form");
+        let temp = Object.assign({},this.state.element);
+        temp.id = `0`;
+        temp.name = ``;
+        temp.shortName = ``;
+        temp.openingDate = this.convertDate(new Date());
+        temp.coordinates = ``;
+        this.setState({
+            element: temp,
+            isChanged: false,
+        });
+
+    }
 
     setName(event) {
         if (this.props.item.level !== this.props.maxLevels) {
@@ -105,7 +121,7 @@ export default class Form extends Component {
             return;
         }
 
-        let temp = this.state.element;
+        let temp = Object.assign({},this.state.element);
         temp.name = event.target.value;
         this.setState({
             element: temp,
