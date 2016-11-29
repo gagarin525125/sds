@@ -158,11 +158,6 @@ export default class Form extends Component {
     }
 
     setNewCoordinates(event) {
-        if (this.props.item.level !== this.props.maxLevels) {
-            alert(`cannot change`);
-            return;
-        }
-
         let temp = this.state.element;
         temp.coordinates = event.target.value;
         this.setState({
