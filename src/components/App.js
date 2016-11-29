@@ -46,7 +46,7 @@ export default class App extends Component {
             },
             wantToChange: false,
             searchMode: false,
-            pageSize: ``,
+            pageSize: 0,
             searchParam: 1,
 
         };
@@ -421,9 +421,7 @@ export default class App extends Component {
             return;
 
         }
-        //let a = NumericInput.getValueAsNumber();
-        //console.log("getvalue as number");
-       // console.log(a);
+
         liveSearch(event.target.value.toLowerCase().trim(), this.state.pageSize) //  ?
             .then(result => {
 
@@ -432,7 +430,6 @@ export default class App extends Component {
                 if (result.organisationUnits.length == 0) {
                     this.setState({
                         isTransition: true,
-                        // items: this.state.itemsToKeep,
                     })
                 } else {
                     this.setState({
@@ -567,10 +564,10 @@ export default class App extends Component {
                                onClick={this.handleLevelUpClick}/>
 
                         <input id="live" type="search" className="form-control"
-                               placeholder="search (3 or more chars)"
+                               placeholder="live search"
                                onChange={this.liveSearch}/>
                         <SetUpLiveSearch setLiveSearchValue={this.setLiveSearchValue}/>
-
+                        set page size
                     </div>
                     {this.state.isTransition ? <div>Searching ...</div> :
                         < List items={this.state.items} onItemClick={this.onItemClick}
@@ -594,10 +591,15 @@ export default class App extends Component {
         );
     }
     //--------------
-    setLiveSearchValue(value){
+    setLiveSearchValue(value){   // uncomment this.setState
+        console.log("new value  " + value);
+         let temp = Object.assign({},this.state);
+         temp.pageSize = value;
+         /*
         this.setState({
-            pageSize: value,
+            temp
         })
+*/
 
     }
 
@@ -605,14 +607,11 @@ export default class App extends Component {
 }
 //-------------------------------
 class SetUpLiveSearch extends React.Component{
-    constructor(props) {
-        super(props);
-            }
 
     render(){
         return(
-        <NumericInput className="form-control" readOnly={true} min={0} max={50} value={20} step={5}
-                      onChange={value => { console.log(value);/*this.props.setLiveSearchValue(value)*/}}/>
+        <NumericInput className="form-control"  min={0} max={50} value={20} step={5}
+                      onChange={value => this.props.setLiveSearchValue(value) }/>
         );
     }
 }
