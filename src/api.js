@@ -11,6 +11,20 @@ const serverUrl = 'https://play.dhis2.org/dev/api/';
 //const serverUrl = 'https://play.dhis2.org/test/api/';
 const basicAuth = `Basic ${btoa('admin:district')}`;
 
+/* Load the DHIS API URL from the manifest. */
+/*
+(function () {
+    fetch("manifest.webapp")
+        .then(response => response.json())
+        .then(json => {
+            console.log("testFetch:");
+            console.log(json);
+            console.log(`href = ${json.activites.href}`)
+        });
+})();
+*/
+
+
 /**
  * Default options object to send along with each request
  */
