@@ -9,10 +9,8 @@ import {
 import List from './List';
 import Form from './Form';
 import MaxResults from './MaxResults';
-import {mapSetItems, mapAddItems, mapClearAll, mapSelectItem, mapSetCoordinatesCallback} from '../map';
+import {mapSetItems, mapAddItems, mapSelectItem, mapSetCoordinatesCallback} from '../map';
 import {addCallbackToItems, arraysEqual} from '../util';
-
-
 
 
 /**
@@ -26,6 +24,14 @@ export default class App extends Component {
         // Set some initial state variables that are used within the component
         this.state = {
 
+            itemTo: {
+                id: "0",
+                displayName: '',
+                shortName: '',
+                openingDate: ``,
+                coordinates: ``,
+                level: '',
+            },
             isLoading: true,
             isTransition: true,
             items: [],
@@ -34,16 +40,7 @@ export default class App extends Component {
             maxLevels: {},
             toScreenP: [],
             toScreenG: [],
-            itemTo: {
-                id: "0",
-                displayName: '',
-                shortName: '',
-
-                openingDate: ``,
-                coordinates: ``,
-                level: '',
-
-            },
+            toScreenProg: [],
             wantToChange: false,
             searchMode: false,
             pageSize: 20,
@@ -67,17 +64,12 @@ export default class App extends Component {
         this.resetItemToClickChoice = this.resetItemToClickChoice.bind(this);
         this.setLiveSearchValue = this.setLiveSearchValue.bind(this);
 
-
-
     }
 
     componentDidMount() {
         this.loadOrganisationUnitMaxLevels();
-
         this.loadOrganisationUnits();
-
-
-        this.resetItemToClick(); // ?
+        this.resetItemToClick();
         mapSetCoordinatesCallback(this.onCoordinatesFromMap);
     }
 
@@ -113,7 +105,6 @@ export default class App extends Component {
                 parentItem.displayName = null;
                 mapAddItems([parentItem]);
                 parentItem.displayName = name;
-
             }
         }
     }
@@ -127,9 +118,7 @@ export default class App extends Component {
                     maxLevels: result.pager.total,
                 });
             })
-
             .catch((error) => alert(`Error loadOrgUnMaxLevels App  ${error.stack}`))
-
     }
 
 //----------------------------------------  part of componentDidMount   --------------
@@ -144,18 +133,12 @@ export default class App extends Component {
                     isTransition: false,
                     items: organisationUnits,
                     itemsToKeep: organisationUnits,
-
                 });
             })
-
             .catch((error) => alert(`Error loadOrgUnits  App ${error.stack}`))
-
-
     }
 
     //--------------------------------------------------------------------------------------------------------
-
-
     loadOrganisationUnitsChildren(item) {
         // save in item to be the parent of future children
         // Loads the organisation units from the api and sets the loading state to false and puts the items onto the component state.
@@ -172,22 +155,8 @@ export default class App extends Component {
 
     //------------------------------------------------------------------------------------------
     onLevelDownClick(item) {    // drill down
-      /*  if (item.level === this.state.maxLevels - 1) {
 
-            let temp = Object.assign({}, this.state.itemTo); // just changed 13:18
-            temp.level = this.state.maxLevels;
-            temp.openingDate = this.convertDate(new Date());
-            this.setState({
-                isTransition: true,
-                itemTo: temp,
-                parentItem: item,
-                searchMode: false,
-            });
-            this.resetItemToClickForm(); //  29   1045
-            this.loadOrganisationUnitsChildren(item);
-        }
-        else */
-            if (item.level < this.state.maxLevels) {
+        if (item.level < this.state.maxLevels) {
             let temp = Object.assign({}, this.state.itemTo);
             temp.openingDate = this.convertDate(new Date());
             this.setState({
@@ -196,17 +165,17 @@ export default class App extends Component {
                 parentItem: item,
                 searchMode: false,
             });
-
             this.resetItemToClick();
             this.loadOrganisationUnitsChildren(item);
         } else {
-                alert(`Lowest Level`);
+            alert(`Lowest Level`);
         }
     }
 
     onItemClick(item) {  // show info
 
-         mapSelectItem(item.id);
+        mapSelectItem(item.id);
+        console.log(item);
         let temp = Object.assign({}, item);
 
         if (item.level < this.state.maxLevels) {
@@ -217,29 +186,28 @@ export default class App extends Component {
                 wantToChange: false,
                 parentItem: item.parent,
             });
-            this.findElement(item);// show Parents and Groups
+            this.findElement(item);// show Parents , Groups and Programs
         } else {
 
             this.setState({
                 itemTo: temp,
                 wantToChange: true,
-                            });
+            });
             this.findElement(item);
         }
     }
 
-
     //----------------------------------------------------------------------------------------------
-
     onSubmit(formData) {
-        console.log("onsubmit app");
-        console.log(formData.id);
 
         if (this.state.wantToChange) {
 
             if (confirm(`Click OK to save edits to ${this.state.itemTo.displayName}`)) {
+                let temp = Object.assign({}, this.state.itemTo);
+
                 this.setState({
                     isTransition: true,
+                    parentItem: temp.parent,
                 });
                 this.updateOrganisationUnit(formData, this.state.itemTo);
                 this.resetItemToClick();
@@ -258,13 +226,12 @@ export default class App extends Component {
     //------------------------------------------------------------------------------------------
     onSelectClick(item) {  // zoom
 
-         console.log("onselect app");
-         let a = new CustomEvent(` `);         //  trying to pass empty string
-         this.liveSearch(a);
+        console.log("onselect app");
+        let a = new CustomEvent(` `);         //  trying to pass empty string
+        this.liveSearch(a);
 
         this.resetItemToClickChoice(item);
-        let temp = Object.assign({}, this.state.itemTo); // 13:45
-       // temp.level = this.state.maxLevels;
+        let temp = Object.assign({}, this.state.itemTo);
         this.setState({
             isTransition: true,
             itemTo: temp,
@@ -330,15 +297,11 @@ export default class App extends Component {
         });
     }
 
-    //-----------------------------------------------------------------------------------------
-
-
-    //
 //---------------------------------------------------------------------------------------------
     handleBackToRootClick(event) {
         event.preventDefault();
         this.setState({
-            isTransitiion: true,
+            isTransition: true,
         });
         this.resetItemToClick();
         this.loadOrganisationUnits();
@@ -354,13 +317,10 @@ export default class App extends Component {
             });
         }
         //--------------------------
-
         let infoG = [];
         if (item.organisationUnitGroups.length !== 0) {
             let groups = item.organisationUnitGroups;
-
             infoG[0] = {name: "Organisation Groups"};
-
             for (let i = 0; i < groups.length; i++) {
                 infoG.push({
                     name: groups[i].name
@@ -368,15 +328,25 @@ export default class App extends Component {
             }
         }
         //--------------------------
+        let infoProg = [];
+        if (item.programs.length !== 0) {
+            let groups = item.programs;
+            infoProg[0] = {name: "Programs "};
+            for (let i = 0; i < groups.length; i++) {
+                infoProg.push({
+                    name: groups[i].displayName
+                });
+            }
+        }
+        //--------------------------
         this.setState({
             toScreenP: infoP,
             toScreenG: infoG,
+            toScreenProg: infoProg,
         })
-
     }
 
     //-----------------------------------------------------------------------------------------
-
     liveSearch(event) {
         console.log("livesearch app");
         console.log(event); // complex when hit 'x'
@@ -395,12 +365,9 @@ export default class App extends Component {
                 searchMode: false,
             });
             return;
-
         }
-
-        liveSearch(event.target.value.toLowerCase().trim(), this.state.pageSize) //  ?
+        liveSearch(event.target.value.toLowerCase().trim(), this.state.pageSize)
             .then(result => {
-
                 if (result.organisationUnits.length == 0) {
                     this.setState({
                         isTransition: true,
@@ -415,7 +382,6 @@ export default class App extends Component {
                 }
             })
             .catch((error) => alert(`Error liveSearch App  ${error.stack}`))
-
     }
 
 //----------------------------------------------------------------------------------------------
@@ -423,18 +389,14 @@ export default class App extends Component {
         this.setState({
             isTransition: true,
         });
-
         let ancestors = this.state.items[0].ancestors;
         let i = ancestors.length;
-
         if (i === 1) {
             this.setState({
                 isTransition: false,
-
             });
             this.resetItemToClick();
         }
-
         else {
             this.loadOrganisationUnitsChildren(ancestors[i - 2]);
             this.resetItemToClick();
@@ -450,10 +412,7 @@ export default class App extends Component {
                 this.resetItemToClickForm();
             }
         } else {
-                  /*  if(item.level === this.state.maxLevels - 1){
-                   this.resetItemToClickForm();
-               }
-          else */ if (item.level < this.state.maxLevels) {
+            if (item.level < this.state.maxLevels) {
                 this.resetItemToClick();
             } else {
                 this.resetItemToClickForm();
@@ -474,6 +433,7 @@ export default class App extends Component {
             },
             toScreenG: [],
             toScreenP: [],
+            toScreenProg: [],
             wantToChange: false,
         })
     }
@@ -489,33 +449,37 @@ export default class App extends Component {
         temp.itemTo.level = this.state.maxLevels;
         temp.toScreenP = [];
         temp.toScreenG = [];
+        temp.toScreenProg = [];
         temp.wantToChange = false;
         this.setState({
             itemTo: temp.itemTo,
             toScreenG: temp.toScreenG,
             toScreenP: temp.toScreenP,
+            toScreenProg: temp.toScreenProg,
             wantToChange: temp.wantToChange,
         })
     }
 
     convertDate(date) {
 
-
         let d = date ? date : new Date();
         let m = d.getMonth() + 1;
         if (m < 10) m = '0' + m;
         let day = d.getDate();
         if (day < 10) day = '0' + day;
-
-
         let newD = `${d.getFullYear()}-${m}-${day}`;
         return newD.toString();
+    }
 
+    //--------------
+    setLiveSearchValue(value) {
+        this.setState({
+            pageSize: value
+        });
     }
 
     //----------------------------------------------------------------------------------------------
     render() {
-
 
         // If the component state is set to isLoading we hide the app and show a loading message
         if (this.state.isLoading) {
@@ -555,6 +519,7 @@ export default class App extends Component {
                     <div>
                         <InfoP toScreenP={this.state.toScreenP}/>
                         <InfoG toScreenG={this.state.toScreenG}/>
+                        <InfoProg toScreenProg={this.state.toScreenProg}/>
                     </div>
 
                 </div>
@@ -563,14 +528,7 @@ export default class App extends Component {
         );
 
         // Render the app which includes the list component and the form component
-        // We hide the form component when we are in the saving state.
-    }
-    //--------------
-    setLiveSearchValue(value) {
-        this.setState({
-            pageSize: value
-        });
-
+        // We hide the form component when we are in the transition state.
     }
 
     //----------------------- end class ---------------------------------
@@ -604,3 +562,17 @@ class InfoG extends React.Component {
     }
 }
 
+class InfoProg extends React.Component { // 30.11    11:00
+
+    render() {
+        if (this.props.toScreenProg.length == 0)
+            return null;
+
+        let list = this.props.toScreenProg.map(function (stuka, i) {
+            return <li key={i} style={{marginLeft: (i == 0 ? 0 : 1) + 'em'}}>
+                {stuka.name}
+            </li>;
+        });
+        return <ul className="list_with_header">{list}</ul>
+    }
+}
