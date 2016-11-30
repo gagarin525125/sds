@@ -251,6 +251,7 @@ export default class App extends Component {
     updateOrganisationUnit(formData, itemTo) {
         this.setState({
             isTransition: true,
+            searchMode: false,
 
         });
         updateOrganisationUnit(formData, itemTo)
@@ -515,7 +516,9 @@ export default class App extends Component {
                     {this.state.isTransition ? <div>Searching ...</div> :
                         <Form onSubmit={this.onSubmit} item={this.state.itemTo}
                               maxLevels={this.state.maxLevels}
-                              resetItemToClickChoice={this.resetItemToClickChoice}/>}
+                              resetItemToClickChoice={this.resetItemToClickChoice}
+                              searchMode={this.state.searchMode}
+                        />}
                     <div>
                         <InfoP toScreenP={this.state.toScreenP}/>
                         <InfoG toScreenG={this.state.toScreenG}/>
