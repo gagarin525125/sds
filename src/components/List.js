@@ -1,45 +1,44 @@
-import React, { PropTypes } from 'react';
-import { mapHighlightItem } from '../map';
+import React, {PropTypes} from 'react';
+import {mapHighlightItem} from '../map';
 
 /**
  * A stateless function component
  * https://facebook.github.io/react/docs/reusable-components.html#stateless-functions
  */
-export default function List({ items = [], onItemClick,onLevelDownClick ,onSelectClick,levels}) {
+export default function List({items = [], onItemClick, onLevelDownClick, onSelectClick, levels}) {
     // Create a list of li elements that make up the list of organisation units units
     // Each has a click handler for that specific item
 
+    let bol = true;
+    for (let i = 0; i < items.length - 1; i++) {
 
-
-    //   this doesnt work
-    // let bol =  items.every((val,i,arr) => val == arr[0].parent.id);
-       let bol = true;
-
-      for(let i = 0;i < items.length - 1;i++){
-
-          if(items[i].parent.id === items[i+1].parent.id){
-              bol = bol && true;
-          }else {
-              bol = bol && false;
-          }
-             if(bol == false) break;
-      }
+        if (items[i].parent.id === items[i + 1].parent.id) {
+            bol = bol && true;
+        } else {
+            bol = bol && false;
+        }
+        if (bol == false) break;
+    }
 
     const listItems = items
         .map(item => {
-            if(item.level === levels ){
-                return(
+            if (item.level === levels) {
+                return (
                     <li key={item.id}
                         onMouseEnter={() => mapHighlightItem(item.id, true)}
                         onMouseLeave={() => mapHighlightItem(item.id, false)}
                         onClick={() => onItemClick(item)}>
                         {item.displayName}
                         <button hidden={bol}
-                                onClick={e => {e.stopPropagation(); onSelectClick(item)}}>
-                                Zoom
+                                onClick={e => {
+                                    e.stopPropagation();
+                                    onSelectClick(item)
+                                }}>
+                            Zoom
                         </button>
                     </li>
-                ) } else {
+                )
+            } else {
                 return (
 
                     <li key={item.id}
@@ -47,12 +46,16 @@ export default function List({ items = [], onItemClick,onLevelDownClick ,onSelec
                         onMouseLeave={() => mapHighlightItem(item.id, false)}
                         onClick={() => onItemClick(item)}>
                         {item.displayName}
-                        <button onClick={e => {e.stopPropagation(); onLevelDownClick(item)}}>
+                        <button onClick={e => {
+                            e.stopPropagation();
+                            onLevelDownClick(item)
+                        }}>
                             Drill down
                         </button>
                     </li>
 
-                );}
+                );
+            }
         });
 
     // Render the list with the items
@@ -64,15 +67,5 @@ List.propTypes = {
     onItemClick: PropTypes.func.isRequired,
     onLevelDownClick: PropTypes.func.isRequired,
     onSelectClick: PropTypes.func.isRequired,
-    //levels: PropTypes.number,
-
 };
 
-/*
-*
-*
- <li  onClick={() => onLevelDownClick(item)}>Level Down
- </li>
-*
-*   < button onClick = {() => onShowMapClick(item)}>show map</button>
-* */
