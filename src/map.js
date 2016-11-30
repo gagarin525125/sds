@@ -58,11 +58,6 @@ export function mapHighlightItem(id, enable) {
 
 /** Show an item as selected on the map. */
 export function mapSelectItem(id) {
-    if (!markers[id]) {
-        console.log(`mapSelectItem: no marker found for id ${id}`);
-        return;
-    }
-
     // Remove the previous selection first.
     if (popup)
         popup.close();
@@ -73,8 +68,10 @@ export function mapSelectItem(id) {
     mapHighlightItem(id, false);
     selectedId = id;
 
-    popup = new google.maps.InfoWindow({content: markers[id].title});
-    popup.open(map, markers[id]);
+    if (markers[id]) {
+        popup = new google.maps.InfoWindow({content: markers[id].title});
+        popup.open(map, markers[id]);
+    }
 
     if (polygons[id])
         polygons[id].forEach(p => p.setOptions({fillOpacity: 0.2}));
