@@ -127,11 +127,6 @@ ul {
     border: 2px;
 }
 
-/*.search li button.delete_button {
-    background: #ff7b80;
-    color: ghostwhite;
-}*/
-
 .info {
     flex: 0 auto;
     margin-top: 1em;
@@ -204,8 +199,8 @@ fieldset {
     background-color: #BB8B71;
 }
 
-.list_with_header ul {
-    padding: 1em;
+.list_with_header {
+    padding: 0.5em;
 }
 
 .list_with_header li:first-of-type {
