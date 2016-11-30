@@ -4,6 +4,10 @@ export default class Form extends Component {
     constructor(props) {
         super(props);
 
+
+
+
+
         this.state = {
 
             element: {
@@ -15,8 +19,7 @@ export default class Form extends Component {
                 level: ``,
             },
             bol: false,
-            tempName: ``,
-        };
+                    };
 
         this.onSubmitClick = this.onSubmitClick.bind(this);
         this.setName = this.setName.bind(this);
@@ -100,22 +103,21 @@ export default class Form extends Component {
         this.setState({
             element: temp,
             bol: false,
-            tempName: ``,
-        });
+                    });
 
     }
 
     setName(event) {
-        let rem = Object.assign({},this.state.element.name);
+
         let temp = Object.assign({}, this.state.element);
         temp.name = event.target.value;
 
         this.setState({
             element: temp,
             bol: true,
-            tempName: temp.name,
-        });
+                    });
     }
+
 
     setShortName(event) {
         let temp = this.state.element;
@@ -158,12 +160,14 @@ export default class Form extends Component {
     }
 
     render() {
+        let one = `Editing Mode`;
+
 
         return (
             <div className="form">
                 <form>
-                    <fieldset disabled={this.props.item.level != this.props.maxLevels}>
-                        {this.state.bol ? <h4> Editing {this.state.tempName}</h4> : console.log("")}
+                    <fieldset disabled={this.validField()}>
+                        {this.state.bol ? <h4> {one}</h4> : console.log()}
                         <label>
                             <span>Name</span>
                             <input type="text" value={this.state.element.name} onChange={this.setName}/>
@@ -196,15 +200,28 @@ export default class Form extends Component {
                     </fieldset>
                 </form>
 
-                <button id="empty_fields" onClick={this.resetFormClick}
-                        disabled={this.props.searchMode /* || (this.props.item.level != this.props.maxLevels)*/}>
+                <button id="empty_fields" onClick={this.resetFormClick} disabled={this.validAdd}>
+
                     Add new
                 </button>
 
             </div>
         );
     }
+    validAdd(){
 
+        if(this.state.bol)
+            return false;
+        else if(this.props.searchMode || (this.props.item.level != this.props.maxLevels))
+            return false;
+        return false;
+
+    }
+    validField(){
+       if( this.props.item.level != this.props.maxLevels)
+           return false;
+       return false;
+    }
     convertDate(dateForm) {
         let d = new Date(dateForm);
         let m = d.getMonth() + 1;
@@ -224,4 +241,4 @@ Form.propTypes = {
 
 };
 
-
+//{this.state.bol ? disabled={true} : disabled={}>}
