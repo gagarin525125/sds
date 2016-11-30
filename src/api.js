@@ -7,8 +7,8 @@
  */
 //const serverUrl = 'http://localhost:8082/api/';
 //const serverUrl = 'https://play.dhis2.org/demo/api/';
-const serverUrl = 'https://play.dhis2.org/dev/api/';
-//const serverUrl = 'https://play.dhis2.org/test/api/';
+//const serverUrl = 'https://play.dhis2.org/dev/api/';
+const serverUrl = 'https://play.dhis2.org/test/api/';
 const basicAuth = `Basic ${btoa('admin:district')}`;
 
 /**
@@ -32,20 +32,19 @@ function onlySuccessResponses(response) {
     }
     return Promise.reject(response);
 }
-export function organisationUnitLevels(){
-return fetch(`${serverUrl}organisationUnitLevels`,fetchOptions)
+export function organisationUnitLevels() {
+    return fetch(`${serverUrl}organisationUnitLevels`, fetchOptions)
         .then(onlySuccessResponses)
         // Parse the json responsee
         .then(response => response.json())
         // Log any errors to the console. (Should probably do some better error handling);
-        .catch((error) => alert(`organisationUnitLevels api ${error.toString()}`));
+        .catch((error) => alert(`orgUnitLevels api ${error.toString()}`));
 
 }
 export function saveOrganisationUnit(organisationUnit, parentOf, levels) {
     //-----------------------------------------------------------
     alert(`Adding new unit at level  : ${levels}`);
     // POST the payload to the server to save the organisationUnit
-    console.log("levels  " + levels);
     let toSend = {
         parent: {
             id: parentOf.id
@@ -57,8 +56,6 @@ export function saveOrganisationUnit(organisationUnit, parentOf, levels) {
         coordinates: organisationUnit.coordinates,
         level: levels,
     };
-    console.log("tosend  api ");
-    console.log(JSON.stringify(toSend));
     let options = Object.assign({}, fetchOptions, {
         method: 'POST',
         body: JSON.stringify(toSend)
@@ -69,17 +66,15 @@ export function saveOrganisationUnit(organisationUnit, parentOf, levels) {
         .then(onlySuccessResponses)
         // Parse the json responsee
         .then(response => response.json())
-        // Log any errors to the console. (Should probably do some better error handling);
-        .catch((error) => alert(`saveOrganisationUnit api ${error}`));
+        .catch((error) => alert(`saveOrgUnit api ${error}`));
 }
 //------------------------------------------------------------------------------------------------------
 
-export function updateOrganisationUnit(formData,itemTo){
-    console.log("update api");
-    if(!itemTo.id)
+export function updateOrganisationUnit(formData, itemTo) {
+    if (!itemTo.id)
         alert("something wrong with  Id ,updateOrgUnit   api  ");
-      else if(!itemTo.parent)
-          alert("something wrong with  Parent , updateOrgUnit   api");
+    else if (!itemTo.parent)
+        alert("something wrong with  Parent , updateOrgUnit   api");
     let toSend = {
         parent: {
             id: itemTo.parent.id
@@ -89,61 +84,42 @@ export function updateOrganisationUnit(formData,itemTo){
         openingDate: formData.openingDate,
         coordinates: formData.coordinates,
         featureType: "POINT",
-      //  featureType: itemTo.featureType,
+        //  featureType: itemTo.featureType,
         level: itemTo.level,
     };
-    console.log("update org un api to send");
-    console.log(JSON.stringify(toSend));
+
     let options = Object.assign({}, fetchOptions, {
         method: 'PUT',
         body: JSON.stringify(toSend)
-          });
-        return fetch(`${serverUrl}organisationUnits/${itemTo.id}?mergeMode=REPLACE`, options)
+    });
+    return fetch(`${serverUrl}organisationUnits/${itemTo.id}?mergeMode=REPLACE`, options)
         .then(onlySuccessResponses)
         // Parse the json responsee
         .then(response => response.json())
-        .catch((error) => alert(`updateOrganisationUnit api ${error}`));
+        .catch((error) => alert(`updateOrgUnit api ${error}`));
 
-}
-
-
-export function deleteOrganisationUnit(organisationUnit) {
-    // Send DELETE request to the server to delete the organisation unit
-    return fetch(
-        `${serverUrl}/organisationUnits/${organisationUnit.id}`,
-        {
-            headers: fetchOptions.headers,
-            method: 'DELETE',
-        }
-    )
-    .then(onlySuccessResponses)
-    .catch((error) => alert(`error delete org.unit api ${error}`));
 }
 
 export function findChildren(organisationUnit) {
-    console.log("findChildren  api");
 
-    console.log(organisationUnit);
-
-    let a = fetch(`${serverUrl}/organisationUnits/${organisationUnit.id}
+    return fetch(`${serverUrl}/organisationUnits/${organisationUnit.id}
     ?paging=false&level=1&fields= 
     id,displayName,featureType,coordinates,level,
-    openingDate,ancestors[id,displayName],shortName,parent[id,displayName,level,ancestors],
-    organisationUnitGroups[id,name]`, fetchOptions)
+    openingDate,ancestors[id,displayName],shortName,parent[id,displayName,level,ancestors,coordinates],
+    organisationUnitGroups[id,name],programs[id,displayName]`, fetchOptions)
 
-    .then(onlySuccessResponses)
+        .then(onlySuccessResponses)
         .then(response => {
             if (response.status === 404) {
                 alert(`Something wrong , children query`);
-                        }
-               return response.json();
+            }
+            return response.json();
         })
-        .then(({ organisationUnits }) => {
+        .then(({organisationUnits}) => {
             return organisationUnits;
         })
         .catch((error) => alert(`findChildren api ${error}`));
 
-    return a;
 }
 
 export function loadOrganisationUnits() {
@@ -151,29 +127,24 @@ export function loadOrganisationUnits() {
     // return fetch(`${serverUrl}/organisationUnits?paging=false&level=1`, fetchOptions)
     return fetch(`${serverUrl}/organisationUnits?paging=false&level=2&fields=
     id,displayName,featureType,coordinates,level,
-    openingDate,ancestors[id,displayName],shortName,parent[id,displayName,level,ancestors],
-    organisationUnitGroups[id,name]`, fetchOptions)
+    openingDate,ancestors[id,displayName],shortName,parent[id,displayName,level,ancestors,coordinates],
+    organisationUnitGroups[id,name],programs[id,displayName]`, fetchOptions)
         .then(onlySuccessResponses)
         .then(response => response.json())
         // pick the organisationUnits property from the payload
         .then(({organisationUnits}) => {
-           // console.log("organisationUnits children   api");
-          //  console.log(organisationUnits);
             return organisationUnits;
         })
-        .catch((error) => alert(`loadOrganisationUnits api ${error}`));
+        .catch((error) => alert(`loadOrgUnits api ${error}`));
 }
 
-export function liveSearch(searchString,pS) {
-    console.log("searchString api");
-    console.log(searchString);
-     if (searchString === '') return null;
+export function liveSearch(searchString, pS) {
 
-    // paging=false
+    if (searchString === '') return null;
     return fetch(`${serverUrl}/organisationUnits?paging=true&pageSize=${pS}&fields=
     id,displayName,featureType,coordinates,level,
-    openingDate,ancestors[id,displayName],shortName,parent[id,displayName,level,ancestors],
-    organisationUnitGroups[id,name]
+    openingDate,ancestors[id,displayName],shortName,parent[id,displayName,level,ancestors,coordinates],
+    organisationUnitGroups[id,name],programs[id,displayName]
     &filter=name:ilike:${searchString}`, fetchOptions)
         .then(onlySuccessResponses)
         .then(response => response.json())
@@ -181,37 +152,17 @@ export function liveSearch(searchString,pS) {
 
 }
 
-export function  findOrganisationUnitGroups(groupId) {
-
-    return fetch(`${serverUrl}/organisationUnitGroups/${groupId}`, fetchOptions)
-        .then(onlySuccessResponses)
-        .then(response => response.json())
-        .catch((error) => alert(`findOrgUnitGroups api ${error}`));
-
-}
 
 /** Retrieve one org.unit from DHIS. */
 export function loadOrganisationUnit(id) {
-    console.log("loadOrganisationUnit api");
 
     return fetch(`${serverUrl}organisationUnits/${id}?fields=id,displayName,
     featureType,coordinates,level,openingDate,shortName,
     parent[id,displayName,level]`, fetchOptions)
         .then(onlySuccessResponses)
         .then(response => response.json())
-        .catch(error => console.log(`loadOrganisationUnit api ${error}`));
+        .catch(error => alert(`loadOrganisationUnit api ${error}`));
 }
-
-/*
-export function itemFeatures(item){
-
-     return fetch(`${serverUrl}organisationUnits/${item.id}`, fetchOptions)
-        .then(onlySuccessResponses)
-        .then(response => response.json())
-        .catch((error) => alert(`itemFeatures api ${error}`))
-    }
-
-*/
 
 
 
