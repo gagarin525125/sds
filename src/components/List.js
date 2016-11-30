@@ -5,20 +5,9 @@ import {mapHighlightItem} from '../map';
  * A stateless function component
  * https://facebook.github.io/react/docs/reusable-components.html#stateless-functions
  */
-export default function List({items = [], onItemClick, onLevelDownClick, onSelectClick, levels}) {
+export default function List({items = [], onItemClick, onLevelDownClick, onSelectClick, levels, zoomButton}) {
     // Create a list of li elements that make up the list of organisation units units
     // Each has a click handler for that specific item
-
-    let bol = true;
-    for (let i = 0; i < items.length - 1; i++) {
-
-        if (items[i].parent.id === items[i + 1].parent.id) {
-            bol = bol && true;
-        } else {
-            bol = bol && false;
-        }
-        if (bol == false) break;
-    }
 
     const listItems = items
         .map(item => {
@@ -29,7 +18,7 @@ export default function List({items = [], onItemClick, onLevelDownClick, onSelec
                         onMouseLeave={() => mapHighlightItem(item.id, false)}
                         onClick={() => onItemClick(item)}>
                         {item.displayName}
-                        <button hidden={bol}
+                        <button hidden={!zoomButton}
                                 onClick={e => {
                                     e.stopPropagation();
                                     onSelectClick(item)
@@ -67,5 +56,7 @@ List.propTypes = {
     onItemClick: PropTypes.func.isRequired,
     onLevelDownClick: PropTypes.func.isRequired,
     onSelectClick: PropTypes.func.isRequired,
+    levels: PropTypes.number.isRequired,
+    zoomButton: PropTypes.bool.isRequired,
 };
 

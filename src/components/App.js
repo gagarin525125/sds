@@ -486,8 +486,6 @@ export default class App extends Component {
             return <div><p/>Loading data...</div>;
         }
 
-        // Render the app which includes the list component and the form component
-        // We hide the form component when we are in the saving state.
         return (
             <div className="app">
                 <div className="search">
@@ -506,11 +504,14 @@ export default class App extends Component {
                                     onChange={this.setLiveSearchValue}/>
                     </div>
                     {this.state.isTransition ? <div>Searching ...</div> :
-                        < List items={this.state.items} onItemClick={this.onItemClick}
-                               onLevelDownClick={this.onLevelDownClick}
-                               levels={this.state.maxLevels}
-                               onSelectClick={this.onSelectClick}/>}
+                        <List items={this.state.items}
+                              onItemClick={this.onItemClick}
+                              onLevelDownClick={this.onLevelDownClick}
+                              levels={this.state.maxLevels}
+                              onSelectClick={this.onSelectClick}
+                              zoomButton={this.state.searchMode}/>}
                 </div>
+
                 <div className="info">
                     {this.state.isTransition ? <div>Searching ...</div> :
                         <Form onSubmit={this.onSubmit} item={this.state.itemTo}
@@ -523,14 +524,12 @@ export default class App extends Component {
                         <InfoG toScreenG={this.state.toScreenG}/>
                         <InfoProg toScreenProg={this.state.toScreenProg}/>
                     </div>
-
                 </div>
+
             </div>
 
         );
 
-        // Render the app which includes the list component and the form component
-        // We hide the form component when we are in the transition state.
     }
 
     //----------------------- end class ---------------------------------
