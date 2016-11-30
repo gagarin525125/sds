@@ -14,8 +14,6 @@ export default class Form extends Component {
                 coordinates: ``,
                 level: ``,
             },
-             isChanged: false,
-
         };
 
         this.onSubmitClick = this.onSubmitClick.bind(this);
@@ -24,34 +22,22 @@ export default class Form extends Component {
         this.setOpeningDate = this.setOpeningDate.bind(this);
         this.setNewCoordinates = this.setNewCoordinates.bind(this);
         this.resetFormClick = this.resetFormClick.bind(this);
-
+        this.resetFormClickLocal = this.resetFormClickLocal.bind(this);
 
     }
 
     componentWillReceiveProps(nextProps) {
 
-        console.log("receive props");
-/*
-        if (nextProps.item.id != this.state.element.id) {
-            this.setState({
-                isChanged: false,
-            });
-        }*/
+
         if (nextProps.item.id != this.state.element.id)
-            this.loadData(nextProps.item,this.state.element);
+            this.loadData(nextProps.item);
         else
 
             this.keepData(this.state.element, nextProps.item.coordinates)
 
     }
 
-
-    shouldComponentUpdate(nextProps, nextState) {
-        return true;
-    }
-
-    loadData(item,stateItem) {
-        console.log("loadData");
+    loadData(item) {
 
         let temp = Object.assign({}, this.state.element);
         temp.id = item.id;
@@ -65,9 +51,7 @@ export default class Form extends Component {
         });
     }
 
-    //------------------
     keepData(item, coord) {
-        console.log("keepData");
         let temp = Object.assign({}, this.state.element);
         temp.id = item.id;
         temp.coordinates = coord ? coord : ``;
@@ -76,18 +60,14 @@ export default class Form extends Component {
         });
     }
 
-    //------------------
     onSubmitClick(event) {
         event.preventDefault();
-        console.log("this.state Form element");
-        console.log(this.state.element);
         this.props.onSubmit(this.state.element);
-        this.resetFormClick2();
+        this.resetFormClickLocal();
     }
 
     resetFormClick() {
-        console.log("reset form");
-        let temp = Object.assign({},this.state.element);
+        let temp = Object.assign({}, this.state.element);
         temp.id = this.state.element.id;
         temp.name = ``;
         temp.shortName = ``;
@@ -95,14 +75,14 @@ export default class Form extends Component {
         temp.coordinates = ``;
         this.setState({
             element: temp,
-             isChanged: false,
         });
         this.props.resetItemToClickChoice();
 
     }
-    resetFormClick2() {
-        console.log("reset form");
-        let temp = Object.assign({},this.state.element);
+
+    resetFormClickLocal() {
+
+        let temp = Object.assign({}, this.state.element);
         temp.id = `0`;
         temp.name = ``;
         temp.shortName = ``;
@@ -110,18 +90,15 @@ export default class Form extends Component {
         temp.coordinates = ``;
         this.setState({
             element: temp,
-            isChanged: false,
         });
 
     }
 
     setName(event) {
-        let temp = Object.assign({},this.state.element);
+        let temp = Object.assign({}, this.state.element);
         temp.name = event.target.value;
         this.setState({
             element: temp,
-            isChanged: true,
-
         });
     }
 
@@ -130,8 +107,6 @@ export default class Form extends Component {
         temp.shortName = event.target.value;
         this.setState({
             element: temp,
-            isChanged: true,
-
         });
     }
 
@@ -140,8 +115,6 @@ export default class Form extends Component {
         temp.openingDate = event.target.value;
         this.setState({
             element: temp,
-             isChanged: true,
-
         });
     }
 
@@ -162,12 +135,13 @@ export default class Form extends Component {
         temp.coordinates = event.target.value;
         this.setState({
             element: temp,
-             isChanged: true,
         });
 
     }
 
     render() {
+        console.log("props search Form");
+        console.log(this.props.searchMode);
         return (
             <div className="form">
                 <form>
@@ -185,33 +159,28 @@ export default class Form extends Component {
                             <input type="date" value={this.state.element.openingDate} onChange={this.setOpeningDate}/>
                         </label>
                         <label>
-                            <span>Location</span>
+                            <span>Location</span>(right click)
                             <input type="text" value={this.state.element.coordinates}
                                    placeholder="[ latitude , longitude ] "
                                    onChange={this.setNewCoordinates}/>
                         </label>
                         <div>
-                            (right click)
-                            <button disabled={this.isFormValid()} id="submit" onClick={this.onSubmitClick}>Submit</button>
+
+                            <button disabled={this.isFormValid()} id="submit" onClick={this.onSubmitClick}>Submit
+                            </button>
 
                         </div>
                     </fieldset>
                 </form>
 
                 <button id="empty_fields" onClick={this.resetFormClick}
-                        disabled={this.props.item.level != this.props.maxLevels}>
+                        disabled={this.props.searchMode /* || (this.props.item.level != this.props.maxLevels)*/}>
                     Add new
                 </button>
 
             </div>
-
-
-
         );
     }
-
-    //-------------
-
 
     convertDate(dateForm) {
         let d = new Date(dateForm);
@@ -219,7 +188,6 @@ export default class Form extends Component {
         if (m < 10) m = '0' + m;
         let day = d.getDate();
         if (day < 10) day = '0' + day;
-
         let newD = `${d.getFullYear()}-${m}-${day}`;
         return newD.toString();
     }
