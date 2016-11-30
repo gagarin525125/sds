@@ -177,10 +177,15 @@ export default class Form extends Component {
                             <input type="date" value={this.state.element.openingDate} onChange={this.setOpeningDate}/>
                         </label>
                         <label>
-                            <span>Location</span>(right click)
+                            <span>Location</span>
                             <input type="text" value={this.state.element.coordinates}
                                    placeholder="[ latitude , longitude ] "
                                    onChange={this.setNewCoordinates}/>
+                        </label>
+                        <label style={{textAlign: "right"}}>
+                            <span style={{fontStyle: "italic", fontSize: "0.8em"}}>
+                                (Right click on map to set)
+                            </span>
                         </label>
                         <div>
 

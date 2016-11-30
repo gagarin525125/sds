@@ -169,11 +169,12 @@ fieldset {
 
 .form span {
     flex: 1;
+    margin-right: 0.5em;
 }
 
 .form input {
     flex: 2;
-    padding: 0.5rem;
+    padding: 0.35rem;
     border: solid 1px;
     border-radius: 0.5em;
     margin: 0.05em;
@@ -193,6 +194,7 @@ fieldset {
 
 .form #submit {
     background-color: #6DA161;
+    margin-top: 0.75em;
 }
 
 .form #empty_fields {
