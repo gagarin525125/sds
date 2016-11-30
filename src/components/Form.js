@@ -14,6 +14,8 @@ export default class Form extends Component {
                 coordinates: ``,
                 level: ``,
             },
+            bol: false,
+            tempName: ``,
         };
 
         this.onSubmitClick = this.onSubmitClick.bind(this);
@@ -29,8 +31,14 @@ export default class Form extends Component {
     componentWillReceiveProps(nextProps) {
 
 
-        if (nextProps.item.id != this.state.element.id)
+        if (nextProps.item.id != this.state.element.id) {
+
             this.loadData(nextProps.item);
+            this.setState({
+                bol: false,
+                tempName: ``,
+            })
+        }
         else
 
             this.keepData(this.state.element, nextProps.item.coordinates)
@@ -57,6 +65,7 @@ export default class Form extends Component {
         temp.coordinates = coord ? coord : ``;
         this.setState({
             element: temp,
+            bol: true,
         });
     }
 
@@ -90,15 +99,21 @@ export default class Form extends Component {
         temp.coordinates = ``;
         this.setState({
             element: temp,
+            bol: false,
+            tempName: ``,
         });
 
     }
 
     setName(event) {
+        let rem = Object.assign({},this.state.element.name);
         let temp = Object.assign({}, this.state.element);
         temp.name = event.target.value;
+
         this.setState({
             element: temp,
+            bol: true,
+            tempName: temp.name,
         });
     }
 
@@ -107,6 +122,7 @@ export default class Form extends Component {
         temp.shortName = event.target.value;
         this.setState({
             element: temp,
+            bol: true,
         });
     }
 
@@ -115,6 +131,7 @@ export default class Form extends Component {
         temp.openingDate = event.target.value;
         this.setState({
             element: temp,
+            bol: true,
         });
     }
 
@@ -135,17 +152,18 @@ export default class Form extends Component {
         temp.coordinates = event.target.value;
         this.setState({
             element: temp,
+            bol: true,
         });
 
     }
 
     render() {
-        console.log("props search Form");
-        console.log(this.props.searchMode);
+
         return (
             <div className="form">
                 <form>
                     <fieldset disabled={this.props.item.level != this.props.maxLevels}>
+                        {this.state.bol ? <h4> Editing {this.state.tempName}</h4> : console.log("")}
                         <label>
                             <span>Name</span>
                             <input type="text" value={this.state.element.name} onChange={this.setName}/>
