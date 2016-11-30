@@ -207,7 +207,6 @@ export default class App extends Component {
 
                 this.setState({
                     isTransition: true,
-                    parentItem: temp.parent,
                 });
                 this.updateOrganisationUnit(formData, this.state.itemTo);
                 this.resetItemToClick();
