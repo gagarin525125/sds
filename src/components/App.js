@@ -74,7 +74,8 @@ export default class App extends Component {
     }
 
     componentWillUpdate(_, nextState) {
-        this.updateMap(nextState);
+        if (!nextState.isTransition)
+            this.updateMap(nextState);
     }
 
     /* Keep the map in sync with the unfiltered list of org.units. */
