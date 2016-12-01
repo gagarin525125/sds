@@ -181,8 +181,9 @@ export default class Form extends Component {
         for (let i = 0; i < items.length - 1; i++) {
 
             if (items[i].parent.id === items[i + 1].parent.id) {
-                secBol = secBol && true;
-            } else {
+                secBol = true;
+            }
+            else {
                 secBol = secBol && false;
             }
             if (secBol == false) break;
@@ -195,7 +196,7 @@ export default class Form extends Component {
             <div className="form">
                 <form>
                     <fieldset disabled={!(secBol && (this.props.item.level == this.props.maxLevels) && !this.props.searchMode)}>
-                        {secBol && this.state.bol ? <h4> {one}</h4> : console.log()}
+                        {secBol && this.state.bol && !this.props.searchMode? <h4> {one}</h4> : console.log()}
                         <label>
                             <span>Name</span>
                             <input type="text" value={this.state.element.name} onChange={this.setName}/>
@@ -225,11 +226,12 @@ export default class Form extends Component {
                             </button>
 
                         </div>
-                    </fieldset>eldset>
+                    </fieldset>
                 </form>
 
-                <button id="empty_fields" onClick={this.resetFormClick} disabled={!(!this.props.searchMode &&
-                (this.props.item.level == this.props.maxLevels) && !this.state.bol)}>
+                <button id="empty_fields" onClick={this.resetFormClick} disabled={false/*!(secBol && true )*/
+                    /*!(!this.props.searchMode &&
+                (this.props.item.level == this.props.maxLevels) )*/}>
 
                     Add new
                 </button>
@@ -258,3 +260,4 @@ Form.propTypes = {
 };
 
 
+// !(!this.props.searchMode && (this.props.item.level == this.props.maxLevels) && !this.state.bol)
