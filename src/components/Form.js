@@ -68,8 +68,11 @@ export default class Form extends Component {
         temp.coordinates = coord ? coord : ``;
         this.setState({
             element: temp,
-            bol: true,
-        });
+                    });
+        if(this.props.item.level == this.props.maxLevels)
+            this.setState({
+                bol: true,
+            });
     }
 
     onSubmitClick(event) {
@@ -114,8 +117,11 @@ export default class Form extends Component {
 
         this.setState({
             element: temp,
-            bol: true,
-                    });
+                     });
+        if(this.props.item.level == this.props.maxLevels)
+            this.setState({
+                bol: true,
+            });
     }
 
 
@@ -124,8 +130,11 @@ export default class Form extends Component {
         temp.shortName = event.target.value;
         this.setState({
             element: temp,
-            bol: true,
-        });
+               });
+        if(this.props.item.level == this.props.maxLevels)
+            this.setState({
+                bol: true,
+            });
     }
 
     setOpeningDate(event) {
@@ -133,8 +142,11 @@ export default class Form extends Component {
         temp.openingDate = event.target.value;
         this.setState({
             element: temp,
-            bol: true,
-        });
+                 });
+        if(this.props.item.level == this.props.maxLevels)
+            this.setState({
+                bol: true,
+            });
     }
 
     isFormValid() {
@@ -154,8 +166,11 @@ export default class Form extends Component {
         temp.coordinates = event.target.value;
         this.setState({
             element: temp,
-            bol: true,
-        });
+                    });
+        if(this.props.item.level == this.props.maxLevels)
+            this.setState({
+                bol: true,
+            });
 
     }
 
@@ -166,7 +181,7 @@ export default class Form extends Component {
         return (
             <div className="form">
                 <form>
-                    <fieldset disabled={this.validField()}>
+                    <fieldset disabled={this.props.item.level != this.props.maxLevels}>
                         {this.state.bol ? <h4> {one}</h4> : console.log()}
                         <label>
                             <span>Name</span>
@@ -197,10 +212,11 @@ export default class Form extends Component {
                             </button>
 
                         </div>
-                    </fieldset>
+                    </fieldset>eldset>
                 </form>
 
-                <button id="empty_fields" onClick={this.resetFormClick} disabled={this.validAdd}>
+                <button id="empty_fields" onClick={this.resetFormClick} disabled={!(!this.props.searchMode &&
+                (this.props.item.level == this.props.maxLevels) && !this.state.bol)}>
 
                     Add new
                 </button>
@@ -210,7 +226,7 @@ export default class Form extends Component {
     }
     validAdd(){
 
-        if(this.state.bol)
+        if(!this.state.bol && !this.props.searchMode)
             return false;
         else if(this.props.searchMode || (this.props.item.level != this.props.maxLevels))
             return false;
