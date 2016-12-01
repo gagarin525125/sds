@@ -521,9 +521,10 @@ export default class App extends Component {
                               searchMode={this.state.searchMode}
                         />}
                     <div>
-                        <InfoP toScreenP={this.state.toScreenP}/>
-                        <InfoG toScreenG={this.state.toScreenG}/>
-                        <InfoProg toScreenProg={this.state.toScreenProg}/>
+                        <Infolist items={this.state.toScreenP}
+                                  increasingIndent={true}/>
+                        <Infolist items={this.state.toScreenG}/>
+                        <Infolist items={this.state.toScreenProg}/>
                     </div>
                 </div>
 
@@ -535,46 +536,25 @@ export default class App extends Component {
 
     //----------------------- end class ---------------------------------
 }
-class InfoP extends React.Component {
 
-    render() {
-        if (this.props.toScreenP.length == 0)
-            return null;
+/** A list where the first item is used as the header. */
+function Infolist({items, increasingIndent=false}) {
+    if (items.length == 0)
+        return null;
 
-        let list = this.props.toScreenP.map(function (stuka, i) {
-            return <li key={i} style={{marginLeft: i + 'em'}}> {stuka.name} </li>;
+    let contents;
 
-        });
-        return <ul className="list_with_header">{list}</ul>
+    if (increasingIndent) {
+        contents = items.map((item, i) => (
+            <li key={item.id} style={{marginLeft: i + 'em'}}>{item.name}</li>
+        ));
     }
-}
-//-------------------------------------------------------
-class InfoG extends React.Component {
-
-    render() {
-        if (this.props.toScreenG.length == 0)
-            return null;
-
-        let list = this.props.toScreenG.map(function (stuka, i) {
-            return <li key={i} style={{marginLeft: (i == 0 ? 0 : 1) + 'em'}}>
-                {stuka.name}
-            </li>;
-        });
-        return <ul className="list_with_header">{list}</ul>
+    else {
+        contents = items.map((item, i) => (
+            <li key={item.id} style={{marginLeft: (i == 0 ? 0 : 1) + 'em'}}>
+                {item.name}
+            </li>
+        ));
     }
-}
-
-class InfoProg extends React.Component { // 30.11    11:00
-
-    render() {
-        if (this.props.toScreenProg.length == 0)
-            return null;
-
-        let list = this.props.toScreenProg.map(function (stuka, i) {
-            return <li key={i} style={{marginLeft: (i == 0 ? 0 : 1) + 'em'}}>
-                {stuka.name}
-            </li>;
-        });
-        return <ul className="list_with_header">{list}</ul>
-    }
+    return <ul className="list_with_header">{contents}</ul>
 }
