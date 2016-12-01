@@ -190,14 +190,12 @@ export default class Form extends Component {
             if (secBol == false) break;
         }
         //--------------
-        let one = `Editing Mode`;
-
 
         return (
             <div className="form">
                 <form>
                     <fieldset disabled={!(secBol && (this.props.item.level == this.props.maxLevels) && !this.props.searchMode)}>
-                        {secBol && this.state.bol && !this.props.searchMode? <h4> {one}</h4> : console.log()}
+
                         <label>
                             <span>Name</span>
                             <input type="text" value={this.state.element.name} onChange={this.setName}/>
