@@ -431,6 +431,7 @@ export default class App extends Component {
 
     //----------------------------------------------------------------------------------------
     resetItemToClick() {
+        console.log("resetitemclick");
         this.setState({
             itemTo: {
                 id: "0",
