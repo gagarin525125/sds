@@ -68,8 +68,11 @@ export default class Form extends Component {
         temp.coordinates = coord ? coord : ``;
         this.setState({
             element: temp,
-            bol: true,
-        });
+                    });
+        if(this.props.item.level == this.props.maxLevels && !this.props.searchMode)
+            this.setState({
+                bol: true,
+            });
     }
 
     onSubmitClick(event) {
@@ -114,8 +117,11 @@ export default class Form extends Component {
 
         this.setState({
             element: temp,
-            bol: true,
-                    });
+                     });
+        if(this.props.item.level == this.props.maxLevels && !this.props.searchMode)
+            this.setState({
+                bol: true,
+            });
     }
 
 
@@ -124,8 +130,11 @@ export default class Form extends Component {
         temp.shortName = event.target.value;
         this.setState({
             element: temp,
-            bol: true,
-        });
+               });
+        if(this.props.item.level == this.props.maxLevels && !this.props.searchMode)
+            this.setState({
+                bol: true,
+            });
     }
 
     setOpeningDate(event) {
@@ -133,8 +142,11 @@ export default class Form extends Component {
         temp.openingDate = event.target.value;
         this.setState({
             element: temp,
-            bol: true,
-        });
+                 });
+        if(this.props.item.level == this.props.maxLevels && !this.props.searchMode)
+            this.setState({
+                bol: true,
+            });
     }
 
     isFormValid() {
@@ -154,20 +166,36 @@ export default class Form extends Component {
         temp.coordinates = event.target.value;
         this.setState({
             element: temp,
-            bol: true,
-        });
+                    });
+        if(this.props.item.level == this.props.maxLevels && !this.props.searchMode)
+            this.setState({
+                bol: true,
+            });
 
     }
 
     render() {
+        //--------------
+        let items = this.props.items;
+        let secBol = true;
+        for (let i = 0; i < items.length - 1; i++) {
+
+            if (items[i].parent.id === items[i + 1].parent.id) {
+                secBol = secBol && true;
+            } else {
+                secBol = secBol && false;
+            }
+            if (secBol == false) break;
+        }
+        //--------------
         let one = `Editing Mode`;
 
 
         return (
             <div className="form">
                 <form>
-                    <fieldset disabled={this.validField()}>
-                        {this.state.bol ? <h4> {one}</h4> : console.log()}
+                    <fieldset disabled={!secBol/*this.props.item.level != this.props.maxLevels*/}>
+                        {secBol && this.state.bol ? <h4> {one}</h4> : console.log()}
                         <label>
                             <span>Name</span>
                             <input type="text" value={this.state.element.name} onChange={this.setName}/>
@@ -197,10 +225,11 @@ export default class Form extends Component {
                             </button>
 
                         </div>
-                    </fieldset>
+                    </fieldset>eldset>
                 </form>
 
-                <button id="empty_fields" onClick={this.resetFormClick} disabled={this.validAdd}>
+                <button id="empty_fields" onClick={this.resetFormClick} disabled={!(!this.props.searchMode &&
+                (this.props.item.level == this.props.maxLevels) && !this.state.bol)}>
 
                     Add new
                 </button>
@@ -210,7 +239,7 @@ export default class Form extends Component {
     }
     validAdd(){
 
-        if(this.state.bol)
+        if(!this.state.bol && !this.props.searchMode)
             return false;
         else if(this.props.searchMode || (this.props.item.level != this.props.maxLevels))
             return false;
