@@ -82,7 +82,7 @@ export default class Form extends Component {
     }
 
     resetFormClick() {
-        let temp = Object.assign({}, this.state.element);
+        let temp = this.state.element;
         temp.id = this.state.element.id;
         temp.name = ``;
         temp.shortName = ``;
@@ -97,7 +97,7 @@ export default class Form extends Component {
 
     resetFormClickLocal() {
 
-        let temp = Object.assign({}, this.state.element);
+        let temp = this.state.element;
         temp.id = `0`;
         temp.name = ``;
         temp.shortName = ``;
@@ -107,6 +107,7 @@ export default class Form extends Component {
             element: temp,
             bol: false,
                     });
+        this.props.resetItemToClickChoice();
 
     }
 
