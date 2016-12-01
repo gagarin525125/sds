@@ -5,6 +5,7 @@
  * `basicAuth` contains the username and password to send with the request as the basic authentication token. This is only needed when you develop locally and need CORS support (https://developer.mozilla.org/en-US/docs/Web/HTTP).
  * You obviously should not do this for your production apps.
  */
+//const serverUrl = '/test/api/';
 //const serverUrl = 'http://localhost:8082/api/';
 //const serverUrl = 'https://play.dhis2.org/demo/api/';
 const serverUrl = 'https://play.dhis2.org/dev/api/';
@@ -12,18 +13,23 @@ const serverUrl = 'https://play.dhis2.org/dev/api/';
 const basicAuth = `Basic ${btoa('admin:district')}`;
 
 /* Load the DHIS API URL from the manifest. */
-/*
-(function () {
-    fetch("manifest.webapp")
+/*(function () {
+    fetch("manifest.webapp", { method: 'GET',
+                                  headers: {
+                                      Authorization: basicAuth,
+                                      'Content-Type': 'application/json',
+                                  }
+                             })
         .then(response => response.json())
         .then(json => {
-            console.log("testFetch:");
-            console.log(json);
-            console.log(`href = ${json.activites.href}`)
+            console.log(`API URL in manifest file is ${json.activites.dhis.href}`);
+            if (json.activites.dhis.href != "*") {
+                console.log(`Setting API URL to ${json.activites.dhis.href}`);
+                serverUrl = json.activites.dhis.href + "/";
+            }
         });
 })();
 */
-
 
 /**
  * Default options object to send along with each request

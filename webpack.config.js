@@ -3,7 +3,7 @@ module.exports = {
     entry: './src/app.js',
     output: {
         // The filename of the bundle. This file will contain all our code from all the separate files bundled into one .js file.
-        filename: 'app.js'
+        filename: 'bundle.js'
     },
 
     module: {
@@ -11,7 +11,7 @@ module.exports = {
             {
                 test: /.*\.js$/,
                 exclude: /node_modules/,
-                loader: 'babel',
+                loader: 'babel-loader',
             }
         ]
     },
