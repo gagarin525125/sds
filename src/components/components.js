@@ -26,13 +26,16 @@ export function Infolist({items, increasingIndent=false}) {
 
     if (increasingIndent) {
         contents = items.map((item, i) => (
-            <li key={item.id} style={{marginLeft: i + 'em'}}>{item.name}</li>
+            <li key={`item.id ${i}`} style={{marginLeft: i + 'em'}}>
+                {item.name}
+            </li>
         ));
     }
     else {
         contents = items.map((item, i) => (
-            <li key={item.id} style={{marginLeft: (i == 0 ? 0 : 1) + 'em'}}>
-                {item.name}
+            <li key={`item.id ${i}`}
+                style={{marginLeft: (i == 0 ? 0 : 1) + 'em'}}>
+                    {item.name}
             </li>
         ));
     }
