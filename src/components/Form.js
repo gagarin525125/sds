@@ -69,7 +69,7 @@ export default class Form extends Component {
         this.setState({
             element: temp,
                     });
-        if(this.props.item.level == this.props.maxLevels)
+        if(this.props.item.level == this.props.maxLevels && !this.props.searchMode)
             this.setState({
                 bol: true,
             });
@@ -118,7 +118,7 @@ export default class Form extends Component {
         this.setState({
             element: temp,
                      });
-        if(this.props.item.level == this.props.maxLevels)
+        if(this.props.item.level == this.props.maxLevels && !this.props.searchMode)
             this.setState({
                 bol: true,
             });
@@ -131,7 +131,7 @@ export default class Form extends Component {
         this.setState({
             element: temp,
                });
-        if(this.props.item.level == this.props.maxLevels)
+        if(this.props.item.level == this.props.maxLevels && !this.props.searchMode)
             this.setState({
                 bol: true,
             });
@@ -143,7 +143,7 @@ export default class Form extends Component {
         this.setState({
             element: temp,
                  });
-        if(this.props.item.level == this.props.maxLevels)
+        if(this.props.item.level == this.props.maxLevels && !this.props.searchMode)
             this.setState({
                 bol: true,
             });
@@ -167,7 +167,7 @@ export default class Form extends Component {
         this.setState({
             element: temp,
                     });
-        if(this.props.item.level == this.props.maxLevels)
+        if(this.props.item.level == this.props.maxLevels && !this.props.searchMode)
             this.setState({
                 bol: true,
             });
@@ -175,14 +175,27 @@ export default class Form extends Component {
     }
 
     render() {
+        //--------------
+        let items = this.props.items;
+        let secBol = true;
+        for (let i = 0; i < items.length - 1; i++) {
+
+            if (items[i].parent.id === items[i + 1].parent.id) {
+                secBol = secBol && true;
+            } else {
+                secBol = secBol && false;
+            }
+            if (secBol == false) break;
+        }
+        //--------------
         let one = `Editing Mode`;
 
 
         return (
             <div className="form">
                 <form>
-                    <fieldset disabled={this.props.item.level != this.props.maxLevels}>
-                        {this.state.bol ? <h4> {one}</h4> : console.log()}
+                    <fieldset disabled={!secBol/*this.props.item.level != this.props.maxLevels*/}>
+                        {secBol && this.state.bol ? <h4> {one}</h4> : console.log()}
                         <label>
                             <span>Name</span>
                             <input type="text" value={this.state.element.name} onChange={this.setName}/>
