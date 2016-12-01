@@ -11,39 +11,17 @@ export default function List({items = [], onItemClick, onLevelDownClick, onSelec
 
     const listItems = items
         .map(item => {
-            if (item.level === levels) {
-                return (
-                    <li key={item.id}
-                        onMouseEnter={() => mapHighlightItem(item.id, true)}
-                        onMouseLeave={() => mapHighlightItem(item.id, false)}
-                        onClick={() => onItemClick(item)}>
-                        {item.displayName}
-                        <button hidden={!zoomButton}
-                                onClick={e => {
-                                    e.stopPropagation();
-                                    onSelectClick(item)
-                                }}>
-                            Zoom
-                        </button>
-                    </li>
-                )
-            } else {
-                return (
-
-                    <li key={item.id}
-                        onMouseEnter={() => mapHighlightItem(item.id, true)}
-                        onMouseLeave={() => mapHighlightItem(item.id, false)}
-                        onClick={() => onItemClick(item)}>
-                        {item.displayName}
-                        <button onClick={e => {
-                            e.stopPropagation();
-                            onLevelDownClick(item)
-                        }}>
-                            Drill down
-                        </button>
-                    </li>
-
-                );
+            if (item.level == levels) {
+                return <ListItem item={item}
+                                 onClick={onItemClick}
+                                 buttonText={zoomButton ? "Zoom" : null}
+                                 onButtonClick={onSelectClick}/>;
+            }
+            else {
+                return <ListItem item={item}
+                                 onClick={onItemClick}
+                                 buttonText="Drill Down"
+                                 onButtonClick={onLevelDownClick}/>;
             }
         });
 
@@ -60,3 +38,19 @@ List.propTypes = {
     zoomButton: PropTypes.bool.isRequired,
 };
 
+function ListItem({item, onClick, buttonText, onButtonClick}) {
+    return (
+        <li key={item.id}
+                onMouseEnter={() => mapHighlightItem(item.id, true)}
+                onMouseLeave={() => mapHighlightItem(item.id, false)}
+                onClick={() => onClick(item)}>
+            {item.displayName}
+            {buttonText ?
+                <button onClick={e => { e.stopPropagation();
+                                        onButtonClick(item)
+                                }}>
+                    {buttonText}
+                </button> : null}
+        </li>
+    )
+}
