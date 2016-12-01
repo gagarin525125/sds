@@ -413,11 +413,11 @@ export default class App extends Component {
                 this.resetItemToClickForm();
             }
         } else {
-            if (item.level < this.state.maxLevels) {
+           // if (item.level < this.state.maxLevels) {
                 this.resetItemToClick();
-            } else {
-                this.resetItemToClickForm();
-            }
+          //  } else {
+         //       this.resetItemToClickForm();
+          //  }
         }
     }
 
@@ -518,6 +518,7 @@ export default class App extends Component {
                               maxLevels={this.state.maxLevels}
                               resetItemToClickChoice={this.resetItemToClickChoice}
                               searchMode={this.state.searchMode}
+                              items={this.state.items}
                         />}
                     <div>
                         <InfoP toScreenP={this.state.toScreenP}/>
