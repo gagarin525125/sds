@@ -2,7 +2,7 @@
   "name": "sds-manager",
   "version": "1.0.0",
   "description": "A facility manager for DHIS2.",
-  "main": "bundle.js",
+  "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "webpack-dev-server",

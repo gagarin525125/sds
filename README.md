@@ -19,7 +19,7 @@ Open the webserver in either Chrome or Firefox and point to
 
 # Building and installing into DHIS2
 
-Edit src/index.html to make it load bundle.js, see instructions in that file.
+Edit src/index.html to make it load ../app.js, see instructions in that file.
 Then open src/api.js and make sure serverUrl is set to the correct relative URL.
 
 Make sure webpack is installed, then build:
