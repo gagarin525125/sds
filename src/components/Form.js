@@ -194,7 +194,7 @@ export default class Form extends Component {
         return (
             <div className="form">
                 <form>
-                    <fieldset disabled={!secBol/*this.props.item.level != this.props.maxLevels*/}>
+                    <fieldset disabled={!(secBol && (this.props.item.level == this.props.maxLevels) && !this.props.searchMode)}>
                         {secBol && this.state.bol ? <h4> {one}</h4> : console.log()}
                         <label>
                             <span>Name</span>
@@ -237,20 +237,7 @@ export default class Form extends Component {
             </div>
         );
     }
-    validAdd(){
 
-        if(!this.state.bol && !this.props.searchMode)
-            return false;
-        else if(this.props.searchMode || (this.props.item.level != this.props.maxLevels))
-            return false;
-        return false;
-
-    }
-    validField(){
-       if( this.props.item.level != this.props.maxLevels)
-           return false;
-       return false;
-    }
     convertDate(dateForm) {
         let d = new Date(dateForm);
         let m = d.getMonth() + 1;
@@ -270,4 +257,4 @@ Form.propTypes = {
 
 };
 
-//{this.state.bol ? disabled={true} : disabled={}>}
+
