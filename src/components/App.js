@@ -125,7 +125,7 @@ export default class App extends Component {
 //----------------------------------------  part of componentDidMount   --------------
     loadOrganisationUnits() {
         // Loads the organisation units from the api and sets the loading state to false and puts the items onto the component state.
-        console.log("load org units ");
+
         loadOrganisationUnits()
             .then((organisationUnits) => {
 
@@ -176,7 +176,7 @@ export default class App extends Component {
     onItemClick(item) {  // show info
 
         mapSelectItem(item.id);
-        console.log(item);
+
         let temp = Object.assign({}, item);
 
         if (item.level < this.state.maxLevels) {
@@ -202,19 +202,26 @@ export default class App extends Component {
     onSubmit(formData) {
 
         if (this.state.wantToChange) {
-
+            let temp = Object.assign({}, this.state.itemTo);
             if (confirm(`Click OK to save edits to ${this.state.itemTo.displayName}`)) {
-                let temp = Object.assign({}, this.state.itemTo);
+
 
                 this.setState({
                     isTransition: true,
+
                 });
                 this.updateOrganisationUnit(formData, this.state.itemTo);
                 this.resetItemToClick();
-            } else alert(`not confirmed`);
+            } else {
+                alert(`not confirmed`);
+                this.setState({
+                    itemTo:temp,
+                })
+            }
         } else {
             this.setState({
                 isTransition: true,
+
             });
             this.resetItemToClick();
             this.saveOrganisationUnit(formData, this.state.items[0].parent);
@@ -226,7 +233,7 @@ export default class App extends Component {
     //------------------------------------------------------------------------------------------
     onSelectClick(item) {  // zoom
 
-        console.log("onselect app");
+
         let a = new CustomEvent(` `);         //  trying to pass empty string
         this.liveSearch(a);
 
@@ -352,7 +359,8 @@ export default class App extends Component {
         console.log("livesearch app");
         console.log(event); // complex when hit 'x'
         if (event == null) return;
-        event.preventDefault();
+
+       // event.preventDefault();
         this.setState({
             isTransition: true,
             searchMode: true,
