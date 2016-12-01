@@ -8,7 +8,7 @@ import {
 
 import List from './List';
 import Form from './Form';
-import MaxResults from './MaxResults';
+import {MaxResults, Infolist} from './components';
 import {mapSetItems, mapAddItems, mapSelectItem, mapSetCoordinatesCallback} from '../map';
 import {addCallbackToItems, arraysEqual} from '../util';
 
@@ -536,26 +536,4 @@ export default class App extends Component {
     }
 
     //----------------------- end class ---------------------------------
-}
-
-/** A list where the first item is used as the header. */
-function Infolist({items, increasingIndent=false}) {
-    if (items.length == 0)
-        return null;
-
-    let contents;
-
-    if (increasingIndent) {
-        contents = items.map((item, i) => (
-            <li key={item.id} style={{marginLeft: i + 'em'}}>{item.name}</li>
-        ));
-    }
-    else {
-        contents = items.map((item, i) => (
-            <li key={item.id} style={{marginLeft: (i == 0 ? 0 : 1) + 'em'}}>
-                {item.name}
-            </li>
-        ));
-    }
-    return <ul className="list_with_header">{contents}</ul>
 }
